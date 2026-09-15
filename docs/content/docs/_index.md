@@ -25,8 +25,8 @@ Designed for building beautiful websites for documentation, blogs, and websites,
 ## Questions or Feedback?
 
 {{< callout emoji="❓" >}}
-  Hextra is still in active development.
-  Have a question or feedback? Feel free to [open an issue](https://github.com/imfing/hextra/issues)!
+Hextra is still in active development.
+Have a question or feedback? Feel free to [open an issue](https://github.com/homelabcentral/hextra/issues)!
 {{< /callout >}}
 
 ## Next
@@ -34,7 +34,7 @@ Designed for building beautiful websites for documentation, blogs, and websites,
 Dive right into the following section to get started:
 
 {{< cards >}}
-  {{< card link="getting-started" title="Getting Started" icon="document-text" subtitle="Learn how to create website using Hextra" >}}
+{{< card link="getting-started" title="Getting Started" icon="document-text" subtitle="Learn how to create website using Hextra" >}}
 {{< /cards >}}
 
 [hugo]: https://gohugo.io/

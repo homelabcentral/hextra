@@ -1,0 +1,67 @@
+{{- /*
+  Swap a youtube-lite facade for the real player on click.
+
+  Loaded only on pages that use the shortcode, gated on the "hasYoutubeLite"
+  store flag in scripts.html — the same pattern as mermaid, asciinema and
+  gallery.
+*/ -}}
+
+<script>
+  (() => {
+    const activate = (el) => {
+      const id = el.dataset.youtubeId;
+      if (!id || el.dataset.youtubeActivated === "1") return;
+
+      const extra = el.dataset.youtubeParams || "";
+      const params = new URLSearchParams(extra);
+      params.set("autoplay", "1");
+
+      const button = el.querySelector(".hextra-youtube-lite__trigger");
+      const label = button ? button.getAttribute("aria-label") : "";
+
+      const iframe = document.createElement("iframe");
+      // nocookie defers YouTube's tracking cookies until playback starts.
+      iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?${params}`;
+      iframe.title = label || "YouTube video player";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      iframe.allowFullscreen = true;
+      iframe.className = "hextra-youtube-lite__frame";
+
+      el.dataset.youtubeActivated = "1";
+      el.replaceChildren(iframe);
+      iframe.focus();
+    };
+
+    const init = () => {
+      document.querySelectorAll(".hextra-youtube-lite").forEach((el) => {
+        if (el.dataset.youtubeInited === "1") return;
+        el.dataset.youtubeInited = "1";
+
+        const button = el.querySelector(".hextra-youtube-lite__trigger");
+        if (!button) return;
+
+        // Warm up the connection as soon as the reader shows intent.
+        const preconnect = () => {
+          if (el.dataset.youtubePreconnected === "1") return;
+          el.dataset.youtubePreconnected = "1";
+          for (const href of ["https://www.youtube-nocookie.com", "https://www.google.com"]) {
+            const link = document.createElement("link");
+            link.rel = "preconnect";
+            link.href = href;
+            document.head.appendChild(link);
+          }
+        };
+
+        button.addEventListener("pointerover", preconnect, { once: true });
+        button.addEventListener("focus", preconnect, { once: true });
+        button.addEventListener("click", () => activate(el));
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+</script>

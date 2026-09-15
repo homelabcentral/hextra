@@ -1,0 +1,18 @@
+/*
+  `isolate` keeps the bidirectional algorithm from letting the embedded text
+  reorder neighbouring content in the opposite direction.
+*/
+.hextra-ltr,
+.hextra-rtl {
+  unicode-bidi: isolate;
+}
+
+.hextra-ltr > :first-child,
+.hextra-rtl > :first-child {
+  @apply hx:mt-0;
+}
+
+.hextra-ltr > :last-child,
+.hextra-rtl > :last-child {
+  @apply hx:mb-0;
+}

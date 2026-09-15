@@ -12,21 +12,21 @@ Take this site as an example:
 <!--more-->
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/file name="_index.md" >}}
-    {{< filetree/folder name="docs" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="getting-started.md" >}}
-      {{< filetree/folder name="guide" state="open" >}}
-        {{< filetree/file name="_index.md" >}}
-        {{< filetree/file name="organize-files.md" >}}
-      {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="blog" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="post-1.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="docs" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="getting-started.md" >}}
+{{< filetree/folder name="guide" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="organize-files.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="blog" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="post-1.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 Each of the `_index.md` files is the index page for the corresponding section. The other Markdown files are regular pages.
@@ -79,11 +79,10 @@ weight: 2
 ```
 
 {{< callout type="info" >}}
-  It is recommended to keep the sidebar not too deep. If you have a lot of content, consider **splitting them into multiple sections**.
+It is recommended to keep the sidebar not too deep. If you have a lot of content, consider **splitting them into multiple sections**.
 {{< /callout >}}
 
 ## Section Navigation
-
 
 ### Section Pagination Order
 
@@ -96,24 +95,24 @@ To disable this reversed ordering you can set the `reversePagination` custom par
 Given the following directory structure:
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/file name="_index.md" >}}
-    {{< filetree/folder name="blog" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/folder name="my-blog-series" state="open" >}}
-        {{< filetree/file name="_index.md" >}}
-        {{< filetree/folder name="post-a" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-        {{< filetree/folder name="post-b" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-        {{< filetree/folder name="post-c" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-      {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="blog" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="my-blog-series" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="post-a" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="post-b" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="post-c" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 And the following front matter in the posts:
@@ -124,12 +123,14 @@ title: Post A
 weight: 1
 ---
 ```
+
 ```yaml {filename="content/blog/my-blog-series/post-b/index.md"}
 ---
 title: Post B
 weight: 2
 ---
 ```
+
 ```yaml {filename="content/blog/my-blog-series/post-c/index.md"}
 ---
 title: Post C
@@ -176,6 +177,7 @@ title: Organize Files
 ```
 
 This would now generate the following breadcrumbs:
+
 ```
 Documentation > Guide > Foo Bar
 ```
@@ -184,11 +186,11 @@ Documentation > Guide > Foo Bar
 
 Whether breadcrumbs are enabled, or disabled, by default for a page, is determined by its [content type](https://gohugo.io/quick-reference/glossary/#content-type) and [page kind](https://gohugo.io/quick-reference/glossary/#page-kind):
 
-|  Content Type   | Section  | Page      |
-|:----------------|:--------:|:----------|
-| `docs`          | Enabled  | Enabled   |
-| `blog`          | Disabled | Enabled   |
-| Any other type  | Disabled | Disabled  |
+| Content Type   | Section  | Page     |
+| :------------- | :------: | :------- |
+| `docs`         | Enabled  | Enabled  |
+| `blog`         | Disabled | Enabled  |
+| Any other type | Disabled | Disabled |
 
 You can override these defaults on a page by setting `breadcrumbs` in its front matter:
 
@@ -222,12 +224,12 @@ To add images, the easiest way is to put the image files in the same directory a
 For example, add an image file `image.png` alongside the `my-page.md` file:
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-        {{< filetree/file name="image.png" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 Then, we can use the following Markdown syntax to add the image to the content:
@@ -239,14 +241,14 @@ Then, we can use the following Markdown syntax to add the image to the content:
 We can also utilize the [page bundles][page-bundles] feature of Hugo to organize the image files together with the Markdown file. To achieve that, turn the `my-page.md` file into a directory `my-page` and put the content into a file named `index.md`, and put the image files inside the `my-page` directory:
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/folder name="my-page" >}}
-            {{< filetree/file name="index.md" >}}
-            {{< filetree/file name="image.png" >}}
-        {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/folder name="my-page" >}}
+{{< filetree/file name="index.md" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 ```markdown {filename="content/docs/my-page/index.md"}
@@ -256,16 +258,16 @@ We can also utilize the [page bundles][page-bundles] feature of Hugo to organize
 Alternatively, we can also put the image files in the `static` directory, which will make the images available for all pages:
 
 {{< filetree/container >}}
-  {{< filetree/folder name="static" >}}
-    {{< filetree/folder name="images" >}}
-        {{< filetree/file name="image.png" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="static" >}}
+{{< filetree/folder name="images" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 Note that the image path begins with a slash `/` and is relative to the static directory:

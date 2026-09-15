@@ -11,4 +11,4 @@ function setTheme(theme) {
   document.documentElement.style.colorScheme = theme;
 }
 
-setTheme("color-theme" in localStorage ? localStorage.getItem("color-theme") : '{{ site.Params.theme.default | default `system`}}')
+setTheme("color-theme" in localStorage ? localStorage.getItem("color-theme") : "{{ site.Params.theme.default | default `system`}}");

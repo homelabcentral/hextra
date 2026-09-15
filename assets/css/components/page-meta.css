@@ -1,0 +1,36 @@
+/*
+  The meta row under a page's content — license notice at the inline-start,
+  last-updated date at the inline-end. Rendered by
+  `layouts/_partials/components/last-updated.html`.
+
+  Utilities are applied here rather than inline in the template so the
+  stylesheet compiles regardless of what the docs site happens to render into
+  docs/hugo_stats.json — the same reasoning as components/blog.css.
+
+  Alignment uses logical properties throughout, so the row reverses for
+  Persian and Hebrew without needing `ltr:`/`rtl:` variants.
+*/
+
+.hextra-page-meta {
+  @apply hx:mt-12 hx:mb-8 hx:flex hx:flex-wrap hx:items-baseline hx:gap-2 hx:text-xs hx:text-neutral-500 hx:dark:text-neutral-400;
+}
+
+.hextra-page-license {
+  text-align: start;
+}
+
+/* `margin-inline-start: auto` rather than `justify-content: space-between` on
+   the row: the date has to stay at the inline-end even when the license is
+   switched off and it is the only child. */
+.hextra-page-updated {
+  margin-inline-start: auto;
+  text-align: end;
+}
+
+.hextra-page-license-link {
+  @apply hx:underline hx:decoration-from-font hx:underline-offset-2 hx:transition-colors hx:hextra-focus-visible;
+}
+
+.hextra-page-license-link:hover {
+  @apply hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
+}

@@ -1,0 +1,52 @@
+{{/* Split `menu.blog` into navigation rows and social icon links.
+
+  Follows the same convention as the navbar: an entry is icon-only when it has
+  `params.icon` and its `params.type` is not "link". Icon-only entries become
+  the socials row; everything else becomes a labelled navigation row.
+
+  Returns an empty result when `menu.blog` is not defined.
+
+  @param {page} context The page being rendered, for active-link detection.
+  @returns {dict} `nav` and `socials`, each a slice of entry dicts
+
+  @example {{ $menu := partial "blog/menu.html" (dict "context" .)
+}}
+*/}}
+{{- $context := .context -}}
+{{- $pageURL := strings.TrimSuffix "/" $context.RelPermalink -}}
+{{- $nav := slice -}}
+{{- $socials := slice -}}
+
+{{- range site.Menus.blog -}}
+  {{- $type := .Params.type | default "" -}}
+  {{- $icon := .Params.icon | default "" -}}
+  {{- $iconOnly := and $icon (ne $type "link") -}}
+
+  {{- $link := .URL -}}
+  {{- with .PageRef -}}
+    {{- if hasPrefix . "/" -}}
+      {{- $link = relLangURL (strings.TrimPrefix "/" .) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $external := hasPrefix $link "http" -}}
+
+  {{- if not $link -}}
+    {{- warnf "hextra: blog menu item %q has no URL" .Name -}}
+  {{- else -}}
+    {{- $entry := dict
+      "label" (or (T .Identifier) .Name)
+      "link" $link
+      "icon" $icon
+      "external" $external
+      "rel" (cond (eq $icon "mastodon") "noreferrer me" "noreferrer")
+      "active" (and (not $external) (eq (strings.TrimSuffix "/" $link) $pageURL))
+    -}}
+    {{- if $iconOnly -}}
+      {{- $socials = $socials | append $entry -}}
+    {{- else -}}
+      {{- $nav = $nav | append $entry -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return (dict "nav" $nav "socials" $socials) -}}

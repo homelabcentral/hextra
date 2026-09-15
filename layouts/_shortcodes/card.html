@@ -1,5 +1,4 @@
-{{- /*
-  A shortcode to create a card.
+{{/* A shortcode to create a card.
 
   @param {string} link The link to the card.
   @param {string} title The title of the card.
@@ -7,15 +6,19 @@
   @param {string} subtitle The subtitle of the card.
   @param {string} tag The tag of the card.
   @param {string} tagColor The color of the tag.
+  @deprecated tagType Earlier name for `tagColor`; still accepted.
+  @param {bool} tagBorder Draw the tag outline. Default true; pass false for a flat tag.
+  @param {string} tagIcon Icon shown before the tag text.
   @param {string} image The image of the card.
   @param {string} alt The alt text for the image (defaults to title if not provided).
   @param {string} method The method to process the image.
   @param {string} options The options to process the image.
+  @param {string} process Full image processing spec, used instead of `method` and `options` when set.
   @param {string} imageStyle The style of the image.
 
   @example {{< card link="/" title="Image Card"
 }}
-*/ -}}
+*/}}
 {{- $link := .Get "link" -}}
 {{- $title := .Get "title" -}}
 {{- $icon := .Get "icon" -}}
@@ -25,6 +28,7 @@
 {{- $width := 0 -}}
 {{- $height := 0 -}}
 {{- $imageStyle := .Get "imageStyle" -}}
+{{- $lqip := "" -}}
 {{- $tag := .Get "tag" -}}
 {{- $tagColor := .Get "tagColor" | default (.Get "tagType") | default "" -}}{{- /* Compatibility with previous parameter. */ -}}
 {{- $tagBorder := not (eq (.Get "tagBorder") false) | default true }}
@@ -44,6 +48,11 @@
       {{- $width = $processed.Width -}}
       {{- $height = $processed.Height -}}
       {{- $image = $processed.RelPermalink -}}
+      {{/* A 16px-wide copy, inlined as a data URI and painted as the image's
+        own background, stands in until the real pixels land on top of it.
+        See `utils/page-image.html`, which does the same for cover images. */}}
+      {{- $tiny := .Process "Resize 16x webp q20" -}}
+      {{- $lqip = printf "data:image/webp;base64,%s" ($tiny.Content | base64Encode) -}}
     {{- end -}}
   {{ else }}
     {{/* Otherwise, use relative link of the image */}}
@@ -64,6 +73,7 @@
   "width"       $width
   "height"      $height
   "imageStyle"  $imageStyle
+  "lqip"        $lqip
   "tag"         $tag
   "tagType"     $tagColor
   "tagBorder"   $tagBorder

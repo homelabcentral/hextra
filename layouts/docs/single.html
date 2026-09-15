@@ -17,6 +17,7 @@
           {{ .Content }}
           {{ partial "custom/content-end.html" . }}
         </div>
+        {{ partial "ads/slot.html" (dict "context" . "name" "docsbottom") }}
         {{ partial "components/last-updated.html" . }}
         {{- if (site.Params.page.displayPagination | default true) -}}
           {{- partial "components/pager.html" . -}}

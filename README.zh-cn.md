@@ -4,6 +4,7 @@
   <p align="center">用于创建美观的静态站点的现代化, 响应式, 功能强大的 Hugo 主题.</p>
 
 演示 → [imfing.github.io/hextra](https://imfing.github.io/hextra/)
+
 </div>
 
 <picture>
@@ -12,7 +13,7 @@
 </picture>
 
 <div align="right">
-<a href="https://github.com/imfing/hextra/actions/workflows/pages.yml"><img alt="GitHub Actions Status" src="https://github.com/imfing/hextra/actions/workflows/pages.yml/badge.svg"></a> <a href="https://app.netlify.com/sites/hugo-hextra/deploys"><img alt="Netlify Status" src="https://api.netlify.com/api/v1/badges/61d6e55a-2447-487e-b59f-c9537e5df175/deploy-status"></a>
+<a href="https://github.com/homelabcentral/hextra/actions/workflows/pages.yml"><img alt="GitHub Actions Status" src="https://github.com/homelabcentral/hextra/actions/workflows/pages.yml/badge.svg"></a>
 </div>
 
 ## 特性

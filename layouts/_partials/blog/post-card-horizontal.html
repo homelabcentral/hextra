@@ -1,0 +1,37 @@
+{{/* Horizontal post card, used on the tag pages: cover image on the
+  inline-start edge, title, meta and excerpt filling the rest. A page
+  without a cover renders text across the full card width — there is no
+  placeholder.
+
+  Clickability mirrors `blog/post-card.html`: the title link is stretched
+  over the card with a pseudo-element, so there is exactly one link whose
+  accessible name is the page title, and tag links stay clickable above it.
+
+  @param {page} page The page.
+  @param {dict} config The dict returned by `blog/config.html`.
+
+  @example {{ partial "blog/post-card-horizontal.html" (dict "page" . "config" $cfg)
+}}
+*/}}
+{{- $page := .page -}}
+{{- $card := .config.card -}}
+{{- $displayTags := site.Params.blog.list.displayTags -}}
+
+
+<article class="hextra-blog-card hextra-blog-card-h">
+  {{- if $card.cover -}}
+    {{- $cover := partialCached "blog/cover.html" (dict "page" $page "variant" "card") $page.RelPermalink "card" -}}
+    {{- if trim $cover " \n\t" -}}
+      <div class="hextra-blog-card-h-cover">
+        {{- $cover | safeHTML -}}
+      </div>
+    {{- end -}}
+  {{- end -}}
+  <div class="hextra-blog-card-body">
+    <h2 class="hextra-blog-card-title">
+      <a class="hextra-blog-card-link" href="{{ $page.RelPermalink }}">{{ $page.Title }}</a>
+    </h2>
+    {{- partial "blog/post-meta.html" (dict "page" $page "readingTime" $card.readingTime "tags" $displayTags) -}}
+    <p class="hextra-blog-card-excerpt">{{ partial "utils/page-description" $page }}</p>
+  </div>
+</article>

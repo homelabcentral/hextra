@@ -9,6 +9,28 @@
 {{- $maxFooterWidth := (index $layoutWidthValues (site.Params.footer.width | default "normal")) | default $layoutWidthDefault -}}
 
 {{- $maxContentWidth := "72rem" -}}
+
+{{- $headingFont := "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" -}}
+{{- $bodyFont := "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" -}}
+{{- $codeFont := "ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace" -}}
+{{- $monoFont := "ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace" -}}
+
+{{- if site.Params.fonts.enable -}}
+  {{- $headingFont = printf "\"%s\", %s" site.Params.fonts.heading.family site.Params.fonts.fallbacks.heading -}}
+  {{- $bodyFont = printf "\"%s\", %s" site.Params.fonts.body.family site.Params.fonts.fallbacks.body -}}
+  {{- $codeFont = printf "\"%s\", %s" site.Params.fonts.code.family site.Params.fonts.fallbacks.code -}}
+  {{/* `mono` is optional and distinct from `code`: interface chrome — keys,
+    badges, counters — rather than code you read. With no family configured it
+    keeps the plain fallback stack, which is what those surfaces got before,
+    so nothing changes visually until a site opts in. */}}
+  {{- with site.Params.fonts.mono -}}
+    {{- with .family -}}
+      {{- $monoFont = printf "\"%s\", %s" . (site.Params.fonts.fallbacks.mono | default $monoFont) -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $monoFont = site.Params.fonts.fallbacks.mono | default $monoFont -}}
+  {{- end -}}
+{{- end -}}
 */
 
 :root {
@@ -16,6 +38,12 @@
   --hextra-max-content-width: {{ $maxContentWidth }};
   --hextra-max-navbar-width: {{ $maxNavbarWidth }};
   --hextra-max-footer-width: {{ $maxFooterWidth }};
+  
+  /* Font variables */
+  --font-heading: {{ $headingFont }};
+  --font-body: {{ $bodyFont }};
+  --font-code: {{ $codeFont }};
+  --font-monospace: {{ $monoFont }};
 }
 
 .hextra-max-page-width {

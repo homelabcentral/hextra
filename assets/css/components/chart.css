@@ -1,0 +1,31 @@
+.hextra-chart {
+  @apply hx:my-6 hx:rounded-lg hx:border hx:p-4;
+  @apply hx:border-neutral-200 hx:bg-neutral-50;
+  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
+
+  /* A canvas inherits no colour, so `scripts/chart.html` reads these two off
+     the container with getComputedStyle and paints the axis numbers, their
+     titles and the grid with them.
+
+     They live here, beside the panel they are drawn on, rather than as a
+     light/dark pair in JavaScript. JavaScript has to decide which mode is
+     current before it can pick a colour, and every way of asking that question
+     - a class on <html>, a media query, a stored preference - can answer for a
+     different moment than the one the panel was painted in, which is how the
+     ink ends up being the other mode's. A custom property cannot: the rule
+     that flips the panel flips the ink, in the same cascade, at the same time.
+
+     Ink is one step softer than body text: axis numbers are reference marks,
+     not prose, and full-contrast numerals fight the series for attention. */
+  --hextra-chart-ink: #262626; /* neutral-800 on the neutral-50 panel: 13.8:1 */
+  --hextra-chart-grid: rgba(0, 0, 0, 0.12);
+}
+
+.dark .hextra-chart {
+  --hextra-chart-ink: #e5e5e5; /* neutral-200 on the neutral-900 panel: 12.6:1 */
+  --hextra-chart-grid: rgba(255, 255, 255, 0.14);
+}
+
+.hextra-chart__canvas {
+  @apply hx:w-full;
+}

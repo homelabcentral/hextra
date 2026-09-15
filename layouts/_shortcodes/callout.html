@@ -1,42 +1,41 @@
-{{- /*
-A shortcode to create a callout.
+{{/* A shortcode to create a callout.
 
-@param {string} type The type of the callout (default, info, warning, error, important).
-@param {string} content The content of the callout.
-@param {string} emoji The emoji of the callout.
-@param {string} icon The icon of the callout (related to type or can be a custom icon).
+  @param {string} type The type of the callout (default, info, warning, error, important).
+  @param {string} emoji The emoji of the callout.
+  @param {string} icon The icon of the callout (related to type or can be a custom icon).
 
-@example {{< callout type="info" >}}Content{{< /callout >}}
-*/ -}}
-
+  @example {{< callout type="info" >}}Content{{< /callout >}}
+*/}}
 {{- $type := .Get "type" | default "default" -}}
 {{- $emoji := .Get "emoji" -}}
 {{- $icon := .Get "icon" -}}
 
-{{- $styles := newScratch -}}
+{{- $styles := newScratch -}}{{/* Default icons are GitHub's alert Octicons, matching the
+  [!NOTE]-style alerts (components/github-style-alert.html)
+*/}}
 {{- $styles.Set "default" (dict
-  "icon" "light-bulb"
-  "style" "hx:border-green-200 hx:bg-green-100 hx:text-green-900 hx:dark:border-green-200/30 hx:dark:bg-green-900/30 hx:dark:text-green-200"
+  "icon" "octicon-light-bulb"
+  "style" "hx:border-green-400 hx:bg-green-50 hx:text-green-700 hx:dark:border-green-500/70 hx:dark:bg-green-950/60 hx:dark:text-green-400"
   )
 -}}
 {{- $styles.Set "info" (dict
-  "icon" "information-circle"
-  "style" "hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"
+  "icon" "octicon-info"
+  "style" "hx:border-blue-400 hx:bg-blue-50 hx:text-blue-700 hx:dark:border-blue-500/70 hx:dark:bg-blue-950/60 hx:dark:text-blue-400"
   )
 -}}
 {{- $styles.Set "warning" (dict
-  "icon" "exclamation"
-  "style" "hx:border-amber-200 hx:bg-amber-100 hx:text-amber-900 hx:dark:border-amber-200/30 hx:dark:bg-amber-900/30 hx:dark:text-amber-200"
+  "icon" "octicon-alert"
+  "style" "hx:border-amber-400 hx:bg-amber-50 hx:text-amber-700 hx:dark:border-amber-500/70 hx:dark:bg-amber-950/60 hx:dark:text-amber-400"
   )
 -}}
 {{- $styles.Set "error" (dict
-  "icon" "ban"
-  "style" "hx:border-red-200 hx:bg-red-100 hx:text-red-900 hx:dark:border-red-200/30 hx:dark:bg-red-900/30 hx:dark:text-red-200"
+  "icon" "octicon-stop"
+  "style" "hx:border-red-400 hx:bg-red-50 hx:text-red-700 hx:dark:border-red-500/70 hx:dark:bg-red-950/60 hx:dark:text-red-400"
   )
 -}}
 {{- $styles.Set "important" (dict
-  "icon" "exclamation-circle"
-  "style" "hx:border-purple-200 hx:bg-purple-100 hx:text-purple-900 hx:dark:border-purple-200/30 hx:dark:bg-purple-900/30 hx:dark:text-purple-200"
+  "icon" "octicon-report"
+  "style" "hx:border-purple-400 hx:bg-purple-50 hx:text-purple-700 hx:dark:border-purple-500/70 hx:dark:bg-purple-950/60 hx:dark:text-purple-400"
   )
 -}}
 

@@ -123,7 +123,7 @@ Hugo 支持使用 [Markdown](https://en.wikipedia.org/wiki/Markdown) 语法来�
 ### 代码块
 
 {{< cards >}}
-  {{< card link="../../guide/syntax-highlighting" title="语法高亮" icon="sparkles" >}}
+{{< card link="../../guide/syntax-highlighting" title="语法高亮" icon="sparkles" >}}
 {{< /cards >}}
 
 ### 列表

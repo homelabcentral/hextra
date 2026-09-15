@@ -1,0 +1,40 @@
+{{/*
+Shared renderer for the `button` and `cta` shortcodes.
+
+@param {string} url The resolved destination.
+@param {string} label The button label, already rendered as HTML.
+@param {string} style One of primary, outline, ghost.
+@param {string} target The anchor target attribute.
+@param {string} rel The anchor rel attribute.
+@param {string} icon Optional icon name shown before the label.
+*/}}
+
+{{- $url := .url | default "#" -}}
+{{- $label := .label -}}
+{{- $style := .style | default "primary" -}}
+{{- $target := .target -}}
+{{- $rel := .rel -}}
+{{- $icon := .icon -}}
+
+{{- $styles := slice "primary" "outline" "ghost" -}}
+{{- if not (in $styles $style) -}}
+  {{- warnf "button: unknown style %q, falling back to 'primary'" $style -}}
+  {{- $style = "primary" -}}
+{{- end -}}
+
+{{- /* Opening a new tab without noreferrer leaks the referrer and window.opener. */ -}}
+{{- if and (eq $target "_blank") (not $rel) -}}
+  {{- $rel = "noreferrer" -}}
+{{- end -}}
+
+<a
+  class="hextra-button hextra-button--{{ $style }} not-prose hx:hextra-focus-visible"
+  href="{{ $url }}"
+  {{- with $target }} target="{{ . }}"{{ end }}
+  {{- with $rel }} rel="{{ . }}"{{ end -}}
+>
+  {{- with $icon -}}
+    {{- partial "utils/icon" (dict "name" . "attributes" `height=16 aria-hidden="true"`) -}}
+  {{- end -}}
+  <span class="hextra-button__label">{{ $label }}</span>
+</a>

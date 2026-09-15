@@ -1,13 +1,11 @@
-{{- /*
-Create a tab.
+{{/* Create a tab.
 
-@param {string} name The name of the tab.
-@param {string} icon The icon of the tab.
-@param {string} selected Whether the tab is selected.
+  @param {string} name The name of the tab.
+  @param {string} icon The icon of the tab.
+  @param {string} selected Whether the tab is selected.
 
-@example {{< tab name="Foo" icon="document-text" selected=true >}}content{{< /tab >}}
-*/ -}}
-
+  @example {{< tab name="Foo" icon="document-text" selected=true >}}content{{< /tab >}}
+*/}}
 {{- $name := .Get "name" | default (printf "Tab %d" .Ordinal) -}}
 
 {{- $icon := .Get "icon" -}}
@@ -19,10 +17,10 @@ Create a tab.
 
 {{- $tabs := .Parent.Store.Get "tabs" | default slice -}}
 {{ .Parent.Store.Set "tabs" ($tabs | append (dict
-    "id" .Ordinal
-    "name" $name
-    "icon" $icon
-    "content" .InnerDeindent
-    "selected" $selected
+  "id" .Ordinal
+  "name" $name
+  "icon" $icon
+  "content" .InnerDeindent
+  "selected" $selected
   ))
 -}}

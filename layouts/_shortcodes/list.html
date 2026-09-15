@@ -1,0 +1,107 @@
+{{/*
+List recent pages from the site, optionally filtered by a page parameter.
+
+Ported from the Blowfish theme (MIT, Nuno Coração). Unlike the original, the
+page the shortcode sits on is removed before the limit is applied, so `limit`
+is the number of entries actually shown.
+
+@param {int} limit Required. How many pages to show.
+@param {string} title Optional heading above the list.
+@param {bool} cardView Show covers in a grid instead of a compact list. Default false.
+@param {string} where Page field to filter on, e.g. "Type" or "Params.tags".
+@param {string} value Value that `where` must match.
+
+@example {{< list limit=3 >}}
+@example {{< list limit=6 title="From the blog" cardView=true where="Type" value="blog" >}}
+*/}}
+
+{{- $limit := .Get "limit" -}}
+{{- if not $limit -}}
+  {{- errorf "The %q shortcode requires a 'limit' parameter. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- $title := .Get "title" -}}
+{{- $cardView := eq (printf "%v" (.Get "cardView")) "true" -}}
+{{- $where := .Get "where" -}}
+{{- $value := .Get "value" -}}
+
+{{- $self := "" -}}
+{{- with .Page -}}
+  {{- $self = .RelPermalink -}}
+{{- end -}}
+
+{{- $pages := site.RegularPages -}}
+{{- with $where -}}
+  {{- if hasPrefix . "Params." -}}{{/*
+      `where` compares with an implicit "=", which never matches a slice-valued
+      field, so the documented where="Params.tags" example returned nothing at
+      all. Hugo's answer for those fields is the "intersect" operator, but that
+      errors on a scalar field, and a page parameter may be either - tags is a
+      slice, draft is not. So match the parameter here, treating a slice as
+      "contains" and anything else as equality.
+
+      The result is fed back through `where` rather than collected directly:
+      that keeps a page.Pages, which the sort below needs.
+    */}}
+    {{- $parts := split (strings.TrimPrefix "Params." .) "." -}}
+    {{- $keys := slice -}}
+    {{- range $page := $pages -}}
+      {{- $found := $page.Params -}}
+      {{- range $parts -}}
+        {{- /* index only descends into a map; a shorter path than expected stops here. */ -}}
+        {{- if reflect.IsMap $found -}}
+          {{- $found = index $found . -}}
+        {{- else -}}
+          {{- $found = false -}}
+        {{- end -}}
+      {{- end -}}
+      {{- $hit := false -}}
+      {{- if reflect.IsSlice $found -}}
+        {{- $hit = in $found $value -}}
+      {{- else if $found -}}
+        {{- $hit = eq (printf "%v" $found) (printf "%v" $value) -}}
+      {{- end -}}
+      {{- if $hit -}}
+        {{- $keys = $keys | append $page.RelPermalink -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if $keys -}}
+      {{- $pages = where $pages "RelPermalink" "in" $keys -}}
+    {{- else -}}
+      {{- $pages = first 0 $pages -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $pages = where $pages . $value -}}
+  {{- end -}}
+{{- end -}}
+{{- $pages = where $pages "RelPermalink" "!=" $self -}}{{/*
+  Sort explicitly. Hugo's default collation is by weight and only then by
+  date, and a page with no weight sorts last, so any weighted page in the site
+  outranks every recent one - which is the opposite of what this shortcode
+  claims to show.
+*/}}
+{{- $pages = $pages.ByDate.Reverse -}}
+{{- $pages = first (int $limit) $pages -}}
+
+{{- if not $pages -}}
+  {{- warnf "The %q shortcode matched no pages. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- with $pages -}}
+  <div class="hextra-list{{ if $cardView }} hextra-list--cards{{ end }} not-prose">
+    {{- with $title -}}
+      <div class="hextra-list__title">{{ . | markdownify }}</div>
+    {{- end -}}
+    <div class="hextra-list__items">
+      {{- range . -}}
+        {{- partial "shortcodes/article-card.html" (dict
+          "page" .
+          "self" $self
+          "cover" $cardView
+          "compactSummary" (not $cardView)
+          )
+        -}}
+      {{- end -}}
+    </div>
+  </div>
+{{- end -}}

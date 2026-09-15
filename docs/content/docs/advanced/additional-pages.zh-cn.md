@@ -13,7 +13,7 @@ Hextra 提供一些需要单独启用的附加页面：术语表与归档页。
 ## 术语表
 
 {{< callout type="info" >}}
-  有关 Hugo 内置术语表支持的更多信息，请参阅 [Hugo 术语表快速参考](https://gohugo.io/quick-reference/glossary/)。
+有关 Hugo 内置术语表支持的更多信息，请参阅 [Hugo 术语表快速参考](https://gohugo.io/quick-reference/glossary/)。
 {{< /callout >}}
 
 ### 数据源文件
@@ -21,17 +21,17 @@ Hextra 提供一些需要单独启用的附加页面：术语表与归档页。
 术语定义集中存储在每种[支持语言](../multi-language/)的 `termbase.yaml` 数据文件中。
 
 {{< filetree/container >}}
-  {{< filetree/folder name="data" state="open" >}}
-    {{< filetree/folder name="en" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="fr" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="ja" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="data" state="open" >}}
+{{< filetree/folder name="en" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="fr" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="ja" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 每个 YAML 数据文件包含一组术语条目。每个条目包括：

@@ -1,0 +1,175 @@
+{{/* "This article is part of a series" module.
+
+  Renders one disclosure per series named in the post's front matter, listing
+  every post in that series in reading order. Like every other blog feature it
+  is opt-in through `blog/config.html`: `series` front matter alone renders
+  nothing, so a site that upgrades into this theme with the key already in its
+  posts - it is a common key in other themes - keeps the markup it had.
+
+  Part numbers are positional, not the `seriesOrder` value. An unpublished
+  draft or a half-renumbered series would otherwise print visible gaps
+  ("Part 1, Part 2, Part 4") or two posts both labelled "Part 4".
+
+  The "nav" variant renders previous/next in series order instead of the full
+  list, taking each direction from the first series that supplies it. It replaces the date-ordered
+  `components/pager.html` at the foot of the post, because two prev/next
+  controls in different orders next to each other are not navigable. The
+  caller decides that: `blog/single.html` only asks for the nav when the
+  pager's own switches (`displayPagination`, front-matter `prev`/`next`)
+  have not already claimed the foot of the article.
+
+  @param {page} context The post.
+  @param {dict} config The dict returned by `blog/config.html`.
+  @param {string} variant "full" (default) or "nav".
+
+  @example {{ partial "blog/series.html" (dict "context" . "config" $cfg)
+}}
+*/}}
+{{- $context := .context -}}
+{{- $series := .config.article.series -}}
+{{- $variant := .variant | default "full" -}}
+
+{{- if $series.enable -}}
+  {{- with $context.Params.series -}}
+    {{- $names := . -}}
+    {{- if not (reflect.IsSlice $names) -}}
+      {{- $names = slice $names -}}
+    {{- end -}}
+    {{/* Hugo does not dedupe list params, and a repeated name would render
+      the whole disclosure twice: two elements claiming aria-current="page" and
+      a duplicated set of og:see_also tags.
+    */}}
+    {{- $names = uniq $names -}}
+
+    {{- $partFormat := (T "seriesPart") | default "Part %d: %s" -}}
+    {{- $intro := (T "seriesIntro") | default "This article is part of a series." -}}
+
+    {{- if eq $variant "nav" -}}
+
+      {{/* Previous/next across every series the post belongs to. The two
+        directions are resolved independently - the first series to supply each
+        side wins - so a post that closes one series and opens another gets a
+        previous link from the first and a next link from the second, instead of
+        stopping at whichever series happened to be named first.
+      */}}
+      {{- $prev := false -}}
+      {{- $next := false -}}
+      {{- $prevLabel := "" -}}
+      {{- $nextLabel := "" -}}
+      {{- range $names -}}
+        {{- if not (and $prev $next) -}}
+          {{- $pages := partialCached "utils/series-pages.html" (dict "name" . "type" $context.Type) . $context.Type site.Language.Lang -}}
+          {{- range $i, $page := $pages -}}
+            {{- if eq $page.RelPermalink $context.RelPermalink -}}
+              {{- if and (not $prev) (gt $i 0) -}}
+                {{- $candidate := index $pages (sub $i 1) -}}
+                {{- $prev = $candidate -}}
+                {{- $prevLabel = printf $partFormat $i (partial "utils/title" $candidate) -}}
+              {{- end -}}
+              {{- if and (not $next) (lt (add $i 1) (len $pages)) -}}
+                {{- $candidate := index $pages (add $i 1) -}}
+                {{- $next = $candidate -}}
+                {{- $nextLabel = printf $partFormat (add $i 2) (partial "utils/title" $candidate) -}}
+              {{- end -}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{/* At a series boundary only one side is populated: part 1 has no
+        previous, the last part has no next. Because this nav replaces the pager
+        wholesale, that would leave the reader with no way back into the blog
+        from the foot of the first or last article. Fill the missing side with
+        the date-ordered neighbour the pager would have used.
+      */}}
+      {{- if or $prev $next -}}
+        {{- $reverse := $context.Params.reversePagination | default true -}}
+        {{- if not $prev -}}
+          {{- with cond $reverse $context.PrevInSection $context.NextInSection -}}
+            {{- $prev = . -}}
+            {{- $prevLabel = partial "utils/title" . -}}
+          {{- end -}}
+        {{- end -}}
+        {{- if not $next -}}
+          {{- with cond $reverse $context.NextInSection $context.PrevInSection -}}
+            {{- $next = . -}}
+            {{- $nextLabel = partial "utils/title" . -}}
+          {{- end -}}
+        {{- end -}}
+        {{- /* A section of two would otherwise point both links at one page. */ -}}
+        {{- if and $prev $next (eq $prev.RelPermalink $next.RelPermalink) -}}
+          {{- $next = false -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{- if or $prev $next -}}
+        <nav class="hextra-series-nav" aria-label="{{ $intro }}">
+          {{- with $prev -}}
+            <a class="hextra-series-nav__link hextra-series-nav__link--prev" href="{{ .RelPermalink }}" title="{{ $prevLabel }}">
+              {{- partial "utils/icon.html" (dict "name" "chevron-right" "attributes" "class=\"hextra-series-nav__icon hx:ltr:rotate-180\"") -}}
+              <span>{{ $prevLabel }}</span>
+            </a>
+          {{- end -}}
+          {{- with $next -}}
+            <a class="hextra-series-nav__link hextra-series-nav__link--next" href="{{ .RelPermalink }}" title="{{ $nextLabel }}">
+              <span>{{ $nextLabel }}</span>
+              {{- partial "utils/icon.html" (dict "name" "chevron-right" "attributes" "class=\"hextra-series-nav__icon hx:rtl:-rotate-180\"") -}}
+            </a>
+          {{- end -}}
+        </nav>
+      {{- end -}}
+
+    {{- else -}}
+
+      {{- $opened := $series.opened -}}
+      {{- if isset $context.Params "seriesopened" -}}
+        {{- $opened = eq $context.Params.seriesOpened true -}}
+      {{- end -}}
+      {{- range $names -}}
+        {{- $name := . -}}
+        {{- $pages := partialCached "utils/series-pages.html" (dict "name" $name "type" $context.Type) $name $context.Type site.Language.Lang -}}
+        {{/* The heading names the group, so it has to come from the same place
+          membership does. Front matter is per-post: a post that writes
+          `series: ["guides"]` joins `Guides` through the taxonomy, and would
+          then head its own box "guides" while every other member heads theirs
+          "Guides" - the same series renamed as the reader navigates. The term
+          page carries one canonical title, so prefer it and fall back to the
+          post's own string on sites with no `series` taxonomy declared.
+        */}}
+        {{- $displayName := $name -}}
+        {{- with site.GetPage (printf "/series/%s" (urlize $name)) -}}
+          {{- $displayName = .Title -}}
+        {{- end -}}
+        {{- /* A series of one is just an article; the module would say nothing. */ -}}
+        {{- if gt (len $pages) 1 -}}
+          <details class="hextra-series" {{ if $opened }}open{{ end }}>
+            <summary class="hextra-series__summary">
+              <span class="hextra-series__marker" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" focusable="false">
+                  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+                </svg>
+              </span>
+              <span class="hextra-series__heading">
+                <span class="hextra-series__name">{{ $displayName }}</span>
+                <span class="hextra-series__intro">{{ $intro }}</span>
+              </span>
+            </summary>
+            <ol class="hextra-series__list">
+              {{- range $i, $page := $pages -}}
+                {{- $label := printf $partFormat (add $i 1) (partial "utils/title" $page) -}}
+                <li class="hextra-series__item">
+                  {{- if eq $page.RelPermalink $context.RelPermalink -}}
+                    <span class="hextra-series__current" aria-current="page">{{ $label }}</span>
+                  {{- else -}}
+                    <a class="hextra-series__link" href="{{ $page.RelPermalink }}">{{ $label }}</a>
+                  {{- end -}}
+                </li>
+              {{- end -}}
+            </ol>
+          </details>
+        {{- end -}}
+      {{- end -}}
+
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

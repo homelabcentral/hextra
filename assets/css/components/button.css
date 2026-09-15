@@ -1,0 +1,42 @@
+.hextra-button {
+  @apply hx:inline-flex hx:items-center hx:gap-2 hx:align-middle;
+  /*
+    Buttons carry their own inline-end margin rather than relying on the
+    whitespace between tags: consecutive shortcodes are emitted as separate
+    raw-HTML blocks, so there is no text node between them to collapse into a
+    space.
+  */
+  @apply hx:mt-1 hx:mb-2 hx:me-2 hx:px-5 hx:py-2.5 hx:rounded-full;
+  @apply hx:text-sm hx:font-medium hx:text-center hx:no-underline;
+  @apply hx:cursor-pointer hx:transition-colors hx:ease-in hx:duration-200;
+
+  &:hover {
+    @apply hx:no-underline;
+  }
+
+  .hextra-button__label > p {
+    @apply hx:m-0 hx:inline;
+  }
+}
+
+/*
+  The label is 14px, so WCAG AA asks for 4.5:1. Against white text the default
+  accent gives 2.71:1 at 500 and 4.02:1 at 600 - both fail. 700 is 5.85:1 and
+  800 is darker still, so one pair serves light and dark mode alike.
+*/
+.hextra-button--primary {
+  @apply hx:text-white hx:bg-hextra-accent-700 hx:hover:bg-hextra-accent-800;
+}
+
+.hextra-button--outline {
+  @apply hx:border hx:bg-transparent;
+  @apply hx:border-hextra-accent-600 hx:text-hextra-accent-700;
+  @apply hx:hover:bg-hextra-accent-500/10;
+  @apply hx:dark:border-hextra-accent-500 hx:dark:text-hextra-accent-300;
+  @apply hx:dark:hover:bg-hextra-accent-500/15;
+}
+
+.hextra-button--ghost {
+  @apply hx:bg-transparent hx:text-neutral-700 hx:hover:bg-neutral-100;
+  @apply hx:dark:text-neutral-200 hx:dark:hover:bg-neutral-800;
+}

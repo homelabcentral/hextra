@@ -1,0 +1,27 @@
+{{/* A call to action: the same button, written as a single self-closing tag.
+
+  Useful in landing pages and long-form content where the label is plain text.
+  Ported from the Blowfish theme (MIT, Nuno Coração).
+
+  @param {string} url Destination URL or path. Defaults to "#".
+  @param {string} label Button text. Defaults to the "learnMore" translation.
+  @param {string} style One of primary (default), outline, ghost.
+  @param {string} target The anchor target attribute, e.g. "_blank".
+  @param {string} rel The anchor rel attribute.
+  @param {string} icon Optional icon name shown before the label.
+
+  @example {{< cta url="/docs/guide/configuration" label="Start building" >}}
+*/}}
+{{- $url := .Get "url" | default "#" -}}
+{{- $url = cond (hasPrefix $url "/") ($url | relURL) $url -}}
+{{- $label := .Get "label" | default ((T "learnMore") | default "Learn more") -}}
+
+{{- partial "shortcodes/button.html" (dict
+  "url" $url
+  "label" ($label | markdownify)
+  "style" (.Get "style")
+  "target" (.Get "target")
+  "rel" (.Get "rel")
+  "icon" (.Get "icon")
+  )
+-}}

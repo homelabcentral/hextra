@@ -1,0 +1,178 @@
+{{/* Embed a GitHub gist.
+
+  The gist is fetched from the GitHub API at build time and rendered with the
+  theme's own code block, so it gets Chroma highlighting, the filename header and
+  the copy button, and the page loads no third-party script.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração), which embeds GitHub's
+  gist.js. That script uses document.write, ships GitHub's own stylesheet, and
+  renders nothing when scripting is off.
+
+  @param {string} id Required. The gist id.
+  @param {string} user The gist owner. Accepted for compatibility; the API does not need it.
+  @param {string} file Render only this file from the gist.
+  @param {string} hl_lines Lines to highlight, e.g. "34-38 43". A gist carries no
+  highlighting metadata of its own, so this is given at the call site.
+  @param {bool} lineNos Show line numbers.
+  @param {int} lineNoStart First line number. Default 1.
+  @param {bool} live Re-fetch each file in the reader's browser and refresh it if
+  the gist has changed since the build. Default false. Only files that existed
+  at build time are refreshed - a file added to the gist later has no block to
+  appear in, and one deleted later keeps showing its build-time content.
+
+  or
+
+  @param {string} 0 The gist owner.
+  @param {string} 1 The gist id.
+  @param {string} 2 Optional filename.
+
+  @example {{< gist id="6cad326836d38bd3a7ae" >}}
+@example
+{{< gist "octocat" "6cad326836d38bd3a7ae" "hello_world.rb" >}}
+*/}}
+{{- $id := .Get "id" -}}
+{{- $file := .Get "file" -}}
+{{- if not $id -}}
+  {{- $id = .Get 1 -}}
+  {{- $file = .Get 2 -}}
+{{- end -}}
+
+{{- if not $id -}}
+  {{- errorf "The %q shortcode requires a gist id. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- if not (findRE `^[0-9a-f]+$` $id) -}}
+  {{- errorf "The %q shortcode was given %q, which is not a gist id. See %s" .Name $id .Position -}}
+{{- end -}}
+
+{{- $api := printf "https://api.github.com/gists/%s" $id -}}
+{{- $gist := false -}}
+
+{{- $remoteFetch := partial "utils/remote-fetch-enabled.html" . -}}
+
+{{- /* Skipped entirely for a build that must not reach the network. */ -}}
+{{- if $remoteFetch -}}
+  {{- with try (resources.GetRemote $api (dict "headers" (dict "Accept" "application/vnd.github+json"))) -}}
+    {{- with .Err -}}
+      {{- warnf "gist: unable to fetch %q: %s" $api . -}}
+    {{- else with .Value -}}
+      {{- $gist = . | transform.Unmarshal -}}
+    {{- else -}}
+      {{- warnf "gist: %q returned no content" $api -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $copyEnabled := or (eq site.Params.highlight.copy.enable nil) site.Params.highlight.copy.enable -}}
+
+{{- /* Chroma options. A gist has no highlighting metadata, so it comes from here. */ -}}
+{{- $options := dict -}}
+{{- with .Get "hl_lines" -}}
+  {{- $options = merge $options (dict "hl_lines" .) -}}
+{{- end -}}
+{{- if eq (printf "%v" (.Get "lineNos")) "true" -}}
+  {{- $options = merge $options (dict "lineNos" true) -}}
+{{- end -}}
+{{- with .Get "lineNoStart" -}}
+  {{- $options = merge $options (dict "lineNoStart" (int .)) -}}
+{{- end -}}{{/* Booleans are compared through printf so an explicit `false` is honoured:
+  `default` treats false as empty and would restore the default instead.
+*/}}
+{{- $live := eq (printf "%v" (.Get "live")) "true" -}}{{/* A build that must not reach the network must not hand the job to the
+  reader's browser either, so the same switch turns the live refresh off.
+*/}}
+{{- if and $live (not $remoteFetch) -}}
+  {{- $live = false -}}
+{{- end -}}
+
+{{- with $gist -}}
+  {{- $htmlURL := .html_url | default (printf "https://gist.github.com/%s" $id) -}}{{/* The API's per-file raw_url pins a revision, so it would never change and is
+    useless for a live refresh. The owner-scoped form without the revision -
+    gist.githubusercontent.com/<owner>/<id>/raw/<file> - always serves the
+    current version and sends Access-Control-Allow-Origin, so the browser may
+    read it. An anonymous gist has no owner to build that URL from.
+  */}}
+  {{- $owner := "" -}}
+  {{- with .owner -}}
+    {{- $owner = .login -}}
+  {{- end -}}
+  {{- if and $live (not $owner) -}}
+    {{- warnf "gist: %q is anonymous, so there is no per-file URL to refresh from; ignoring live=true. See %s" $id $.Position -}}
+    {{- $live = false -}}
+  {{- end -}}
+  {{- if $live -}}
+    {{- $.Page.Store.Set "hasLiveCode" true -}}
+  {{- end -}}
+
+
+  <div class="hextra-gist">
+    {{- range $name, $meta := .files -}}
+      {{- if or (not $file) (eq $name $file) -}}
+        {{- $lang := lower ($meta.language | default "") -}}{{/* Assembled into one string so a non-live gist's markup is unchanged and
+          the tag stays balanced, which prettier-plugin-go-template requires.
+
+          The values are htmlEscaped because safeHTMLAttr below switches off
+          Hugo's escaping: a gist filename or language is third-party data, and
+          a `"` in one would otherwise close the attribute early.
+        */}}{{/* A file the API truncated is never refreshed. The raw URL serves it
+          whole, so its hash could never match the partial content hashed here,
+          and the block would re-fetch the whole file, re-hash it and re-run
+          the highlighter over it on every page view, for every reader,
+          permanently. That is the churn `live` exists to avoid, and it is
+          worst on exactly the largest files.
+        */}}
+        {{- $fileLive := $live -}}
+        {{- if and $fileLive $meta.truncated -}}
+          {{- $fileLive = false -}}
+        {{- end -}}
+        {{- $liveAttrs := "" -}}
+        {{- if $fileLive -}}
+          {{/* A bare `%` in a gist filename makes urls.JoinPath fail the build
+            outright - Go tries to unescape the joined path and reports
+            `invalid URL escape` - and a filename that already looks escaped,
+            such as `a%20b.go`, is passed through as-is and fetches the wrong
+            file. Percent-encoding the `%` first leaves JoinPath a valid escape
+            to carry through, and it still handles spaces, `#`, `?` and
+            non-ASCII itself. Gist filenames are third-party data, so this is
+            not something the site author can avoid.
+          */}}
+          {{- $rawURL := urls.JoinPath "https://gist.githubusercontent.com" $owner $id "raw" (replace $name "%" "%25") -}}
+          {{- $liveAttrs = printf ` data-live-url="%s" data-live-lang="%s" data-live-hash="%s"` (htmlEscape $rawURL) (htmlEscape $lang) (string (hash.FNV32a ($meta.content | default ""))) -}}
+        {{- end -}}
+        <div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code" {{ $liveAttrs | safeHTMLAttr }}>
+          {{- partial "components/codeblock" (dict
+            "filename" $name
+            "base_url" ""
+            "lang" $lang
+            "content" ($meta.content | default "")
+            "options" $options
+            "action" (dict
+            "url" $htmlURL
+            "icon" "github"
+            "label" ((T "viewOnGitHub") | default "View on GitHub")
+            )
+            )
+            -}}
+          {{- if $copyEnabled -}}
+            {{- partial "components/codeblock-copy-button" (dict "filename" $name) -}}
+          {{- end -}}
+        </div>
+        {{- if $meta.truncated -}}
+          {{- if $live -}}
+            {{- warnf "gist: %q is truncated by the GitHub API and is shown in part only; live refresh is skipped for it" $name -}}
+          {{- else -}}
+            {{- warnf "gist: %q is truncated by the GitHub API and is shown in part only" $name -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+
+  </div>
+{{- else -}}
+  {{- /* No network, or the gist is gone: leave a link rather than nothing. */ -}}
+  <p>
+    <a href="https://gist.github.com/{{ $id }}" target="_blank" rel="noreferrer">
+      {{- (T "viewOnGitHub") | default "View on GitHub" -}}
+    </a>
+  </p>
+{{- end -}}

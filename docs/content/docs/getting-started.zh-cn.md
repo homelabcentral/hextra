@@ -57,7 +57,7 @@ cd my-site
 hugo mod init github.com/username/my-site
 
 # 添加Hextra主题
-hugo mod get github.com/imfing/hextra
+hugo mod get github.com/homelabcentral/hextra
 ```
 
 配置`hugo.yaml`以使用Hextra主题，添加以下内容：
@@ -65,7 +65,7 @@ hugo mod get github.com/imfing/hextra
 ```yaml
 module:
   imports:
-    - path: github.com/imfing/hextra
+    - path: github.com/homelabcentral/hextra
 ```
 
 ### 创建您的内容页面
@@ -87,7 +87,6 @@ hugo server --buildDrafts --disableFastRender
 
 {{% /steps %}}
 
-
 {{% details title="如何更新主题？" %}}
 
 要更新项目中的所有Hugo模块到最新版本，运行以下命令：
@@ -96,10 +95,10 @@ hugo server --buildDrafts --disableFastRender
 hugo mod get -u
 ```
 
-要将Hextra更新到[最新发布版本](https://github.com/imfing/hextra/releases)，运行以下命令：
+要将Hextra更新到[最新发布版本](https://github.com/homelabcentral/hextra/releases)，运行以下命令：
 
 ```shell
-hugo mod get -u github.com/imfing/hextra
+hugo mod get -u github.com/homelabcentral/hextra
 ```
 
 更多详情请参阅[Hugo模块](https://gohugo.io/hugo-modules/use-modules/#update-all-modules)。
@@ -137,7 +136,7 @@ git init
 然后，将Hextra主题添加为Git子模块：
 
 ```shell
-git submodule add https://github.com/imfing/hextra.git themes/hextra
+git submodule add https://github.com/homelabcentral/hextra.git themes/hextra
 ```
 
 配置`hugo.yaml`以使用Hextra主题，添加以下内容：
@@ -165,7 +164,6 @@ hugo server --buildDrafts --disableFastRender
 
 {{% /steps %}}
 
-
 当使用[CI/CD](https://en.wikipedia.org/wiki/CI/CD)部署Hugo网站时，确保在运行`hugo`命令之前执行以下命令至关重要。
 
 ```shell
@@ -173,7 +171,6 @@ git submodule update --init
 ```
 
 如果不运行此命令，主题文件夹将不会被填充Hextra主题文件，导致构建失败。
-
 
 {{% details title="如何更新主题？" %}}
 
@@ -198,7 +195,7 @@ git submodule update --remote themes/hextra
 探索以下部分以开始添加更多内容：
 
 {{< cards >}}
-  {{< card link="../guide/organize-files" title="组织文件" icon="document-duplicate" >}}
-  {{< card link="../guide/configuration" title="配置" icon="adjustments" >}}
-  {{< card link="../guide/markdown" title="Markdown" icon="markdown" >}}
+{{< card link="../guide/organize-files" title="组织文件" icon="document-duplicate" >}}
+{{< card link="../guide/configuration" title="配置" icon="adjustments" >}}
+{{< card link="../guide/markdown" title="Markdown" icon="markdown" >}}
 {{< /cards >}}

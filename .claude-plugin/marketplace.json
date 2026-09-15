@@ -1,0 +1,26 @@
+{
+  "name": "hextra",
+  "description": "The Hextra Hugo theme, packaged for coding agents: shortcodes, front matter, hugo.yaml, the blog, and Markdown features.",
+  "owner": {
+    "name": "homelabcentral",
+    "url": "https://github.com/homelabcentral"
+  },
+  "plugins": [
+    {
+      "name": "hextra",
+      "source": "./",
+      "displayName": "Hextra",
+      "description": "Author and configure a Hugo site built on the Hextra theme — shortcodes, front matter, hugo.yaml, the blog, and Markdown features.",
+      "version": "0.1.0",
+      "category": "documentation",
+      "keywords": [
+        "hugo",
+        "hextra",
+        "theme",
+        "documentation",
+        "shortcodes",
+        "blog"
+      ]
+    }
+  ]
+}

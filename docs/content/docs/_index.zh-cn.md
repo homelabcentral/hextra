@@ -24,8 +24,8 @@ Hextra 是一个基于 [Tailwind CSS][tailwind-css] 构建的现代化、高性�
 ## 问题或建议？
 
 {{< callout emoji="❓" >}}
-  Hextra 仍在积极开发中。
-  如有疑问或反馈，欢迎[提交 Issue](https://github.com/imfing/hextra/issues)！
+Hextra 仍在积极开发中。
+如有疑问或反馈，欢迎[提交 Issue](https://github.com/homelabcentral/hextra/issues)！
 {{< /callout >}}
 
 ## 下一步
@@ -33,7 +33,7 @@ Hextra 是一个基于 [Tailwind CSS][tailwind-css] 构建的现代化、高性�
 立即开始探索：
 
 {{< cards >}}
-  {{< card link="getting-started" title="快速开始" icon="document-text" subtitle="学习如何使用 Hextra 创建网站" >}}
+{{< card link="getting-started" title="快速开始" icon="document-text" subtitle="学习如何使用 Hextra 创建网站" >}}
 {{< /cards >}}
 
 [hugo]: https://gohugo.io/

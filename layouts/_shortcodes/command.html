@@ -1,0 +1,24 @@
+{{- /*
+Render a shell command as text: the prompt glyph in the accent colour, the
+command itself coloured by Chroma's shell lexer.
+
+Paired, and each non-blank line of the body becomes one command line. Use the
+angle-bracket notation, not the percent one, so the body is taken verbatim
+rather than being run through Markdown first.
+
+The same renderer backs the `coverText` front matter key, which puts one of
+these where a blog post's cover image would otherwise go.
+
+@param {string} prompt Prompt glyph. Defaults to `params.command.prompt`, then `$`.
+
+@example {{< command >}}claude add skill hextra{{< /command >}}
+*/ -}}
+{{- $lines := slice -}}
+{{- range (split (string .Inner) "\n") -}}
+  {{- with (trim . " \t\r") -}}
+    {{- $lines = $lines | append . -}}
+  {{- end -}}
+{{- end -}}
+{{- with $lines -}}
+  {{- partial "components/command-block.html" (dict "lines" . "prompt" ($.Get "prompt")) -}}
+{{- end -}}

@@ -7,9 +7,9 @@ next: /docs/guide/deploy-site
 
 {{< tabs >}}
 
-  {{< tab name="macOS" >}}**macOS**: یک سیستم عامل دسکتاپ توسط اپل.{{< /tab >}}
-  {{< tab name="Linux" >}}**Linux**: یک سیستم عامل متن‌باز.{{< /tab >}}
-  {{< tab name="Windows" >}}**Windows**: یک سیستم عامل دسکتاپ توسط مایکروسافت.{{< /tab >}}
+{{< tab name="macOS" >}}**macOS**: یک سیستم عامل دسکتاپ توسط اپل.{{< /tab >}}
+{{< tab name="Linux" >}}**Linux**: یک سیستم عامل متن‌باز.{{< /tab >}}
+{{< tab name="Windows" >}}**Windows**: یک سیستم عامل دسکتاپ توسط مایکروسافت.{{< /tab >}}
 
 {{< /tabs >}}
 
@@ -51,7 +51,6 @@ next: /docs/guide/deploy-site
 
 {{< /tabs >}}
 
-
 ### افزودن آیکون
 
 با استفاده از پارامتر `icon` برای هر `tab` می‌توانید قبل از عنوان تب آیکون نمایش دهید.
@@ -75,7 +74,6 @@ next: /docs/guide/deploy-site
 
 {{< /tabs >}}
 
-
 ### استفاده از Markdown
 
 نحو Markdown شامل بلوک کد نیز پشتیبانی می‌شود:
@@ -96,26 +94,31 @@ next: /docs/guide/deploy-site
 
 {{< tabs >}}
 
-  {{< tab name="JSON" >}}
-  ```json
-  { "hello": "world" }
-  ```
-  {{< /tab >}}
+{{< tab name="JSON" >}}
 
-  {{< tab name="YAML" >}}
-  ```yaml
-  hello: world
-  ```
-  {{< /tab >}}
+```json
+{ "hello": "world" }
+```
 
-  {{< tab name="TOML" >}}
-  ```toml
-  hello = "world"
-  ```
-  {{< /tab >}}
+{{< /tab >}}
+
+{{< tab name="YAML" >}}
+
+```yaml
+hello: world
+```
+
+{{< /tab >}}
+
+{{< tab name="TOML" >}}
+
+```toml
+hello = "world"
+```
+
+{{< /tab >}}
 
 {{< /tabs >}}
-
 
 ### همگام‌سازی تب‌ها
 

@@ -22,9 +22,9 @@ sidebar:
 ```
 
 {{< gallery >}}
-  {{< gallery-item src="images/space.jpg" caption="فضا" >}}
-  {{< gallery-item src="https://picsum.photos/id/1015/1600/1200" thumb="https://picsum.photos/id/1015/800/600" width="1600" height="1200" caption="دره رودخانه" >}}
-  {{< gallery-item src="https://picsum.photos/id/1018/1600/1200" thumb="https://picsum.photos/id/1018/800/600" width="1600" height="1200" caption="دریاچه کوهستانی" >}}
+{{< gallery-item src="images/space.jpg" caption="فضا" >}}
+{{< gallery-item src="https://picsum.photos/id/1015/1600/1200" thumb="https://picsum.photos/id/1015/800/600" width="1600" height="1200" caption="دره رودخانه" >}}
+{{< gallery-item src="https://picsum.photos/id/1018/1600/1200" thumb="https://picsum.photos/id/1018/800/600" width="1600" height="1200" caption="دریاچه کوهستانی" >}}
 {{< /gallery >}}
 
 ## منابع تصویر
@@ -69,12 +69,12 @@ sidebar:
 ```
 
 {{< gallery type="grid" cols="3" >}}
-  {{< gallery-item src="https://picsum.photos/id/1015/1200/1200" thumb="https://picsum.photos/id/1015/600/600" width="1200" height="1200" caption="رودخانه" >}}
-  {{< gallery-item src="https://picsum.photos/id/1018/1200/1200" thumb="https://picsum.photos/id/1018/600/600" width="1200" height="1200" caption="دریاچه" >}}
-  {{< gallery-item src="https://picsum.photos/id/1019/1200/1200" thumb="https://picsum.photos/id/1019/600/600" width="1200" height="1200" caption="مسیر" >}}
-  {{< gallery-item src="https://picsum.photos/id/1039/1200/1200" thumb="https://picsum.photos/id/1039/600/600" width="1200" height="1200" caption="دره" >}}
-  {{< gallery-item src="https://picsum.photos/id/1043/1200/1200" thumb="https://picsum.photos/id/1043/600/600" width="1200" height="1200" caption="آبشار" >}}
-  {{< gallery-item src="https://picsum.photos/id/1059/1200/1200" thumb="https://picsum.photos/id/1059/600/600" width="1200" height="1200" caption="جنگل" >}}
+{{< gallery-item src="https://picsum.photos/id/1015/1200/1200" thumb="https://picsum.photos/id/1015/600/600" width="1200" height="1200" caption="رودخانه" >}}
+{{< gallery-item src="https://picsum.photos/id/1018/1200/1200" thumb="https://picsum.photos/id/1018/600/600" width="1200" height="1200" caption="دریاچه" >}}
+{{< gallery-item src="https://picsum.photos/id/1019/1200/1200" thumb="https://picsum.photos/id/1019/600/600" width="1200" height="1200" caption="مسیر" >}}
+{{< gallery-item src="https://picsum.photos/id/1039/1200/1200" thumb="https://picsum.photos/id/1039/600/600" width="1200" height="1200" caption="دره" >}}
+{{< gallery-item src="https://picsum.photos/id/1043/1200/1200" thumb="https://picsum.photos/id/1043/600/600" width="1200" height="1200" caption="آبشار" >}}
+{{< gallery-item src="https://picsum.photos/id/1059/1200/1200" thumb="https://picsum.photos/id/1059/600/600" width="1200" height="1200" caption="جنگل" >}}
 {{< /gallery >}}
 
 ### Carousel
@@ -93,12 +93,12 @@ sidebar:
 ```
 
 {{< gallery type="carousel" >}}
-  {{< gallery-item src="https://picsum.photos/id/1015/1600/1200" thumb="https://picsum.photos/id/1015/800/600" width="1600" height="1200" caption="رودخانه" >}}
-  {{< gallery-item src="https://picsum.photos/id/1018/1600/1200" thumb="https://picsum.photos/id/1018/800/600" width="1600" height="1200" caption="دریاچه" >}}
-  {{< gallery-item src="https://picsum.photos/id/1019/1600/1200" thumb="https://picsum.photos/id/1019/800/600" width="1600" height="1200" caption="مسیر" >}}
-  {{< gallery-item src="https://picsum.photos/id/1039/1600/1200" thumb="https://picsum.photos/id/1039/800/600" width="1600" height="1200" caption="دره" >}}
-  {{< gallery-item src="https://picsum.photos/id/1043/1600/1200" thumb="https://picsum.photos/id/1043/800/600" width="1600" height="1200" caption="آبشار" >}}
-  {{< gallery-item src="https://picsum.photos/id/1059/1600/1200" thumb="https://picsum.photos/id/1059/800/600" width="1600" height="1200" caption="جنگل" >}}
+{{< gallery-item src="https://picsum.photos/id/1015/1600/1200" thumb="https://picsum.photos/id/1015/800/600" width="1600" height="1200" caption="رودخانه" >}}
+{{< gallery-item src="https://picsum.photos/id/1018/1600/1200" thumb="https://picsum.photos/id/1018/800/600" width="1600" height="1200" caption="دریاچه" >}}
+{{< gallery-item src="https://picsum.photos/id/1019/1600/1200" thumb="https://picsum.photos/id/1019/800/600" width="1600" height="1200" caption="مسیر" >}}
+{{< gallery-item src="https://picsum.photos/id/1039/1600/1200" thumb="https://picsum.photos/id/1039/800/600" width="1600" height="1200" caption="دره" >}}
+{{< gallery-item src="https://picsum.photos/id/1043/1600/1200" thumb="https://picsum.photos/id/1043/800/600" width="1600" height="1200" caption="آبشار" >}}
+{{< gallery-item src="https://picsum.photos/id/1059/1600/1200" thumb="https://picsum.photos/id/1059/800/600" width="1600" height="1200" caption="جنگل" >}}
 {{< /gallery >}}
 
 ### Mosaic
@@ -116,11 +116,11 @@ sidebar:
 ```
 
 {{< gallery type="mosaic" >}}
-  {{< gallery-item src="https://picsum.photos/id/1015/1600/900" thumb="https://picsum.photos/id/1015/1200/600" width="1600" height="900" caption="رودخانه" span="wide" >}}
-  {{< gallery-item src="https://picsum.photos/id/1018/800/1200" thumb="https://picsum.photos/id/1018/400/600" width="800" height="1200" caption="دریاچه" span="tall" >}}
-  {{< gallery-item src="https://picsum.photos/id/1019/800/600" thumb="https://picsum.photos/id/1019/400/300" width="800" height="600" caption="مسیر" >}}
-  {{< gallery-item src="https://picsum.photos/id/1039/800/600" thumb="https://picsum.photos/id/1039/400/300" width="800" height="600" caption="دره" >}}
-  {{< gallery-item src="https://picsum.photos/id/1043/1600/900" thumb="https://picsum.photos/id/1043/1200/600" width="1600" height="900" caption="آبشار" span="wide" >}}
+{{< gallery-item src="https://picsum.photos/id/1015/1600/900" thumb="https://picsum.photos/id/1015/1200/600" width="1600" height="900" caption="رودخانه" span="wide" >}}
+{{< gallery-item src="https://picsum.photos/id/1018/800/1200" thumb="https://picsum.photos/id/1018/400/600" width="800" height="1200" caption="دریاچه" span="tall" >}}
+{{< gallery-item src="https://picsum.photos/id/1019/800/600" thumb="https://picsum.photos/id/1019/400/300" width="800" height="600" caption="مسیر" >}}
+{{< gallery-item src="https://picsum.photos/id/1039/800/600" thumb="https://picsum.photos/id/1039/400/300" width="800" height="600" caption="دره" >}}
+{{< gallery-item src="https://picsum.photos/id/1043/1600/900" thumb="https://picsum.photos/id/1043/1200/600" width="1600" height="900" caption="آبشار" span="wide" >}}
 {{< /gallery >}}
 
 ### Masonry
@@ -139,12 +139,12 @@ sidebar:
 ```
 
 {{< gallery type="masonry" >}}
-  {{< gallery-item src="https://picsum.photos/id/1015/1200/800" thumb="https://picsum.photos/id/1015/600/400" width="1200" height="800" caption="رودخانه" >}}
-  {{< gallery-item src="https://picsum.photos/id/1018/800/1200" thumb="https://picsum.photos/id/1018/400/600" width="800" height="1200" caption="دریاچه" >}}
-  {{< gallery-item src="https://picsum.photos/id/1019/1200/900" thumb="https://picsum.photos/id/1019/600/450" width="1200" height="900" caption="مسیر" >}}
-  {{< gallery-item src="https://picsum.photos/id/1039/1000/1000" thumb="https://picsum.photos/id/1039/500/500" width="1000" height="1000" caption="دره" >}}
-  {{< gallery-item src="https://picsum.photos/id/1043/1200/800" thumb="https://picsum.photos/id/1043/600/400" width="1200" height="800" caption="آبشار" >}}
-  {{< gallery-item src="https://picsum.photos/id/1059/800/1200" thumb="https://picsum.photos/id/1059/400/600" width="800" height="1200" caption="جنگل" >}}
+{{< gallery-item src="https://picsum.photos/id/1015/1200/800" thumb="https://picsum.photos/id/1015/600/400" width="1200" height="800" caption="رودخانه" >}}
+{{< gallery-item src="https://picsum.photos/id/1018/800/1200" thumb="https://picsum.photos/id/1018/400/600" width="800" height="1200" caption="دریاچه" >}}
+{{< gallery-item src="https://picsum.photos/id/1019/1200/900" thumb="https://picsum.photos/id/1019/600/450" width="1200" height="900" caption="مسیر" >}}
+{{< gallery-item src="https://picsum.photos/id/1039/1000/1000" thumb="https://picsum.photos/id/1039/500/500" width="1000" height="1000" caption="دره" >}}
+{{< gallery-item src="https://picsum.photos/id/1043/1200/800" thumb="https://picsum.photos/id/1043/600/400" width="1200" height="800" caption="آبشار" >}}
+{{< gallery-item src="https://picsum.photos/id/1059/800/1200" thumb="https://picsum.photos/id/1059/400/600" width="800" height="1200" caption="جنگل" >}}
 {{< /gallery >}}
 
 ## پیوند به‌جای لایت‌باکس
@@ -166,11 +166,11 @@ sidebar:
 
 ### `gallery`
 
-| پارامتر | نوع    | پیش‌فرض  | توضیح                                                    |
-| ------- | ------ | -------- | -------------------------------------------------------- |
-| `type`  | string | `grid`   | نوع چیدمان: `grid`، `mosaic`، `masonry` یا `carousel`    |
-| `cols`  | number | `3`      | تعداد ستون‌ها (در `masonry` استفاده نمی‌شود)             |
-| `gap`   | string | `0.5rem` | فاصله CSS بین آیتم‌ها                                    |
+| پارامتر | نوع    | پیش‌فرض  | توضیح                                                 |
+| ------- | ------ | -------- | ----------------------------------------------------- |
+| `type`  | string | `grid`   | نوع چیدمان: `grid`، `mosaic`، `masonry` یا `carousel` |
+| `cols`  | number | `3`      | تعداد ستون‌ها (در `masonry` استفاده نمی‌شود)          |
+| `gap`   | string | `0.5rem` | فاصله CSS بین آیتم‌ها                                 |
 
 ### `gallery-item`
 

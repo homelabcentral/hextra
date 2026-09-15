@@ -36,13 +36,13 @@ languages:
 Hugo supports managing translations by filename. For example, if we have a file `content/docs/_index.md` in English, we can create a file `content/docs/_index.fr.md` for French translation.
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="_index.fr.md" >}}
-      {{< filetree/file name="_index.ja.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="_index.fr.md" >}}
+{{< filetree/file name="_index.ja.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 Note: Hugo also supports [Translation by content directory](https://gohugo.io/content-management/multilingual/#translation-by-content-directory).

@@ -6,9 +6,9 @@ next: /docs/guide/term
 ## Example
 
 {{< tabs >}}
-  {{< tab name="JSON" >}}**JSON**: JavaScript Object Notation (JSON) is a standard text-based format for representing structured data based on JavaScript object syntax.{{< /tab >}}
-  {{< tab name="YAML" >}}**YAML**: YAML is a human-readable data serialization language.{{< /tab >}}
-  {{< tab name="TOML" >}}**TOML**: TOML aims to be a minimal configuration file format that's easy to read due to obvious semantics.{{< /tab >}}
+{{< tab name="JSON" >}}**JSON**: JavaScript Object Notation (JSON) is a standard text-based format for representing structured data based on JavaScript object syntax.{{< /tab >}}
+{{< tab name="YAML" >}}**YAML**: YAML is a human-readable data serialization language.{{< /tab >}}
+{{< tab name="TOML" >}}**TOML**: TOML aims to be a minimal configuration file format that's easy to read due to obvious semantics.{{< /tab >}}
 {{< /tabs >}}
 
 ## Usage
@@ -42,9 +42,9 @@ Use `selected` property to specify the selected tab.
 The `YAML` tab will be selected by default.
 
 {{< tabs >}}
-  {{< tab name="JSON" >}}**JSON**: JavaScript Object Notation (JSON) is a standard text-based format for representing structured data based on JavaScript object syntax.{{< /tab >}}
-  {{< tab name="YAML" selected=true >}}**YAML**: YAML is a human-readable data serialization language.{{< /tab >}}
-  {{< tab name="TOML" >}}**TOML**: TOML aims to be a minimal configuration file format that's easy to read due to obvious semantics.{{< /tab >}}
+{{< tab name="JSON" >}}**JSON**: JavaScript Object Notation (JSON) is a standard text-based format for representing structured data based on JavaScript object syntax.{{< /tab >}}
+{{< tab name="YAML" selected=true >}}**YAML**: YAML is a human-readable data serialization language.{{< /tab >}}
+{{< tab name="TOML" >}}**TOML**: TOML aims to be a minimal configuration file format that's easy to read due to obvious semantics.{{< /tab >}}
 {{< /tabs >}}
 
 ### Add Icons
@@ -63,11 +63,10 @@ See the [Icon shortcode](../icon) page for the list of available icons.
 ```
 
 {{< tabs >}}
-  {{< tab name="Photos" icon="photograph" >}}Manage and organize your photo library.{{< /tab >}}
-  {{< tab name="Music" icon="music-note" >}}Browse and play your favorite tracks.{{< /tab >}}
-  {{< tab name="Videos" icon="film" >}}Watch and stream video content.{{< /tab >}}
+{{< tab name="Photos" icon="photograph" >}}Manage and organize your photo library.{{< /tab >}}
+{{< tab name="Music" icon="music-note" >}}Browse and play your favorite tracks.{{< /tab >}}
+{{< tab name="Videos" icon="film" >}}Watch and stream video content.{{< /tab >}}
 {{< /tabs >}}
-
 
 ### Use Markdown
 
@@ -89,26 +88,31 @@ Markdown syntax including code block is also supported:
 
 {{< tabs >}}
 
-  {{< tab name="JSON" >}}
-  ```json
-  { "hello": "world" }
-  ```
-  {{< /tab >}}
+{{< tab name="JSON" >}}
 
-  {{< tab name="YAML" >}}
-  ```yaml
-  hello: world
-  ```
-  {{< /tab >}}
+```json
+{ "hello": "world" }
+```
 
-  {{< tab name="TOML" >}}
-  ```toml
-  hello = "world"
-  ```
-  {{< /tab >}}
+{{< /tab >}}
+
+{{< tab name="YAML" >}}
+
+```yaml
+hello: world
+```
+
+{{< /tab >}}
+
+{{< tab name="TOML" >}}
+
+```toml
+hello = "world"
+```
+
+{{< /tab >}}
 
 {{< /tabs >}}
-
 
 ### Sync Tabs
 

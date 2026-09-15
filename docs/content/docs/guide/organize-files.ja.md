@@ -12,21 +12,21 @@ prev: /docs/guide
 <!--more-->
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/file name="_index.md" >}}
-    {{< filetree/folder name="docs" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="getting-started.md" >}}
-      {{< filetree/folder name="guide" state="open" >}}
-        {{< filetree/file name="_index.md" >}}
-        {{< filetree/file name="organize-files.md" >}}
-      {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="blog" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="post-1.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="docs" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="getting-started.md" >}}
+{{< filetree/folder name="guide" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="organize-files.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="blog" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="post-1.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 各 `_index.md` ファイルは、対応するセクションのインデックスページです。他の Markdown ファイルは通常のページです。
@@ -49,11 +49,11 @@ content
 
 Hextra は、異なるコンテンツタイプに対して3つのレイアウトを提供します：
 
-| レイアウト | ディレクトリ          | 特徴                                                                 |
-| :-------- | :------------------- | :------------------------------------------------------------------- |
-| `docs`    | `content/docs/`      | 構造化されたドキュメントに最適。このセクションと同じです。            |
-| `blog`    | `content/blog/`      | ブログ投稿用。リスト表示と詳細記事ビューの両方があります。            |
-| `default` | その他のディレクトリ  | サイドバーなしの単一ページ記事ビュー。                                |
+| レイアウト | ディレクトリ         | 特徴                                                       |
+| :--------- | :------------------- | :--------------------------------------------------------- |
+| `docs`     | `content/docs/`      | 構造化されたドキュメントに最適。このセクションと同じです。 |
+| `blog`     | `content/blog/`      | ブログ投稿用。リスト表示と詳細記事ビューの両方があります。 |
+| `default`  | その他のディレクトリ | サイドバーなしの単一ページ記事ビュー。                     |
 
 セクションの動作を組み込みレイアウトと同じにするには、セクションの `_index.md` のフロントマターで希望するタイプを指定します。
 
@@ -79,7 +79,7 @@ weight: 2
 ```
 
 {{< callout type="info" >}}
-  サイドバーを深くしすぎないことをお勧めします。多くのコンテンツがある場合は、**複数のセクションに分割する**ことを検討してください。
+サイドバーを深くしすぎないことをお勧めします。多くのコンテンツがある場合は、**複数のセクションに分割する**ことを検討してください。
 {{< /callout >}}
 
 ## セクションナビゲーション
@@ -95,24 +95,24 @@ weight: 2
 次のディレクトリ構造を考えます：
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/file name="_index.md" >}}
-    {{< filetree/folder name="blog" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/folder name="my-blog-series" state="open" >}}
-        {{< filetree/file name="_index.md" >}}
-        {{< filetree/folder name="post-a" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-        {{< filetree/folder name="post-b" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-        {{< filetree/folder name="post-c" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-      {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="blog" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="my-blog-series" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="post-a" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="post-b" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="post-c" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 そして、投稿のフロントマターは次のようになっています：
@@ -123,12 +123,14 @@ title: Post A
 weight: 1
 ---
 ```
+
 ```yaml {filename="content/blog/my-blog-series/post-b/index.md"}
 ---
 title: Post B
 weight: 2
 ---
 ```
+
 ```yaml {filename="content/blog/my-blog-series/post-c/index.md"}
 ---
 title: Post C
@@ -175,6 +177,7 @@ title: Organize Files
 ```
 
 これにより、次のパンくずリストが生成されます：
+
 ```
 Documentation > Guide > Foo Bar
 ```
@@ -201,12 +204,12 @@ title: Organize Files
 たとえば、`my-page.md` ファイルと同じディレクトリに `image.png` ファイルを追加します：
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-        {{< filetree/file name="image.png" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 そして、次の Markdown 構文を使用してコンテンツに画像を追加できます：
@@ -218,14 +221,14 @@ title: Organize Files
 また、Hugo の [ページバンドル][page-bundles] 機能を利用して、画像ファイルを Markdown ファイルと一緒に整理することもできます。そのためには、`my-page.md` ファイルを `my-page` ディレクトリに変換し、コンテンツを `index.md` というファイルに置き、画像ファイルを `my-page` ディレクトリ内に配置します：
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/folder name="my-page" >}}
-            {{< filetree/file name="index.md" >}}
-            {{< filetree/file name="image.png" >}}
-        {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/folder name="my-page" >}}
+{{< filetree/file name="index.md" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 ```markdown {filename="content/docs/my-page/index.md"}
@@ -235,16 +238,16 @@ title: Organize Files
 あるいは、画像ファイルを `static` ディレクトリに置くこともできます。これにより、画像はすべてのページで利用可能になります：
 
 {{< filetree/container >}}
-  {{< filetree/folder name="static" >}}
-    {{< filetree/folder name="images" >}}
-        {{< filetree/file name="image.png" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="static" >}}
+{{< filetree/folder name="images" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 画像パスはスラッシュ `/` で始まり、static ディレクトリからの相対パスであることに注意してください：

@@ -9,7 +9,6 @@ Hugo は静的サイトを生成するため、柔軟なホスティングオプ
 
 <!--more-->
 
-
 ## GitHub Pages
 
 [GitHub Pages](https://docs.github.com/pages) は無料でサイトをデプロイ・ホストするための推奨方法です。
@@ -100,10 +99,9 @@ jobs:
 
 {{% /details %}}
 
-
 {{< callout type="warning" >}}
-  リポジトリ設定で、**Pages** > **Build and deployment** > **Source** を **GitHub Actions** に設定してください:
-  ![](https://user-images.githubusercontent.com/5097752/266784808-99676430-884e-42ab-b901-f6534a0d6eee.png)
+リポジトリ設定で、**Pages** > **Build and deployment** > **Source** を **GitHub Actions** に設定してください:
+![](https://user-images.githubusercontent.com/5097752/266784808-99676430-884e-42ab-b901-f6534a0d6eee.png)
 {{< /callout >}}
 
 デフォルトでは、上記の GitHub Actions ワークフロー `.github/workflows/pages.yaml` は `https://<USERNAME>.github.io/<REPO>/` へのデプロイを想定しています。
@@ -119,7 +117,6 @@ run: |
 
 独自ドメインを使用する場合は、`--baseURL` の値を適宜変更してください。
 
-
 ## Cloudflare Pages
 
 1. サイトのソースコードを Git リポジトリ（GitHub など）に配置
@@ -134,9 +131,9 @@ run: |
 | Build directory   | `public`             |
 
 詳細は以下を参照:
+
 - [Deploy a Hugo site](https://developers.cloudflare.com/pages/framework-guides/deploy-a-hugo-site/#deploy-with-cloudflare-pages)
 - [Language support and tools](https://developers.cloudflare.com/pages/platform/language-support-and-tools/)
-
 
 ## Netlify
 
@@ -149,7 +146,6 @@ run: |
 4. デプロイ！
 
 詳細は [Hugo on Netlify](https://docs.netlify.com/integrations/frameworks/hugo/) を参照
-
 
 ## Vercel
 

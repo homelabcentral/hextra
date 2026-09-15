@@ -9,7 +9,6 @@ Hugo 生成静态网站，支持灵活的托管方案。
 
 <!--more-->
 
-
 ## GitHub Pages
 
 [GitHub Pages](https://docs.github.com/pages) 是推荐的免费部署托管方案。
@@ -101,10 +100,9 @@ jobs:
 
 {{% /details %}}
 
-
 {{< callout type="warning" >}}
-  在仓库设置中，将 **Pages** > **构建与部署** > **源** 设为 **GitHub Actions**：
-  ![](https://user-images.githubusercontent.com/5097752/266784808-99676430-884e-42ab-b901-f6534a0d6eee.png)
+在仓库设置中，将 **Pages** > **构建与部署** > **源** 设为 **GitHub Actions**：
+![](https://user-images.githubusercontent.com/5097752/266784808-99676430-884e-42ab-b901-f6534a0d6eee.png)
 {{< /callout >}}
 
 默认配置中，GitHub Actions 工作流 `.github/workflows/pages.yaml` 假设站点部署在 `https://<用户名>.github.io/<仓库名>/`。
@@ -120,7 +118,6 @@ run: |
 
 若使用自定义域名，请相应调整 `--baseURL` 值。
 
-
 ## Cloudflare Pages
 
 1. 将站点源码存入 Git 仓库（如 GitHub）
@@ -128,16 +125,16 @@ run: |
 3. 在账户首页选择 **Workers & Pages** > **创建应用** > **Pages** > **连接 Git**
 4. 选择仓库后，在 **设置构建与部署** 部分填写：
 
-| 配置项           | 值                   |
-| ---------------- | -------------------- |
-| 生产分支         | `main`               |
-| 构建命令         | `hugo --gc --minify` |
-| 构建输出目录     | `public`             |
+| 配置项       | 值                   |
+| ------------ | -------------------- |
+| 生产分支     | `main`               |
+| 构建命令     | `hugo --gc --minify` |
+| 构建输出目录 | `public`             |
 
 更多细节请参阅：
+
 - [部署 Hugo 站点](https://developers.cloudflare.com/pages/framework-guides/deploy-a-hugo-site/#deploy-with-cloudflare-pages)
 - [语言支持与工具](https://developers.cloudflare.com/pages/platform/language-support-and-tools/)
-
 
 ## Netlify
 
@@ -150,7 +147,6 @@ run: |
 4. 开始部署！
 
 详见 [Netlify 上的 Hugo](https://docs.netlify.com/integrations/frameworks/hugo/)
-
 
 ## Vercel
 

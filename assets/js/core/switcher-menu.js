@@ -5,15 +5,15 @@ function computeMenuTranslation(switcher, optionsElement) {
   // Must be called before optionsElement.clientWidth.
   optionsElement.style.minWidth = `${Math.max(switcherRect.width, 50)}px`;
 
-  const isOnTop = switcher.dataset.location === 'top';
-  const isOnBottom = switcher.dataset.location === 'bottom';
-  const isOnBottomRight = switcher.dataset.location === 'bottom-right';
-  const isRTL = document.documentElement.dir === 'rtl'
+  const isOnTop = switcher.dataset.location === "top";
+  const isOnBottom = switcher.dataset.location === "bottom";
+  const isOnBottomRight = switcher.dataset.location === "bottom-right";
+  const isRTL = document.documentElement.dir === "rtl";
 
   // Stuck on the left side of the switcher.
   let x = switcherRect.left;
 
-  if (isOnTop && !isRTL || isOnBottom && isRTL || isOnBottomRight && !isRTL) {
+  if ((isOnTop && !isRTL) || (isOnBottom && isRTL) || (isOnBottomRight && !isRTL)) {
     // Stuck on the right side of the switcher.
     x = switcherRect.right - optionsElement.clientWidth;
   }
@@ -32,7 +32,7 @@ function computeMenuTranslation(switcher, optionsElement) {
 function toggleMenu(switcher) {
   const optionsElement = switcher.nextElementSibling;
 
-  optionsElement.classList.toggle('hx:hidden');
+  optionsElement.classList.toggle("hx:hidden");
 
   // Calculate the position of a language options element.
   const translate = computeMenuTranslation(switcher, optionsElement);
@@ -43,7 +43,7 @@ function toggleMenu(switcher) {
 function resizeMenu(switcher) {
   const optionsElement = switcher.nextElementSibling;
 
-  if (optionsElement.classList.contains('hx:hidden')) return;
+  if (optionsElement.classList.contains("hx:hidden")) return;
 
   // Calculate the position of a language options element.
   const translate = computeMenuTranslation(switcher, optionsElement);

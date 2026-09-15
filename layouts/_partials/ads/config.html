@@ -1,0 +1,214 @@
+{{/* Resolve the advertising configuration for a page into a single dict.
+
+  Ads are off until `params.ads` exists, and `params.ads.enable: false` turns
+  them all off again without deleting the configuration. A site with no
+  `params.ads` gets a dict whose every slot is disabled, which renders the
+  pre-existing markup unchanged.
+
+  Four layers, each overriding the one before:
+
+  1. the defaults below
+  2. `params.ads` - applies to every slot and every shortcode call
+  3. the provider block, e.g. `params.ads.adsense`
+  4. the individual slot under `params.ads.slots`
+
+  Front matter is applied last. It can override presentation, and it can
+  disable the whole page or one named slot, but it cannot switch a slot on that
+  the site configuration left off - otherwise a copied post could start serving
+  ads on a site that had deliberately stopped.
+
+  Every key in the returned dict is lowercase. Hugo lowercases configuration
+  keys, so this lets `ads/pick.html` copy a configuration block straight over
+  the defaults with no camelCase translation table in between.
+
+  The provider's own fields are flattened into each slot rather than left in a
+  sub-dict, so `slot.html` and the `ad` shortcode both read one flat map and a
+  shortcode parameter can override any of them by name.
+
+  Resolution is cheap but not free and a page has several slots, so call this
+  through `partialCached` keyed on the page - the result depends on front
+  matter, so the key must identify the page.
+
+  @param {page} . The page being rendered.
+  @returns {dict} enable, slots (keyed by lowercase slot name), providers, and the common defaults.
+
+  @example {{ $ads := partialCached "ads/config.html" . .RelPermalink
+}}
+*/}}
+{{- $page := . -}}
+{{- $ads := site.Params.ads -}}
+
+{{/* Presentation defaults, shared by every slot and every shortcode call. */}}
+{{- $common := dict
+  "provider" "adsense"
+  "label" true
+  "labeltext" ""
+  "height" "280px"
+  "maxwidth" ""
+  "align" "center"
+  "class" ""
+  "border" true
+  "background" true
+  "placeholder" true
+  "production" true
+  "consent" ""
+-}}
+
+{{/* Field defaults per provider, flattened into a slot once its provider is
+  known. The names do not collide across providers, which is what makes the
+  flattening safe.
+*/}}
+{{- $providerFields := dict
+  "adsense" (dict "client" "" "format" "auto" "fullwidth" true "layout" "" "layoutkey" "" "test" false "verifyallpages" false)
+  "ethicalads" (dict "publisher" "" "type" "image" "style" "horizontal" "keywords" slice)
+  "carbon" (dict "serve" "" "placement" "")
+  "custom" dict
+-}}
+
+{{- $commonKeys := slice "provider" "label" "labeltext" "height" "maxwidth" "align" "class" "border" "background" "placeholder" "production" "consent" -}}
+{{- $fieldKeys := slice "client" "format" "fullwidth" "layout" "layoutkey" "test" "verifyallpages" "publisher" "type" "style" "keywords" "serve" "placement" -}}
+{{- $slotKeys := union $commonKeys $fieldKeys -}}
+
+{{/* The slots this theme has render points for. A name outside this list in
+  `params.ads.slots` is a typo, and is reported as one.
+*/}}
+{{- $slotNames := slice "blogbottom" "blogend" "bloglist" "docsbottom" -}}
+
+{{/* ------------------------------------------------------------- enabled? */}}
+{{- $enable := false -}}
+{{- if reflect.IsMap $ads -}}
+  {{- $enable = ne (index $ads "enable") false -}}
+{{- end -}}
+
+{{- $pageAds := $page.Params.ads -}}
+{{- if eq (printf "%v" $pageAds) "false" -}}
+  {{- $enable = false -}}
+{{- end -}}
+{{- if reflect.IsMap $pageAds -}}
+  {{- if eq (index $pageAds "enable") false -}}
+    {{- $enable = false -}}
+  {{- end -}}
+{{- end -}}
+
+{{/* ------------------------------------------------------------- defaults */}}
+{{- $slots := dict -}}
+{{- $providers := dict -}}
+
+{{- if $enable -}}
+  {{- $common = partial "ads/pick.html" (dict "onto" $common "from" $ads "keys" $commonKeys) -}}
+  {{- $common = partial "ads/pick.html" (dict "onto" $common "from" $pageAds "keys" $commonKeys) -}}
+
+  {{/* Each provider's fields, resolved once. The slot loop reads them from
+    here, and so does the `ad` shortcode, which has no slot to inherit from.
+  */}}
+  {{- range $name, $fields := $providerFields -}}
+    {{- $providers = merge $providers (dict $name (partial "ads/pick.html" (dict "onto" $fields "from" (index $ads $name) "keys" $fieldKeys))) -}}
+  {{- end -}}
+
+  {{- $slotConfig := index $ads "slots" -}}
+
+  {{/* A misspelled slot name would otherwise fail silently: the author sees no
+    ad, the build says nothing, and there is no wrong output to notice.
+  */}}
+  {{- if reflect.IsMap $slotConfig -}}
+    {{- range $name, $value := $slotConfig -}}
+      {{- if not (in $slotNames $name) -}}
+        {{- warnidf "ads-unknown-slot" "params.ads.slots has no slot named %q. Known slots: %s." $name (delimit $slotNames ", ") -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- range $name := $slotNames -}}
+    {{- $raw := "" -}}
+    {{- if reflect.IsMap $slotConfig -}}
+      {{- $raw = index $slotConfig $name -}}
+    {{- end -}}
+
+    {{/* A slot is a bare id, `true` for a provider that needs no id, or a map
+      carrying its own overrides. Absent or false leaves it off.
+    */}}
+    {{- $on := false -}}
+    {{- $id := "" -}}
+    {{- $isMap := reflect.IsMap $raw -}}
+    {{- if $isMap -}}
+      {{- $on = ne (index $raw "enable") false -}}
+      {{- $id = printf "%v" ((index $raw "slot") | default "") -}}
+    {{- else if eq (printf "%v" $raw) "true" -}}
+      {{- $on = true -}}
+    {{- else if $raw -}}
+      {{- $on = true -}}
+      {{- $id = printf "%v" $raw -}}
+    {{- end -}}
+
+    {{/* The provider has to be settled before its fields can be flattened. */}}
+    {{- $provider := index $common "provider" -}}
+    {{- if $isMap -}}
+      {{- $provider = (index $raw "provider") | default $provider -}}
+    {{- end -}}
+
+    {{- $opts := $common -}}
+    {{- with index $providers $provider -}}
+      {{- $opts = merge $opts . -}}
+    {{- end -}}
+    {{- $opts = partial "ads/pick.html" (dict "onto" $opts "from" $raw "keys" $slotKeys) -}}
+    {{- $opts = merge $opts (dict "provider" $provider "name" $name "slot" $id) -}}
+
+    {{/* Interleave spacing for `bloglist`; carried on every slot so callers
+      never have to check which one they are holding. `every` divides, so a
+      zero would fail the build rather than render nothing.
+    */}}
+    {{- $every := 4 -}}
+    {{- $offset := 0 -}}
+    {{- if $isMap -}}
+      {{- with index $raw "every" -}}{{- $every = . -}}{{- end -}}
+      {{- with index $raw "offset" -}}{{- $offset = . -}}{{- end -}}
+    {{- end -}}
+    {{- $every = cond (lt (int $every) 1) 1 (int $every) -}}
+    {{- $opts = merge $opts (dict "every" $every "offset" (int $offset)) -}}
+
+    {{/* Front matter can take a named slot away: `ads: { blogEnd: false }`. */}}
+    {{- if and $on (reflect.IsMap $pageAds) -}}
+      {{- if eq (index $pageAds $name) false -}}
+        {{- $on = false -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{/* Anything misconfigured is disabled rather than half-rendered, and is
+      reported once per build rather than once per page - a wrong client id
+      would otherwise print a warning for every page on the site.
+    */}}
+    {{- if $on -}}
+      {{- if not (index $providerFields $provider) -}}
+        {{- if ne $provider "custom" -}}
+          {{- warnidf (printf "ads-provider-%s" $provider) "ads: unknown provider %q. One of adsense, ethicalads, carbon." $provider -}}
+          {{- $on = false -}}
+        {{- end -}}
+      {{- end -}}
+      {{- if eq $provider "custom" -}}
+        {{- $html := partial "ads/creative.html" $id -}}
+        {{- if $html -}}
+          {{- $opts = merge $opts (dict "html" $html) -}}
+        {{- else -}}
+          {{- warnidf (printf "ads-creative-%s" $name) "ads: slot %q uses the custom provider but %q is not a creative under params.ads.custom." $name $id -}}
+          {{- $on = false -}}
+        {{- end -}}
+      {{- else if and (eq $provider "adsense") (not (index $opts "client")) -}}
+        {{- warnidf "ads-adsense-client" "ads: params.ads.adsense.client is not set, so no AdSense slot can render." -}}
+        {{- $on = false -}}
+      {{- else if and (eq $provider "adsense") (not $id) -}}
+        {{- warnidf (printf "ads-adsense-slot-%s" $name) "ads: slot %q needs an AdSense ad unit id. Give it the id as its value, or a map with a 'slot' key." $name -}}
+        {{- $on = false -}}
+      {{- else if and (eq $provider "ethicalads") (not (index $opts "publisher")) -}}
+        {{- warnidf "ads-ethicalads-publisher" "ads: params.ads.ethicalads.publisher is not set, so no EthicalAds slot can render." -}}
+        {{- $on = false -}}
+      {{- else if and (eq $provider "carbon") (or (not (index $opts "serve")) (not (index $opts "placement"))) -}}
+        {{- warnidf "ads-carbon-keys" "ads: Carbon needs both params.ads.carbon.serve and params.ads.carbon.placement." -}}
+        {{- $on = false -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- $slots = merge $slots (dict $name (merge $opts (dict "enable" $on))) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return (merge $common (dict "enable" $enable "slots" $slots "providers" $providers)) -}}

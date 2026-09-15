@@ -3,14 +3,15 @@
 {{- $alertTitle := .alertTitle -}}
 {{- $alertSign := .alertSign -}}
 
+{{- /* GitHub's own alert icons (Octicons), matching github.com rendering */ -}}
 {{- $icons := dict
-  "note" "information-circle"
-  "tip" "light-bulb"
-  "important" "information-circle"
-  "warning" "exclamation"
-  "caution" "exclamation-circle"
+  "note" "octicon-info"
+  "tip" "octicon-light-bulb"
+  "important" "octicon-report"
+  "warning" "octicon-alert"
+  "caution" "octicon-stop"
 -}}
-{{- $icon := or (index $icons $alertType) "light-bulb" -}}
+{{- $icon := or (index $icons $alertType) "octicon-info" -}}
 {{- $title := or $alertTitle (i18n $alertType) (title $alertType) -}}
 
 <div

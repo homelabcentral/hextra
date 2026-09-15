@@ -1,53 +1,159 @@
 /* Code syntax highlight */
 @import "./chroma/light.css";
 @import "./chroma/dark.css";
+/* Same palette, for blocks highlighted client-side by `codeimporter live=true`. */
+@import "./chroma/hljs.css";
 
 .hextra-code-block {
   @apply hx:text-[.9em] hx:leading-5;
 
   pre {
-    @apply hx:text-[.9em] hx:bg-primary-700/5 hx:overflow-x-auto hx:font-medium hx:subpixel-antialiased hx:dark:bg-primary-300/10 hx:contrast-more:border hx:contrast-more:border-primary-900/20 hx:contrast-more:contrast-150 hx:contrast-more:dark:border-primary-100/40;
+    /* @apply hx:text-[.9em] hx:bg-neutral-50 hx:overflow-x-auto hx:font-medium hx:subpixel-antialiased hx:dark:bg-neutral-950 hx:contrast-more:border hx:contrast-more:border-hextra-accent-900/20 hx:contrast-more:contrast-150 hx:contrast-more:dark:border-hextra-accent-100/40; */
+    @apply hx:text-[.9em] hx:bg-neutral-50 hx:border hx:border-neutral-400 hx:overflow-x-auto hx:font-medium hx:subpixel-antialiased hx:dark:border hx:dark:border-neutral-700 hx:dark:bg-neutral-950 hx:contrast-more:border hx:contrast-more:border-hextra-accent-900/20 hx:contrast-more:contrast-150 hx:contrast-more:dark:border-hextra-accent-100/40;
   }
 
+  /* .code-border {
+    @apply hx:border-2 hx:dark:border hx:border-neutral-400 hx:dark:border-neutral-700 hx:rounded-xl hx:dark:rounded-xl;
+  } */
+
   .hextra-code-filename {
-    @apply hx:absolute hx:top-0 hx:z-1 hx:w-full hx:truncate hx:rounded-t-xl hx:bg-primary-700/5 hx:py-2 hx:px-4 hx:text-xs hx:text-gray-700 hx:dark:bg-primary-300/10 hx:dark:text-gray-200;
+    @apply hx:absolute hx:top-0 hx:z-1 hx:w-full hx:flex hx:items-center hx:gap-1.5 hx:rounded-t-lg hx:bg-neutral-200 hx:py-3 hx:px-4 hx:text-xs hx:text-neutral-700 hx:dark:bg-neutral-800 hx:dark:text-neutral-200 hx:border-1  hx:border-neutral-400 hx:dark:border-1 hx:dark:border-neutral-700;
+  }
+
+  /* Pinned to the inline-end of the bar. The copy button drops to top-10 when a
+     filename is present, so the two never overlap. */
+  .hextra-code-filename__action {
+    @apply hx:ms-auto hx:shrink-0 hx:inline-flex hx:items-center hx:no-underline hx:opacity-70 hx:transition-opacity;
+
+    &:hover,
+    &:focus-visible {
+      @apply hx:opacity-100;
+    }
+  }
+
+  .hextra-code-filename svg {
+    /* Icons fill the bar's content height, keep aspect ratio, and inherit the
+       bar text color so they adapt to light/dark mode */
+    @apply hx:h-4 hx:w-auto hx:shrink-0;
+    fill: currentColor;
   }
 
   .hextra-code-filename + pre:not(.lntable pre) {
     /* Override padding for code blocks with filename but no highlight */
-    @apply hx:pt-12;
+    @apply hx:pt-14;
   }
+
+  /* .highlight {
+    @apply hx:border-2 hx:dark:border hx:border-neutral-400 hx:dark:border-neutral-700 hx:rounded-xl hx:dark:rounded-xl;
+  } */
 }
 
 .hextra-code-block pre:not(.lntable pre) {
-  @apply hx:px-4 hx:mb-4 hx:py-4 hx:rounded-xl;
+  @apply hx:px-4 hx:mb-4 hx:py-4 hx:rounded-lg;
 }
 
 .hextra-code-block div:nth-of-type(2) pre {
-  @apply hx:pt-12 hx:pb-4;
+  @apply hx:pt-14 hx:pb-4;
 }
 
 .chroma {
+  /*
+    The border belongs on the element that scrolls. It used to sit on the two
+    inner <pre>s, which are content inside this table, so a block wider than
+    its column scrolled its own left border out of view one way and its right
+    border out the other. The plain (non-line-numbered) block never had the
+    bug because there the <pre> is itself the scroll container.
+  */
   .lntable {
-    @apply hx:m-0 hx:block hx:w-auto hx:overflow-auto hx:rounded-xl;
+    @apply hx:m-0 hx:block hx:w-auto hx:overflow-auto hx:rounded-lg;
+    @apply hx:border hx:border-neutral-400 hx:dark:border-neutral-700;
 
     pre {
       @apply hx:pt-4 hx:pb-4;
     }
   }
   .ln,
-  .lnt:not(.hl > .lnt),
-  .hl:not(.line) {
+  .lnt:not(.hl > .lnt) {
     @apply hx:pl-4 hx:pr-4 hx:min-w-[2.6rem] hx:text-neutral-600 hx:dark:text-neutral-300;
+  }
+  /* Highlighted rows in the numbers cell carry the 2px accent left border,
+     so take those 2px out of the padding to keep the numbers aligned with
+     unhighlighted rows */
+  .hl:not(.line) {
+    @apply hx:pl-[calc(1rem-2px)] hx:pr-4 hx:min-w-[2.6rem] hx:text-neutral-600 hx:dark:text-neutral-300;
   }
   .lntd {
     @apply hx:p-0 hx:align-top;
+
+    /* pre {
+      @apply hx:rounded-sm;
+    } */
+  }
+  /*
+    Keep the numbers beside the code they belong to while the code scrolls
+    under them. No z-index: being positioned is already enough to paint above
+    the code cell, and staying at `auto` leaves the filename bar (z-1) on top
+    where it belongs. The divider between the numbers and the code is opt-in;
+    see the .hextra-lineno-divider rule at the end of this file.
+  */
+  .lntd:first-child {
+    /* inset-inline-start, not left: on an RTL page the numbers cell lays out
+       on the visual right, and pinning it to the left of the scroll box
+       detached it from its rows and parked it on top of the code. */
+    @apply hx:sticky hx:start-0;
+  }
+  /* Borders and rounding now live on .lntable, which is what scrolls. */
+  .lntd:first-child pre,
+  .lntd:last-child pre {
+    @apply hx:border-0 hx:rounded-none;
+  }
+  /*
+    The code cell gets the same horizontal padding a non-table block has, so
+    the first character does not sit flush against the numbers divider. Only
+    the numbers cell was padded before (see .ln/.lnt above), which left the
+    code touching the rule.
+  */
+  .lntd:last-child pre {
+    @apply hx:px-4;
   }
   .lntd:last-of-type {
     @apply hx:w-full;
   }
   /* LineHighlight */
   .hl {
-    @apply hx:block hx:w-full hx:bg-primary-800/10;
+    /* @apply hx:block hx:w-full hx:bg-hextra-accent-800/10; */
+    @apply hx:block hx:w-full hx:dark:bg-hextra-accent-950/60 hx:dark:border-l-2 hx:dark:border-hextra-accent-500 hx:bg-hextra-accent-200/60 hx:border-l-2 hx:border-hextra-accent-500;
   }
+  /* In inline (non-table) blocks the pre has px-4, so bleed the highlight
+     into that padding to span the full block width; pad back 1rem minus the
+     2px accent border so highlighted text stays aligned with other lines */
+  code > .line.hl {
+    @apply hx:-mx-4 hx:w-[calc(100%+2rem)] hx:pl-[calc(1rem-2px)] hx:pr-4;
+  }
+  /* Same bleed as above now that the table's code cell is padded too, so a
+     highlighted row still reaches the divider instead of starting a notch
+     inside it. No 2px accent compensation here: the accent border is removed
+     on this side (see below), so the padding matches unhighlighted lines. */
+  .lntable code > .line.hl {
+    @apply hx:-mx-4 hx:w-[calc(100%+2rem)] hx:pl-4 hx:pr-4;
+  }
+  .lntd:last-child pre code .hl {
+    border-left: none !important;
+    /* Or with Tailwind, apply 'border-l-0' if using utilities:
+  @apply border-l-0;
+  */
+  }
+}
+
+/*
+  Optional rule between the line numbers and the code, off by default. Set
+  params.highlight.lineNumberDivider.enable to put the class on <body> (see
+  baseof.html) - the line-number table is Chroma's markup, so there is no
+  per-block element to hang it on.
+
+  Without it the two columns are still separated by the numbers cell's padding
+  and the code cell's, which is the theme's original look.
+*/
+.hextra-lineno-divider .chroma .lntd:first-child {
+  @apply hx:border-e hx:border-neutral-400 hx:dark:border-neutral-700;
 }

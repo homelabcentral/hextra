@@ -24,7 +24,7 @@ title: 详情
 
 ## 使用方法
 
-````markdown
+```markdown
 {{</* details title="详情" */>}}
 
 这是详情的内容。
@@ -32,12 +32,12 @@ title: 详情
 支持 **Markdown** 格式。
 
 {{</* /details */>}}
-````
+```
 
-````markdown
+```markdown
 {{</* details title="点击我展开" closed="true" */>}}
 
 默认情况下，这部分内容会被隐藏。
 
 {{</* /details */>}}
-````
+```

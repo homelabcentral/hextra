@@ -1,0 +1,110 @@
+# Tag and publish a GitHub release when the VERSION file changes on main.
+#
+# Deployment (pages.yml) runs on every push to main; this does not. A release
+# is cut only by a commit that changes VERSION, so an ordinary merge ships the
+# site without minting a version nobody asked for.
+name: Release
+
+on:
+  push:
+    branches: ["main"]
+    paths: ["VERSION"]
+
+  # Re-run after a failure without having to touch VERSION again. The tag guard
+  # below makes this a no-op once the release exists.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "release"
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the changelog diffs against the previous tag
+          fetch-tags: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Read VERSION
+        id: version
+        run: |
+          VERSION="$(tr -d ' \t\n\r' < VERSION)"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error file=VERSION::Not a semantic version: '$VERSION'"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          # A version with a semver prerelease suffix must not be published as
+          # the latest release: GitHub picks "Latest" as the newest release
+          # that is neither draft nor prerelease.
+          if [[ "$VERSION" == *-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Re-running the workflow, or landing an unrelated edit to VERSION, must
+      # not try to move a tag that is already published.
+      - name: Check whether the tag already exists
+        id: guard
+        run: |
+          if git rev-parse -q --verify "refs/tags/${{ steps.version.outputs.tag }}" >/dev/null; then
+            echo "::notice::${{ steps.version.outputs.tag }} already exists, nothing to release"
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build release notes
+        if: steps.guard.outputs.release == 'true'
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          node scripts/changelog.mjs --version "${{ steps.version.outputs.version }}" > release-notes.md
+          echo "--- release notes ---"
+          cat release-notes.md
+
+      - name: Build source archive
+        if: steps.guard.outputs.release == 'true'
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          # git archive exports tracked files only, so build outputs and local
+          # scratch never reach the zip.
+          git archive --format=zip --prefix="hextra-${TAG}/" -o "hextra-${TAG}-source.zip" HEAD
+          unzip -l "hextra-${TAG}-source.zip" | tail -1
+
+      - name: Create release
+        if: steps.guard.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          PRERELEASE: ${{ steps.version.outputs.prerelease }}
+        run: |
+          FLAGS=()
+          if [[ "$PRERELEASE" == "true" ]]; then
+            FLAGS+=(--prerelease)
+          fi
+          # gh creates the tag at --target, so there is no separate tag push.
+          gh release create "$TAG" \
+            --target "${{ github.sha }}" \
+            --title "$TAG" \
+            --notes-file release-notes.md \
+            "${FLAGS[@]}" \
+            "hextra-${TAG}-source.zip"

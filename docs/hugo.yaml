@@ -1,3 +1,8 @@
+# Opt in to the theme's taxonomies (category, tag, series). Hugo only honours
+# a merge strategy set here, not in the theme's own config.
+taxonomies:
+  _merge: shallow
+
 # Configuration
 baseURL: "https://example.com/"
 title: "Hextra"
@@ -30,45 +35,51 @@ languages:
     weight: 2
     title: هگزترا
     params:
-      banner:
-        message: |
-          هگزترا **v0.12** منتشر شد! 🎉 [تازه‌ها را ببینید]({{% relref "blog/v0.12" %}})
       page:
         contextMenu:
           links:
             - name: باز کردن در ChatGPT
               icon: chatgpt
+              description: درباره این صفحه سوال بپرسید
               url: "https://chatgpt.com/?hints=search&q=%D8%AF%D8%A7%D8%B1%D9%85+%D8%A7%DB%8C%D9%86+%D9%85%D8%B3%D8%AA%D9%86%D8%AF%D8%A7%D8%AA+%D8%B1%D8%A7+%D9%85%DB%8C%E2%80%8C%D8%AE%D9%88%D8%A7%D9%86%D9%85%3A+{url}%0A%DA%A9%D9%85%DA%A9%D9%85+%DA%A9%D9%86+%D8%A8%D9%81%D9%87%D9%85%D9%85+%DA%86%D8%B7%D9%88%D8%B1+%D8%A7%D8%B2+%D8%A2%D9%86+%D8%A7%D8%B3%D8%AA%D9%81%D8%A7%D8%AF%D9%87+%DA%A9%D9%86%D9%85."
+            - name: باز کردن در Claude
+              icon: claude
+              description: درباره این صفحه سوال بپرسید
+              url: "https://claude.ai/new?q=%D8%AF%D8%A7%D8%B1%D9%85+%D8%A7%DB%8C%D9%86+%D9%85%D8%B3%D8%AA%D9%86%D8%AF%D8%A7%D8%AA+%D8%B1%D8%A7+%D9%85%DB%8C%E2%80%8C%D8%AE%D9%88%D8%A7%D9%86%D9%85%3A+{url}%0A%DA%A9%D9%85%DA%A9%D9%85+%DA%A9%D9%86+%D8%A8%D9%81%D9%87%D9%85%D9%85+%DA%86%D8%B7%D9%88%D8%B1+%D8%A7%D8%B2+%D8%A2%D9%86+%D8%A7%D8%B3%D8%AA%D9%81%D8%A7%D8%AF%D9%87+%DA%A9%D9%86%D9%85."
   ja:
     label: 日本語
     locale: ja-JP
     weight: 3
     title: Hextra
     params:
-      banner:
-        message: |
-          Hextra **v0.12** がリリースされました！🎉 [新着情報はこちら]({{% relref "blog/v0.12" %}})
       page:
         contextMenu:
           links:
             - name: ChatGPTで開く
               icon: chatgpt
+              description: このページについて質問する
               url: "https://chatgpt.com/?hints=search&q=%E3%81%93%E3%81%AE%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%82%92%E8%AA%AD%E3%82%93%E3%81%A7%E3%81%84%E3%81%BE%E3%81%99%3A+{url}%0A%E4%BD%BF%E3%81%84%E6%96%B9%E3%82%92%E7%90%86%E8%A7%A3%E3%81%99%E3%82%8B%E3%81%AE%E3%82%92%E6%89%8B%E4%BC%9D%E3%81%A3%E3%81%A6%E3%81%8F%E3%81%A0%E3%81%95%E3%81%84%E3%80%82"
+            - name: Claudeで開く
+              icon: claude
+              description: このページについて質問する
+              url: "https://claude.ai/new?q=%E3%81%93%E3%81%AE%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%82%92%E8%AA%AD%E3%82%93%E3%81%A7%E3%81%84%E3%81%BE%E3%81%99%3A+{url}%0A%E4%BD%BF%E3%81%84%E6%96%B9%E3%82%92%E7%90%86%E8%A7%A3%E3%81%99%E3%82%8B%E3%81%AE%E3%82%92%E6%89%8B%E4%BC%9D%E3%81%A3%E3%81%A6%E3%81%8F%E3%81%A0%E3%81%95%E3%81%84%E3%80%82"
   zh-cn:
     label: 简体中文
     locale: zh-CN
     weight: 4
     title: Hextra
     params:
-      banner:
-        message: |
-          Hextra **v0.12** 发布啦！🎉 查看[更新内容]({{% relref "blog/v0.12" %}})
       page:
         contextMenu:
           links:
             - name: 在 ChatGPT 中打开
               icon: chatgpt
+              description: 就这个页面提问
               url: "https://chatgpt.com/?hints=search&q=%E6%88%91%E6%AD%A3%E5%9C%A8%E9%98%85%E8%AF%BB%E8%BF%99%E4%B8%AA%E6%96%87%E6%A1%A3%3A+{url}%0A%E5%B8%AE%E6%88%91%E7%90%86%E8%A7%A3%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E5%AE%83%E3%80%82"
+            - name: 在 Claude 中打开
+              icon: claude
+              description: 就这个页面提问
+              url: "https://claude.ai/new?q=%E6%88%91%E6%AD%A3%E5%9C%A8%E9%98%85%E8%AF%BB%E8%BF%99%E4%B8%AA%E6%96%87%E6%A1%A3%3A+{url}%0A%E5%B8%AE%E6%88%91%E7%90%86%E8%A7%A3%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E5%AE%83%E3%80%82"
 
 module:
   hugoVersion:
@@ -77,7 +88,7 @@ module:
 
   workspace: hugo.work
   imports:
-    - path: github.com/imfing/hextra
+    - path: github.com/homelabcentral/hextra
 
 markup:
   highlight:
@@ -88,7 +99,7 @@ markup:
     extensions:
       passthrough:
         delimiters:
-          block: [['\[', '\]'], ['$$', '$$']]
+          block: [['\[', '\]'], ["$$", "$$"]]
           inline: [['\(', '\)']]
         enable: true
 
@@ -123,7 +134,7 @@ menu:
         type: search
     - name: GitHub
       weight: 7
-      url: "https://github.com/imfing/hextra"
+      url: "https://github.com/homelabcentral/hextra"
       params:
         icon: github
     - identifier: development
@@ -157,6 +168,55 @@ menu:
       parent: more
       weight: 3
 
+  # Left identity rail on blog pages. Entries with a label become navigation
+  # rows; entries with only params.icon become the social links row.
+  blog:
+    - identifier: home
+      name: Home
+      pageRef: /
+      weight: 1
+      params:
+        type: link
+        icon: home
+    - identifier: blog
+      name: Blog
+      pageRef: /blog
+      weight: 2
+      params:
+        type: link
+        icon: newspaper
+    - identifier: documentation
+      name: Documentation
+      pageRef: /docs
+      weight: 3
+      params:
+        type: link
+        icon: book-open
+    - identifier: archives
+      name: Archives
+      pageRef: /archives
+      weight: 4
+      params:
+        type: link
+        icon: clock
+    - identifier: about
+      name: About
+      pageRef: /about
+      weight: 5
+      params:
+        type: link
+        icon: user-circle
+    - name: GitHub
+      url: "https://github.com/homelabcentral/hextra"
+      weight: 10
+      params:
+        icon: github
+    - name: RSS
+      url: /blog/index.xml
+      weight: 11
+      params:
+        icon: rss
+
   sidebar:
     - identifier: more
       name: More
@@ -175,12 +235,42 @@ menu:
 params:
   description: Modern, responsive, batteries-included Hugo theme for creating beautiful static websites.
 
-  externalLinkDecoration: true
+  # Google Fonts Configuration
+  fonts:
+    # Enable Google Fonts integration
+    enable: true
+    # Heading font configuration
+    heading:
+      family: "Sora"
+      axes: "wght@100..800"
+      display: "swap"
+    # Body font configuration
+    body:
+      family: "Mozilla Text"
+      axes: "wght@200..700"
+      display: "swap"
+    # Code block font configuration
+    code:
+      family: "Google Sans Code"
+      axes: "ital,wght@0,300;1,300"
+      display: "swap"
+    # Monospaced interface chrome — keyboard keys, shortcut badges, notebook
+    # execution counts, swatch hex labels. Deliberately not `code`: those are
+    # UI, not code to read. Omit `family` to use the fallback stack alone.
+    mono:
+      # IBM Plex Mono is not a variable font — discrete weights only. A range
+      # such as `wght@400..600` is rejected by the Google Fonts API with a 400.
+      family: "IBM Plex Mono"
+      axes: "wght@400;500;600"
+      display: "swap"
 
-  banner:
-    key: 'announcement-v0.12'
-    message: |
-      Hextra **v0.12** is here! 🎉 Discover [what's new]({{% relref "blog/v0.12" %}})
+    # Fallback fonts (used if Google Fonts fail to load)
+    fallbacks:
+      heading: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+      body: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+      code: "ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace"
+      mono: "SFMono-Regular, 'SF Mono', ui-monospace, Consolas, 'Liberation Mono', Menlo, monospace"
+  externalLinkDecoration: true
 
   navbar:
     displayTitle: true
@@ -211,6 +301,15 @@ params:
   # Display the author name of the last modified date
   displayUpdatedAuthor: false
 
+  # License notice, shown at the inline-start of the same row as the
+  # last-modified date. Off unless `enable` is true. The sentence itself is the
+  # `license` i18n string; only the name and URL are configured here, so any
+  # license works — MIT, CC BY-SA, and so on.
+  license:
+    enable: true
+    name: "CC BY 4.0"
+    url: "https://creativecommons.org/licenses/by/4.0/"
+
   # Search
   # flexsearch is enabled by default
   search:
@@ -226,7 +325,7 @@ params:
 
   editURL:
     enable: true
-    base: "https://github.com/imfing/hextra/edit/main/docs/content"
+    base: "https://github.com/homelabcentral/hextra/edit/main/docs/content"
 
   blog:
     list:
@@ -236,9 +335,75 @@ params:
       sortOrder: desc # or "asc"
       # Pagination
       pagerSize: 20
+      # Post cards with a cover image, reading time and excerpt.
+      # Remove this block to fall back to the plain list.
+      card:
+        enable: true
+        cover: true
+        readingTime: true
 
     article:
       displayPagination: true
+      cover: true
+      readingTime: true
+      tags: true
+      share:
+        links:
+          - name: X
+            icon: x-twitter
+            url: "https://x.com/intent/tweet?url={url}&text={title}"
+          - name: LinkedIn
+            icon: linkedin
+            url: "https://www.linkedin.com/sharing/share-offsite/?url={url}"
+          - name: Bluesky
+            icon: bluesky
+            url: "https://bsky.app/intent/compose?text={title}%20{url}"
+          - name: Facebook
+            icon: facebook
+            url: "https://www.facebook.com/sharer/sharer.php?u={url}"
+          # Mastodon is federated and has no central share endpoint, so this
+          # points at one instance's /share route. Swap the host for your own.
+          - name: Mastodon
+            icon: mastodon
+            url: "https://mastodon.social/share?text={title}%20{url}"
+          - name: Telegram
+            icon: telegram
+            url: "https://t.me/share/url?url={url}&text={title}"
+          # No url: `type: copy` copies the post's permalink to the clipboard.
+          - name: Copy link
+            icon: link
+            type: copy
+      related:
+        count: 3
+      # "This article is part of a series" module, on every post with `series`
+      # in front matter. Remove this block to turn it off.
+      series:
+        enable: true
+        opened: false
+
+    # Left identity rail. Links come from the `blog` menu above; every element
+    # below renders only when its key is present.
+    rail:
+      onArticle: true
+      profile:
+        avatar: images/space.jpg
+        name: Hextra
+        tagline: Notes, release announcements and guides from the Hextra project.
+      sponsor:
+        title: Sponsor
+        text: Hextra is built in the open, with no ads and no trackers.
+        url: /about
+        label: Become a sponsor →
+        icon: heart
+
+    # Right rail sections, rendered in this order.
+    widgets:
+      recent:
+        count: 5
+      pinned:
+        count: 3
+      tags:
+        count: 12
 
   archives:
     # Source section used for the archives page.
@@ -254,24 +419,123 @@ params:
       enable: true
       # hover | always
       display: hover
+    # Vertical rule between the line numbers and the code. Off by default;
+    # flip to true to see it on the syntax highlighting page.
+    lineNumberDivider:
+      enable: false
+
+  command:
+    # Prompt glyph for the `command` shortcode and for a post's `coverText`.
+    prompt: "$"
+    # Width over height of a text cover. Larger is shorter; the renderer
+    # divides it by the number of lines.
+    coverRatio: 7.2
 
   page:
     # full (100%), wide (90rem), normal (80rem)
-    width: normal
-    # tabs:
-    #   sync: true
+    width: wide
+    tabs:
+      sync: true
     contextMenu:
       enable: true
+      # Hugo merges maps but replaces slices, so a per-language `links:` block
+      # overrides this list outright rather than adding to it. Every language
+      # that defines any link must therefore repeat all of them - see the fa,
+      # ja and zh-cn blocks near the top of this file.
       links:
         - name: Open in ChatGPT
           icon: chatgpt
+          description: Ask questions about this page
           url: "https://chatgpt.com/?hints=search&q=I%27m+looking+at+this+documentation%3A+{url}%0AHelp+me+understand+how+to+use+it."
         - name: Open in Claude
           icon: claude
+          description: Ask questions about this page
           url: "https://claude.ai/new?q=I%27m+looking+at+this+documentation%3A+{url}%0AHelp+me+understand+how+to+use+it."
 
   imageZoom:
     enable: true
+
+  # Advertising. Left commented out on purpose: this site's own sponsor copy
+  # says Hextra carries no ads and no trackers, and uncommenting this would
+  # make that a lie. Uncomment on your own site.
+  #
+  # Nothing renders until this block exists. `enable: false` silences every ad
+  # while keeping the settings, and any page can opt out with `ads: false` in
+  # its front matter. Ads never render outside a production build; a dashed
+  # placeholder box is drawn at the reserved height instead.
+  #
+  # ads:
+  #   enable: true
+  #
+  #   # Default network for every slot and every `ad` shortcode.
+  #   # adsense | ethicalads | carbon | custom
+  #   provider: adsense
+  #
+  #   # Presentation defaults. Any slot, and any shortcode call, can override
+  #   # every one of these by name.
+  #   label: true # the "Advertisement" caption
+  #   labelText: "" # replaces the caption text
+  #   height: 280px # reserved height, so arriving ads do not shift the page
+  #   maxWidth: "" # cap the width, e.g. 728px
+  #   align: center # left | center | right
+  #   border: true # hairline around the ad
+  #   background: true # tinted area behind it
+  #   class: "" # extra classes on the wrapper
+  #   placeholder: true # draw the dashed box outside production
+  #   production: true # false renders live ads in development too
+  #   consent: "" # "npa" asks AdSense for non-personalised ads
+  #
+  #   adsense:
+  #     client: ca-pub-XXXXXXXXXXXXXXXX
+  #     format: auto # auto | fluid | rectangle | vertical | horizontal
+  #     fullWidth: true
+  #     layout: "" # in-article and in-feed units
+  #     layoutKey: "" # in-feed units
+  #     test: false # request test ads instead of live ones
+  #     # Put the loader on every page rather than only on pages carrying an
+  #     # ad. AdSense looks for it while reviewing your site, and Auto ads
+  #     # needs it site-wide. Configuring one slot achieves the same thing.
+  #     verifyAllPages: false
+  #
+  #   ethicalads:
+  #     publisher: your-publisher-id
+  #     type: image # image | text
+  #     style: horizontal # horizontal | vertical | raw
+  #     keywords: [hugo, documentation]
+  #
+  #   carbon:
+  #     serve: XXXXXXXX
+  #     placement: yoursite
+  #
+  #   # Named creatives for the `custom` provider: house ads and sponsor
+  #   # banners, no ad network involved. A slot or a shortcode names one with
+  #   # `slot`, e.g. {{< ad provider="custom" slot="sponsor" >}}.
+  #   custom:
+  #     sponsor: '<a href="/sponsor">Sponsor this project</a>'
+  #
+  #   # Where ads appear. Omit a slot and that position stays empty. A value is
+  #   # the ad unit id, or `true` for a network that needs no id, or a map
+  #   # carrying any of the keys above plus its own `provider`.
+  #   slots:
+  #     # Blog post, directly below the article body.
+  #     blogBottom: "1111111111"
+  #     # Blog post, directly above the comments.
+  #     blogEnd: "2222222222"
+  #     # Blog index, after every `every` cards, skipping the first `offset`.
+  #     # Never after the last card on a page.
+  #     blogList:
+  #       slot: "3333333333"
+  #       every: 4
+  #       offset: 0
+  #     # Docs page, directly below the page body.
+  #     docsBottom:
+  #       slot: "4444444444"
+  #       height: 120px
+  #       format: horizontal
+  #
+  # Ads also require two things this theme cannot provide: an ads.txt file at
+  # your site root, and - for EU traffic with personalised ads - a consent
+  # management platform, which you enable in your AdSense account.
 
   comments:
     enable: false
@@ -279,10 +543,13 @@ params:
 
     # https://giscus.app/
     giscus:
-      repo: imfing/hextra
-      repoId: R_kgDOJ9fJag
+      repo: homelabcentral/hextra
+      # repoId and categoryId are GitHub node IDs, not derivable from the repo
+      # name. Generate both at https://giscus.app for your own repository
+      # before setting comments.enable to true.
+      repoId: ""
       category: General
-      categoryId: DIC_kwDOJ9fJas4CY7gW
+      categoryId: ""
       # mapping: pathname
       # strict: 0
       # reactionsEnabled: 1

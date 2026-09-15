@@ -1,0 +1,100 @@
+.hextra-timeline {
+  @apply hx:my-6 hx:list-none hx:p-0;
+}
+
+.hextra-timeline__item {
+  @apply hx:relative hx:pb-6;
+  padding-inline-start: 3rem;
+}
+
+/*
+  The rail. Written as plain CSS rather than @apply: Tailwind variants append
+  their selector after `::before`, which never matches, so `dark:` and
+  `ltr:`/`rtl:` utilities silently do nothing on a pseudo-element. Logical
+  properties handle RTL without a variant.
+
+  Note the `--hx-` prefix: `@import "tailwindcss" prefix(hx)` in `styles.css`
+  prefixes the emitted custom properties too, so the unprefixed
+  `--color-neutral-300` a Tailwind reference would give you does not exist.
+*/
+.hextra-timeline__item::before {
+  content: "";
+  position: absolute;
+  top: 2.625rem;
+  bottom: 0;
+  width: 1px;
+  inset-inline-start: 15.5px;
+  background-color: var(--hx-color-neutral-300);
+}
+
+.dark .hextra-timeline__item::before {
+  background-color: var(--hx-color-neutral-700);
+}
+
+.hextra-timeline__marker {
+  @apply hx:absolute hx:top-1.5 hx:flex hx:size-8 hx:items-center hx:justify-center;
+  @apply hx:rounded-full hx:border;
+  @apply hx:border-neutral-300 hx:bg-neutral-50 hx:text-neutral-500;
+  @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-800 hx:dark:text-neutral-400;
+  inset-inline-start: 0;
+}
+
+.hextra-timeline__content {
+  @apply hx:rounded-lg hx:border hx:px-4 hx:py-3;
+  @apply hx:border-neutral-200 hx:bg-neutral-50;
+  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
+}
+
+/*
+  The badge is pinned to the inline-end of the first row and never wraps below
+  it: the header takes the remaining space and wraps within itself instead.
+*/
+.hextra-timeline__head {
+  @apply hx:flex hx:items-start hx:gap-3;
+}
+
+.hextra-timeline__header {
+  @apply hx:min-w-0 hx:grow hx:font-semibold hx:text-neutral-900 hx:dark:text-neutral-100;
+}
+
+.hextra-timeline__badge {
+  @apply hx:shrink-0 hx:ms-auto;
+}
+
+.hextra-timeline__subheader {
+  @apply hx:mt-1 hx:text-sm hx:text-neutral-600 hx:dark:text-neutral-400;
+}
+
+.hextra-timeline__body {
+  @apply hx:mt-3 hx:text-sm hx:leading-relaxed;
+  @apply hx:text-neutral-700 hx:dark:text-neutral-300;
+
+  > :first-child {
+    @apply hx:mt-0;
+  }
+
+  > :last-child {
+    @apply hx:mb-0;
+  }
+
+  ul,
+  ol {
+    @apply hx:my-2 hx:ps-5;
+  }
+
+  ul {
+    @apply hx:list-disc;
+  }
+
+  ol {
+    @apply hx:list-decimal;
+  }
+
+  li {
+    @apply hx:my-1;
+  }
+
+  p + p {
+    @apply hx:mt-2;
+  }
+}

@@ -1,29 +1,64 @@
 {{ $filename := .filename | default "" -}}
 {{ $base_url := .base_url | default "" -}}
 {{ $lang := .lang | default "" }}
+{{ $icon := .icon | default "" }}
 {{ $content := .content }}
 {{ $options := .options | default (dict) }}
+{{/* Optional icon link pinned to the inline-end of the filename bar.
+     dict "url" <href> "icon" <icon name> "label" <accessible name> */}}
+{{ $action := .action | default (dict) }}
 
 {{- if $filename -}}
+  {{- $iconName := "" -}}
+  {{- if or (eq site.Params.highlight.filenameIcon.enable nil) site.Params.highlight.filenameIcon.enable -}}
+    {{- $iconName = partial "utils/codeblock-icon" (dict "filename" $filename "lang" $lang "icon" $icon) -}}
+  {{- end -}}
   <div class="hextra-code-filename not-prose" dir="auto">
+    {{- with $iconName -}}
+      {{- partial "utils/icon" (dict "name" . "attributes" `aria-hidden="true"`) -}}
+    {{- end -}}
     {{- if $base_url -}}
 
       {{- $base_url = strings.TrimSuffix "/" $base_url -}}
       {{- $filename = strings.TrimPrefix "/" $filename -}}
       {{- $file_url := urls.JoinPath $base_url $filename -}}
 
-      <a class="hx:no-underline hx:inline-flex hx:items-center hx:gap-1" href="{{ $file_url }}" target="_blank" rel="noopener noreferrer">
-          <span>{{- $filename -}}</span>
-          {{- partial "utils/icon" (dict "name" "external-link" "attributes" "height=1em") -}}
+
+      <a class="hx:no-underline hx:inline-flex hx:items-center hx:gap-1 hx:min-w-0" href="{{ $file_url }}" target="_blank" rel="noopener noreferrer">
+        <span class="hx:truncate">{{- $filename -}}</span>
+        {{- partial "utils/icon" (dict "name" "external-link" "attributes" "height=1em") -}}
       </a>
     {{- else -}}
-      {{- $filename -}}
+      <span class="hx:truncate">{{- $filename -}}</span>
+    {{- end -}}
+    {{- with $action.url -}}
+      <a
+        class="hextra-code-filename__action"
+        href="{{ . }}"
+        target="_blank"
+        rel="noreferrer"
+        title="{{ $action.label }}"
+        aria-label="{{ $action.label }}"
+      >
+        {{- partial "utils/icon" (dict "name" ($action.icon | default "external-link") "attributes" `aria-hidden="true"`) -}}
+      </a>
     {{- end -}}
   </div>
 {{- end -}}
 
 {{- if transform.CanHighlight $lang -}}
   <div>{{- highlight $content $lang $options -}}</div>
+{{- else if $options -}}
+  {{- /*
+    Chroma has no lexer for this language - `env`, or any imported URL with no
+    file extension - but the caller still asked for line numbers or highlighted
+    lines. Rendering as plain text keeps those options working; the plain
+    <pre> below silently dropped them, so codeimporter's documented lineNos,
+    hl_lines and lineNoStart did nothing at all for such a file.
+  */ -}}
+  <div>{{- highlight $content "text" $options -}}</div>
 {{- else -}}
-  <div><pre><code>{{ $content }}</code></pre></div>
+  <div>
+    <pre><code>{{ $content }}</code></pre>
+  </div>
 {{- end -}}

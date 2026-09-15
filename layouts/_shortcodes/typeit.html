@@ -1,0 +1,106 @@
+{{/* Type out one or more strings with a typewriter effect.
+
+  Each line of the inner content is one string. With breakLines the strings are
+  typed one under another; without it, each string is deleted and replaced by the
+  next.
+
+  The strings are rendered into the page as normal text and only animated once
+  the script runs, so the content is present for search engines, for readers with
+  scripting disabled, and for anyone who prefers reduced motion.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração), which wraps the TypeIt
+  library. TypeIt is GPL-3.0 and needs a paid licence for commercial use, so this
+  implements the effect directly rather than shipping it.
+
+  @param {string} tag HTML tag to render the strings in. Default "div".
+  @param {string} classList Extra CSS classes for the element.
+  @param {string} initialString String shown before typing starts, then deleted.
+  @param {int} speed Milliseconds between characters. Default 100.
+  @param {bool} lifeLike Vary the pace as a person would. Default true.
+  @param {int} startDelay Milliseconds before typing begins. Default 250.
+  @param {bool} breakLines Type strings on separate lines instead of replacing. Default true.
+  @param {bool} waitUntilVisible Wait until scrolled into view. Default true.
+  @param {bool} loop Restart after the last string. Default false.
+
+  @example {{< typeit
+>}}Lorem
+ipsum dolor sit
+amet{{< /typeit >}}
+@example
+{{< typeit tag="h3" speed=50 breakLines=false loop=true >}}
+First line Second line
+{{< /typeit >}}
+*/}}
+{{- $tag := .Get "tag" | default "div" -}}
+{{- if not (findRE `^[A-Za-z][A-Za-z0-9]*$` $tag) -}}
+  {{- errorf "The %q shortcode was given an invalid tag %q. See %s" .Name $tag .Position -}}
+{{- end -}}
+
+{{- $classList := .Get "classList" | default "" -}}
+{{- $initialString := .Get "initialString" | default "" -}}{{/* Compared against nil rather than piped through `default`, which treats 0 as
+  empty: speed=0 and startDelay=0 are meaningful - type instantly, start
+  immediately - and were silently replaced by the defaults.
+*/}}
+{{- $speed := .Get "speed" -}}
+{{- if eq $speed nil -}}{{- $speed = 100 -}}{{- end -}}
+{{- $startDelay := .Get "startDelay" -}}
+{{- if eq $startDelay nil -}}{{- $startDelay = 250 -}}{{- end -}}{{/* Booleans are compared through printf so an explicit `false` is honoured:
+  `default` treats false as empty and would restore the default instead.
+*/}}
+{{- $lifeLike := ne (printf "%v" (.Get "lifeLike")) "false" -}}
+{{- $breakLines := ne (printf "%v" (.Get "breakLines")) "false" -}}
+{{- $waitUntilVisible := ne (printf "%v" (.Get "waitUntilVisible")) "false" -}}
+{{- $loop := eq (printf "%v" (.Get "loop")) "true" -}}
+
+{{- $strings := slice -}}
+{{- range (split (trim .InnerDeindent "\n") "\n") -}}
+  {{- with trim . " \t" -}}
+    {{- $strings = $strings | append . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if not $strings -}}
+  {{- errorf "The %q shortcode requires at least one line of content. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- .Page.Store.Set "hasTypeIt" true -}}{{/* Built with printf rather than written as markup: html/template rejects a
+  dynamic element name, so `<{{ $tag
+}}`
+is escaped into visible text instead of being emitted as a tag. Every interpolated value is escaped explicitly to make up for stepping outside the contextual escaper. */}}
+{{- $class := "hextra-typeit" -}}
+{{- with $classList -}}
+  {{- $class = printf "%s %s" $class . -}}
+{{- end -}}{{/* The server-rendered body is what readers who prefer reduced motion and
+  readers with no JavaScript actually get, so it has to look like the finished
+  animation. Joining with a newline did not: HTML collapses it to a space, so
+  those readers saw every line run together while the script path emits <br>.
+  Each string is escaped individually and the separator added afterwards.
+*/}}
+{{- $escaped := slice -}}
+{{- range $strings -}}
+  {{- $escaped = $escaped | append (htmlEscape .) -}}
+{{- end -}}
+{{- $body := delimit $escaped (cond $breakLines "<br>" " ") -}}{{/* A looping animation never stops on its own, so WCAG 2.2.2 requires a way to
+  pause it. The control is built by the script, which needs its labels from
+  here to keep them translatable.
+*/}}
+{{- $pauseLabel := (T "pauseAnimation") | default "Pause animation" -}}
+{{- $resumeLabel := (T "resumeAnimation") | default "Resume animation" -}}
+
+{{- printf `<%s class="%s" data-typeit data-typeit-strings="%s" data-typeit-initial="%s" data-typeit-speed="%v" data-typeit-start-delay="%v" data-typeit-lifelike="%v" data-typeit-break-lines="%v" data-typeit-wait-visible="%v" data-typeit-loop="%v" data-typeit-pause-label="%s" data-typeit-resume-label="%s">%s</%s>`
+  $tag
+  (htmlEscape $class)
+  (htmlEscape (delimit $strings "\n"))
+  (htmlEscape $initialString)
+  (htmlEscape (printf "%v" $speed))
+  (htmlEscape (printf "%v" $startDelay))
+  $lifeLike
+  $breakLines
+  $waitUntilVisible
+  $loop
+  (htmlEscape $pauseLabel)
+  (htmlEscape $resumeLabel)
+  $body
+  $tag
+  | safeHTML
+-}}

@@ -123,7 +123,7 @@ Tables aren't part of the core Markdown spec, but Hugo supports them out-of-the-
 ### Code Blocks
 
 {{< cards >}}
-  {{< card link="../../guide/syntax-highlighting" title="Syntax Highlighting" icon="sparkles" >}}
+{{< card link="../../guide/syntax-highlighting" title="Syntax Highlighting" icon="sparkles" >}}
 {{< /cards >}}
 
 ### Lists
@@ -142,9 +142,9 @@ Tables aren't part of the core Markdown spec, but Hugo supports them out-of-the-
 
 #### Unordered List
 
-* List item
-* Another item
-* And another item
+- List item
+- Another item
+- And another item
 
 ```markdown {filename=Markdown}
 * List item

@@ -1,11 +1,10 @@
-{{/*
-  This utility replaces placeholders in a URL template string.
+{{/* This utility replaces placeholders in a URL template string.
 
   Usage:
-    {{ partial "utils/template-url.html" (dict "template" .url "values" (dict "url" $pageURL "title" $pageTitle "markdown_url" $markdownURL)) }}
+  {{ partial "utils/template-url.html" (dict "template" .url "values" (dict "url" $pageURL "title" $pageTitle "markdown_url" $markdownURL))
+}}
 
-  Placeholders use the format {key} and values are URL-encoded automatically.
-*/}}
+Placeholders use the format {key} and values are URL-encoded automatically. */}}
 {{- $template := .template -}}
 {{- $values := .values | default dict -}}
 

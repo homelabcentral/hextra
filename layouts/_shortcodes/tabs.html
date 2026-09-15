@@ -1,9 +1,12 @@
-{{- /*
-Create a tabbed interface with the given items.
+{{/* Create a tabbed interface with the given items.
 
-@example {{< tabs >}}...{{< /tabs >}}
-*/ -}}
+  Each tab is a `tab` shortcode; its `name` is the label and `selected` opens it.
 
+  @deprecated defaultIndex Warns at build time. Use `selected` on `tab` instead.
+  @deprecated items Warns at build time. Use `name` on `tab` instead.
+
+  @example {{< tabs >}}{{< tab name="First" >}}...{{< /tab >}}{{< /tabs >}}
+*/}}
 {{- /* Unused, but required for the shortcode to work. */ -}}
 {{- .Inner -}}
 

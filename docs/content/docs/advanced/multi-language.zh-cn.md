@@ -36,13 +36,13 @@ languages:
 Hugo 支持通过文件名管理翻译。例如，如果我们有一个英文文件 `content/docs/_index.md`，可以创建 `content/docs/_index.fr.md` 作为法语翻译。
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="_index.fr.md" >}}
-      {{< filetree/file name="_index.ja.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="_index.fr.md" >}}
+{{< filetree/file name="_index.ja.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 注意：Hugo 还支持[通过内容目录翻译](https://gohugo.io/content-management/multilingual/#translation-by-content-directory)。

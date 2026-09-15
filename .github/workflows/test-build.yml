@@ -34,6 +34,11 @@ jobs:
           node-version: "24"
           cache: npm
 
+      # No dependencies needed: the generator is plain Node. Runs before the
+      # slower steps so a stale skill reference fails the job early.
+      - name: Check generated skill references are current
+        run: node scripts/build-skill.mjs --check
+
       - name: Setup Hugo
         run: |
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \

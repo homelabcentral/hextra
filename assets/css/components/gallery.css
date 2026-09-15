@@ -5,7 +5,7 @@
 }
 
 .hextra-gallery__item {
-  @apply hx:relative hx:m-0 hx:overflow-hidden hx:rounded-md hx:bg-gray-100 hx:break-inside-avoid hx:dark:bg-neutral-800;
+  @apply hx:relative hx:m-0 hx:overflow-hidden hx:rounded-md hx:bg-neutral-100 hx:break-inside-avoid hx:dark:bg-neutral-800;
 }
 
 .hextra-gallery__link {
@@ -17,7 +17,7 @@
 }
 
 .hextra-gallery__link:focus-visible {
-  @apply hx:outline-2 hx:outline-offset-2 hx:outline-primary-500;
+  @apply hx:outline-2 hx:outline-offset-2 hx:outline-hextra-accent-500;
 }
 
 .hextra-gallery__item img {
@@ -151,7 +151,7 @@
 }
 
 .hextra-gallery__track:focus-visible {
-  @apply hx:outline-2 hx:outline-offset-2 hx:outline-primary-500 hx:rounded-md;
+  @apply hx:outline-2 hx:outline-offset-2 hx:outline-hextra-accent-500 hx:rounded-md;
 }
 
 .hextra-gallery--carousel .hextra-gallery__item {
@@ -175,9 +175,9 @@
 .hextra-gallery__nav {
   @apply hx:absolute hx:top-1/2 hx:-translate-y-1/2 hx:inline-flex hx:items-center hx:justify-center;
   @apply hx:z-10 hx:w-9 hx:h-9 hx:rounded-full hx:cursor-pointer hx:shadow;
-  @apply hx:border hx:border-black/10 hx:bg-white/90 hx:text-gray-800;
+  @apply hx:border hx:border-black/10 hx:bg-neutral-100/90 hx:text-neutral-800;
   @apply hx:transition-colors hx:duration-200 hx:hover:bg-white;
-  @apply hx:dark:border-white/10 hx:dark:bg-neutral-800/90 hx:dark:text-gray-200 hx:dark:hover:bg-neutral-800;
+  @apply hx:dark:border-white/10 hx:dark:bg-neutral-800/90 hx:dark:text-neutral-200 hx:dark:hover:bg-neutral-800;
 }
 
 .hextra-gallery__nav:active {
@@ -185,7 +185,7 @@
 }
 
 .hextra-gallery__nav:focus-visible {
-  @apply hx:outline-2 hx:outline-offset-2 hx:outline-primary-500;
+  @apply hx:outline-2 hx:outline-offset-2 hx:outline-hextra-accent-500;
 }
 
 .hextra-gallery__nav--prev {

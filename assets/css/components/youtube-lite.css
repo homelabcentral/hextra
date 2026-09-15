@@ -1,0 +1,44 @@
+.hextra-youtube-lite {
+  @apply hx:relative hx:my-6 hx:w-full hx:overflow-hidden hx:rounded-lg hx:bg-black;
+  aspect-ratio: 16 / 9;
+}
+
+.hextra-youtube-lite__trigger {
+  @apply hx:absolute hx:inset-0 hx:block hx:size-full hx:cursor-pointer hx:border-0 hx:p-0;
+  @apply hx:bg-transparent;
+}
+
+/*
+  YouTube's hqdefault poster is 4:3 with letterbox bars baked in, 12.5% of the
+  height at each end. The container is 16:9, so object-cover already crops
+  exactly those bars and nothing else - no extra scaling.
+*/
+.hextra-youtube-lite__poster {
+  @apply hx:absolute hx:inset-0 hx:size-full hx:object-cover;
+}
+
+.hextra-youtube-lite__play {
+  @apply hx:absolute hx:left-1/2 hx:top-1/2 hx:block hx:w-16;
+  @apply hx:-translate-x-1/2 hx:-translate-y-1/2;
+  @apply hx:transition-opacity hx:ease-in hx:duration-200;
+
+  svg {
+    @apply hx:w-full;
+  }
+}
+
+.hextra-youtube-lite__play-bg {
+  fill: #212121;
+  fill-opacity: 0.8;
+  transition: fill-opacity 0.2s ease-in;
+}
+
+.hextra-youtube-lite__trigger:hover .hextra-youtube-lite__play-bg,
+.hextra-youtube-lite__trigger:focus-visible .hextra-youtube-lite__play-bg {
+  fill: #f00;
+  fill-opacity: 1;
+}
+
+.hextra-youtube-lite__frame {
+  @apply hx:absolute hx:inset-0 hx:size-full hx:border-0;
+}

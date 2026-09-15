@@ -1,0 +1,55 @@
+{{- /*
+  A table without rules, for reference material.
+
+  Wraps an ordinary Markdown table so it renders as a quiet reference block -
+  a single underline beneath the header, hairlines between rows, no cell
+  borders - instead of the fully ruled grid Markdown tables get by default.
+  Intended for the Name / Type / Default listings that document shortcode
+  parameters, front matter keys and configuration options, where a full grid
+  competes with the code spans inside the cells.
+
+  The body is normal Markdown, so `code`, links and emphasis inside the cells
+  all work, and a table written this way is still a table if the shortcode is
+  ever removed. Markdown tables elsewhere on the page are untouched.
+
+  The table stays a table at every width. It once hid the header row and gave
+  each cell its own line below the `lg` breakpoint, which read as a stack of
+  unlabelled values - the column names were gone from the page - and blockified
+  cells stop browsers exposing the table as a table at all, so screen reader
+  table navigation went dead. It also fired at 400% desktop zoom. A narrow
+  viewport scrolls the wrapper instead.
+
+  The wrapper is the horizontal scroll container, so it carries `tabindex="0"`
+  to keep a table wider than the column reachable without a pointer, matching
+  gallery.html and jupyter.html. styles.css already gives `[tabindex="0"]` a
+  focus ring on `:focus-visible`.
+
+  `markup` is pinned to `markdown` because `RenderString` otherwise defaults
+  to the content format of the calling page: on an .adoc page the body would
+  be handed to asciidoctor, which has no pipe tables, and the documented
+  snippet would ship as a wall of literal pipes with no build error.
+
+  Do not put a block shortcode in a cell. Hugo substitutes a nested
+  shortcode's rendered HTML into the body before this template reads it, and
+  block shortcodes such as `badge` and `icon` render across several lines.
+  A GFM table needs one row per line, so those newlines terminate the table
+  and the rows after them come out as a paragraph of literal pipes. Inline
+  HTML in a cell is fine. The build fails with a message rather than shipping
+  the pipes, which is what the guard below is for.
+
+  The body is a Markdown table and nothing else. It is not reproduced here as
+  an @example: prettier reflows a table written inside this comment onto one
+  line. See docs/content/docs/guide/shortcodes/borderless-table.md.
+  */
+-}}
+
+{{- $rendered := .InnerDeindent | .Page.RenderString (dict "display" "block" "markup" "markdown") -}}
+
+{{- if not (strings.Contains $rendered "<table") -}}
+  {{- errorf "borderless-table: the body did not parse as a Markdown table (%s). A block shortcode inside a cell renders across several lines and terminates the table - use an inline one, or a plain Markdown table." .Position -}}
+{{- end -}}
+
+
+<div class="hextra-borderless-table" tabindex="0">
+  {{- $rendered -}}
+</div>

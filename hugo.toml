@@ -14,3 +14,23 @@
     mediaType = 'text/markdown'
     isPlainText = true
     ugly = true
+
+# The series module resolves from front matter, so it works with no taxonomy at
+# all. Declaring one adds /series/<name>/ landing pages, which list their posts
+# newest-first like every other blog listing.
+#
+# Hugo gives `taxonomies` a merge strategy of "none" and only honours a strategy
+# set in the project config, so a theme cannot contribute a taxonomy on its own.
+# A site opts in with one line:
+#
+#   taxonomies:
+#     _merge: shallow
+#
+# The defaults are re-declared here so that opting in cannot silently drop them -
+# a site that wrote its own `taxonomies` block with only `series` would lose
+# `tag` and `category`.
+[taxonomies]
+  category = 'categories'
+  tag = 'tags'
+  series = 'series'
+

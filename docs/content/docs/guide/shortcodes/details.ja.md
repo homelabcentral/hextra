@@ -24,7 +24,7 @@ Markdown は **サポートされています**。
 
 ## 使用方法
 
-````markdown
+```markdown
 {{</* details title="詳細" */>}}
 
 これは詳細のコンテンツです。
@@ -32,12 +32,12 @@ Markdown は **サポートされています**。
 Markdown は **サポートされています**。
 
 {{</* /details */>}}
-````
+```
 
-````markdown
+```markdown
 {{</* details title="クリックして表示" closed="true" */>}}
 
 これはデフォルトで非表示になります。
 
 {{</* /details */>}}
-````
+```

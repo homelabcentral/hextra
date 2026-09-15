@@ -10,8 +10,8 @@ with one file defined per supported language.
 
 ## Example
 
-* {{< term "static site generator" >}}
-* {{< term "SEO" >}}
+- {{< term "static site generator" >}}
+- {{< term "SEO" >}}
 
 ## Usage
 
@@ -21,9 +21,8 @@ with one file defined per supported language.
 
 If a term is not found in the glossary, it is returned as-is.
 
-
 ## Options
 
-| Name         | Description                 |
-|--------------|-----------------------------|
-| `entry`      | Glossary term               |
+| Name    | Description   |
+| ------- | ------------- |
+| `entry` | Glossary term |

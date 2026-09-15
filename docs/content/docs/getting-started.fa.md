@@ -57,7 +57,7 @@ cd my-site
 hugo mod init github.com/username/my-site
 
 # افزودن تم Hextra
-hugo mod get github.com/imfing/hextra
+hugo mod get github.com/homelabcentral/hextra
 ```
 
 فایل `hugo.yaml` را برای استفاده از تم Hextra با افزودن موارد زیر پیکربندی کنید:
@@ -65,7 +65,7 @@ hugo mod get github.com/imfing/hextra
 ```yaml
 module:
   imports:
-    - path: github.com/imfing/hextra
+    - path: github.com/homelabcentral/hextra
 ```
 
 ### ایجاد اولین صفحات محتوای شما
@@ -87,7 +87,6 @@ hugo server --buildDrafts --disableFastRender
 
 {{% /steps %}}
 
-
 {{% details title="چگونه تم را به‌روزرسانی کنیم؟" %}}
 
 برای به‌روزرسانی تمام ماژول‌های Hugo در پروژه خود به آخرین نسخه‌ها، دستور زیر را اجرا کنید:
@@ -96,10 +95,10 @@ hugo server --buildDrafts --disableFastRender
 hugo mod get -u
 ```
 
-برای به‌روزرسانی Hextra به [آخرین نسخه منتشر شده](https://github.com/imfing/hextra/releases)، دستور زیر را اجرا کنید:
+برای به‌روزرسانی Hextra به [آخرین نسخه منتشر شده](https://github.com/homelabcentral/hextra/releases)، دستور زیر را اجرا کنید:
 
 ```shell
-hugo mod get -u github.com/imfing/hextra
+hugo mod get -u github.com/homelabcentral/hextra
 ```
 
 برای جزئیات بیشتر، [ماژول‌های Hugo](https://gohugo.io/hugo-modules/use-modules/#update-all-modules) را ببینید.
@@ -137,7 +136,7 @@ git init
 سپس، تم Hextra را به عنوان زیرماژول Git اضافه کنید:
 
 ```shell
-git submodule add https://github.com/imfing/hextra.git themes/hextra
+git submodule add https://github.com/homelabcentral/hextra.git themes/hextra
 ```
 
 فایل `hugo.yaml` را برای استفاده از تم Hextra با افزودن موارد زیر پیکربندی کنید:
@@ -165,7 +164,6 @@ hugo server --buildDrafts --disableFastRender
 
 {{% /steps %}}
 
-
 هنگام استفاده از [CI/CD](https://en.wikipedia.org/wiki/CI/CD) برای استقرار سایت Hugo، ضروری است که قبل از اجرای دستور `hugo`، دستور زیر اجرا شود.
 
 ```shell
@@ -173,7 +171,6 @@ git submodule update --init
 ```
 
 عدم اجرای این دستور منجر به پر نشدن پوشه تم با فایل‌های تم Hextra شده و باعث شکست ساخت می‌شود.
-
 
 {{% details title="چگونه تم را به‌روزرسانی کنیم؟" %}}
 
@@ -198,7 +195,7 @@ git submodule update --remote themes/hextra
 برای شروع افزودن محتوای بیشتر، بخش‌های زیر را بررسی کنید:
 
 {{< cards >}}
-  {{< card link="../guide/organize-files" title="سازماندهی فایل‌ها" icon="document-duplicate" >}}
-  {{< card link="../guide/configuration" title="پیکربندی" icon="adjustments" >}}
-  {{< card link="../guide/markdown" title="Markdown" icon="markdown" >}}
+{{< card link="../guide/organize-files" title="سازماندهی فایل‌ها" icon="document-duplicate" >}}
+{{< card link="../guide/configuration" title="پیکربندی" icon="adjustments" >}}
+{{< card link="../guide/markdown" title="Markdown" icon="markdown" >}}
 {{< /cards >}}

@@ -1,0 +1,148 @@
+/* "This article is part of a series" module and its previous/next nav.
+   Shares the disclosure vocabulary of accordion.css - same chevron rotation,
+   same Safari marker reset - without borrowing its classes, which carry the
+   spacing and per-item borders of a multi-section container. */
+
+.hextra-series {
+  /* Sits between the metadata line, which already carries mb-5, and the cover
+     image, so it needs a bottom margin only. */
+  @apply hx:mt-0 hx:mb-6 hx:overflow-hidden hx:rounded-lg hx:border;
+  /* Same surface, border and hover colours as the `details` shortcode and the
+     accordion, so every collapsible in the theme reads as one family: the
+     near-white `neutral-50` a code block uses in light mode, and `neutral-900`
+     in dark - one step above the page at `#111111`, so it reads as raised
+     without competing with a code block at `neutral-950`. */
+  @apply hx:border-neutral-400 hx:bg-neutral-50;
+  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
+  /* The edge lifts with the fill on hover, the way Nextra's cards do. Without
+     it the border and the hovered surface converge and the outline vanishes
+     for exactly as long as the pointer is on it. */
+  @apply hx:transition-colors hx:hover:border-neutral-500 hx:dark:hover:border-neutral-700;
+}
+
+.hextra-series__summary {
+  @apply hx:flex hx:items-center hx:gap-2 hx:cursor-pointer hx:select-none hx:list-none;
+  @apply hx:px-4 hx:py-3 hx:text-sm;
+  @apply hx:text-neutral-900 hx:dark:text-neutral-100;
+  @apply hx:transition-colors hx:ease-in hx:duration-200;
+
+  /* Safari still paints its own triangle without this. */
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:hover {
+    @apply hx:bg-neutral-200 hx:dark:bg-neutral-800;
+  }
+}
+
+.hextra-series__marker {
+  @apply hx:inline-flex hx:shrink-0 hx:text-neutral-500 hx:dark:text-neutral-400;
+  @apply hx:transition-transform hx:ease-in hx:duration-200;
+  @apply hx:rtl:rotate-180;
+}
+
+[open] > .hextra-series__summary .hextra-series__marker {
+  @apply hx:rotate-90;
+}
+
+.hextra-series__heading {
+  @apply hx:flex hx:min-w-0 hx:flex-wrap hx:items-baseline hx:gap-x-2 hx:gap-y-0.5;
+}
+
+.hextra-series__name {
+  @apply hx:font-semibold;
+}
+
+.hextra-series__intro {
+  /* neutral-500 is the theme's usual muted text, but on this module's
+     `neutral-50` it sits right on the 4.5:1 AA floor for 14px normal-weight
+     text, with nothing left over for the summary's own hover surface.
+     neutral-600 has real headroom and is already what the sibling links use.
+     (The original figures here were measured against the pre-unification
+     `hextra-light-*` ramp and no longer describe these surfaces.) */
+  @apply hx:text-neutral-600 hx:dark:text-neutral-400;
+}
+
+/* Qualified with `ol` to outweigh `:lang(fa) ol` in typography.css, which is
+   also unlayered and one specificity point higher than a bare class. */
+ol.hextra-series__list {
+  /* Part numbers are rendered into the text, so the marker would double up. */
+  @apply hx:list-none hx:m-0 hx:pt-2 hx:pb-3 hx:pe-4 hx:ps-5;
+}
+
+.hextra-series__item {
+  /* Deliberately lighter than the container's own `neutral-400` edge: this is
+     the dotted rule threading the parts together, not a component edge, and at
+     the container's weight it competed with the border it sits inside. */
+  @apply hx:border-s hx:border-dotted hx:border-neutral-300 hx:dark:border-neutral-700;
+  @apply hx:py-1 hx:ps-4 hx:text-sm;
+
+  &:first-child {
+    @apply hx:pt-0;
+  }
+
+  &:last-child {
+    @apply hx:pb-0;
+  }
+}
+
+.hextra-series__link {
+  @apply hx:text-neutral-600 hx:transition-colors hx:dark:text-neutral-300;
+  @apply hx:hover:text-hextra-accent-600 hx:dark:hover:text-hextra-accent-400;
+  @apply hx:hextra-focus-visible;
+}
+
+.hextra-series__current {
+  @apply hx:font-semibold hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
+}
+
+/* Mark the current part on the connector line too, so the position is
+   readable without relying on colour alone. Browsers without :has still get
+   the accent text. */
+.hextra-series__item:has(.hextra-series__current) {
+  @apply hx:border-solid hx:border-hextra-accent-600 hx:dark:border-hextra-accent-400;
+}
+
+/* A collapsed <details> prints as its summary alone, which would drop the
+   series from a printed article entirely. The closed state is enforced by the
+   browser, not by a rule on the list: current Blink and Gecko hide it with
+   `content-visibility: hidden` on `::details-content`, so that is what has to
+   be reverted. Older engines slot the children into a `display: none` shadow
+   slot, which no author rule can reach - they print the summary alone. */
+@media print {
+  .hextra-series::details-content {
+    content-visibility: visible;
+    block-size: auto;
+  }
+}
+
+/* ------------------------------------------------------- previous / next */
+
+/* Mirrors components/pager.html, which this replaces on posts in a series. */
+.hextra-series-nav {
+  @apply hx:mb-8 hx:flex hx:items-center hx:border-t hx:pt-8;
+  @apply hx:border-neutral-200 hx:dark:border-neutral-800;
+  @apply hx:contrast-more:border-neutral-400 hx:dark:contrast-more:border-neutral-400;
+  @apply hx:print:hidden;
+}
+
+.hextra-series-nav__link {
+  @apply hx:flex hx:max-w-[50%] hx:items-center hx:gap-1 hx:py-4;
+  @apply hx:text-base hx:font-medium hx:text-neutral-600 hx:transition-colors hx:md:text-lg;
+  @apply hx:hover:text-hextra-accent-600 hx:dark:text-neutral-300 hx:dark:hover:text-hextra-accent-400;
+  @apply hx:hextra-focus-visible;
+  word-break: break-word;
+}
+
+.hextra-series-nav__link--prev {
+  @apply hx:ltr:pr-4 hx:rtl:pl-4;
+}
+
+.hextra-series-nav__link--next {
+  @apply hx:ltr:ml-auto hx:ltr:pl-4 hx:ltr:text-right hx:rtl:mr-auto hx:rtl:pr-4 hx:rtl:text-left;
+}
+
+.hextra-series-nav__icon {
+  @apply hx:inline hx:h-5 hx:shrink-0;
+}

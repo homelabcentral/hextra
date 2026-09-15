@@ -1,0 +1,65 @@
+{{- /*
+Draw a chart with Chart.js from a configuration written inside the shortcode.
+
+The body is a Chart.js configuration object without the surrounding braces,
+exactly as in the Chart.js documentation. Refer to
+https://www.chartjs.org/docs/latest/ for the available types and options.
+
+Ported from the Blowfish theme (MIT, Nuno Coração).
+
+@param {string} title Accessible description of what the chart shows.
+
+@example {{< chart title="Votes per fruit" >}}
+type: 'bar',
+data: { labels: ['Tomato'], datasets: [{ label: '# of votes', data: [12] }] }
+{{< /chart >}}
+*/ -}}
+
+{{- /*
+  A per-page counter, rather than .Page.File.UniqueID and .Ordinal. UniqueID is
+  a hex string and was formatted with %d, so every chart shipped
+  id="hextra-chart-%!d(string=...)-0" - unusable as a selector or a fragment,
+  and invalid HTML. .Page.File is also nil for pages with no backing file, such
+  as those built by a content adapter, where reading it fails the build.
+  .Ordinal alone would not do either: it is relative to the shortcode's parent
+  and restarts inside a tab or an accordion.
+*/ -}}
+{{- $n := add (.Page.Store.Get "hextraChartCount" | default 0 | int) 1 -}}
+{{- .Page.Store.Set "hextraChartCount" $n -}}
+{{- $id := printf "hextra-chart-%d" $n -}}
+{{- $title := .Get "title" -}}
+
+{{- .Page.Store.Set "hasChart" true -}}
+
+<div class="hextra-chart not-prose">
+  {{- /*
+    A canvas is opaque to assistive technology, so the title is the only
+    description of the data a screen reader gets. Chart.js also renders a
+    fallback for the canvas body, which we use for the same purpose.
+  */ -}}
+  <canvas
+    id="{{ $id }}"
+    class="hextra-chart__canvas"
+    {{ with $title }}role="img" aria-label="{{ . }}"{{ else }}role="img" aria-label="{{ (T "chart") | default "Chart" }}"{{ end }}
+  >{{ with $title }}{{ . }}{{ end }}</canvas>
+</div>
+
+{{- /*
+  The body is a JavaScript object literal, not JSON, so it cannot go through
+  jsonify and has to be written into the script element as-is. safeJS marks it
+  trusted without touching it, which means a literal "</script>" anywhere in
+  the configuration - a label on a page about HTML, say - would end the element
+  early, spill the rest of the config onto the page as text and leave the push
+  call unterminated. Since every chart shares one array and one draw pass, that
+  blanks every chart on the page. Neutralise the sequence; "<\/" is identical
+  to "</" inside a JavaScript string.
+*/ -}}
+{{- $config := replace .InnerDeindent "</" "<\\/" -}}
+
+<script>
+  window.hextraCharts = window.hextraCharts || [];
+  window.hextraCharts.push({
+    id: {{ $id | jsonify | safeJS }},
+    config: { {{ $config | safeJS }} },
+  });
+</script>

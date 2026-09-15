@@ -48,6 +48,7 @@
   {{- end -}}
 {{- end -}}
 
+
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     // Store original mermaid code for each diagram
@@ -55,20 +56,28 @@
       el.dataset.original = el.innerHTML;
     });
 
-    const theme = document.documentElement.classList.contains("dark") ? "dark" : "default";
-    mermaid.initialize({ startOnLoad: true, theme: theme });
+    // Mermaid draws its own SVG text and would otherwise use its built-in
+    // font, ignoring params.fonts. The variable already carries its fallbacks.
+    const config = () => {
+      const theme = document.documentElement.classList.contains("dark") ? "dark" : "default";
+      const fontFamily = getComputedStyle(document.documentElement).getPropertyValue("--font-body").trim();
+      const opts = { startOnLoad: true, theme: theme };
+      if (fontFamily) opts.fontFamily = fontFamily;
+      return opts;
+    };
+
+    mermaid.initialize(config());
 
     let timeout;
     new MutationObserver(() => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        const theme = document.documentElement.classList.contains("dark") ? "dark" : "default";
         document.querySelectorAll(".mermaid").forEach((el) => {
           // Reset to original content, preserving HTML
           el.innerHTML = el.dataset.original;
           el.removeAttribute("data-processed");
         });
-        mermaid.initialize({ startOnLoad: true, theme: theme });
+        mermaid.initialize(config());
         mermaid.init();
       }, 150);
     }).observe(document.documentElement, {

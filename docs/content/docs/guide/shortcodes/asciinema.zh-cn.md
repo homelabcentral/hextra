@@ -25,6 +25,7 @@ your-site/
 ```
 
 在你的 markdown 文件中：
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -41,6 +42,7 @@ your-site/
 ```
 
 在你的 markdown 文件中：
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -57,6 +59,7 @@ your-site/
 ```
 
 在你的 markdown 文件中：
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -77,6 +80,7 @@ your-site/
 ### 文件查找机制
 
 shortcode 会按以下顺序自动查找你的 cast 文件：
+
 1. **页面包资源**（如果使用页面包）
 2. **全局 assets 目录**（`assets/`）
 3. **Static 目录**（`static/`）
@@ -89,7 +93,7 @@ shortcode 会按以下顺序自动查找你的 cast 文件：
 这是一个展示所有可用参数的高级示例：
 
 ```markdown
-{{</* asciinema 
+{{</* asciinema
   file="demo.cast"
   theme="dracula"
   speed="2"
@@ -99,23 +103,22 @@ shortcode 会按以下顺序自动查找你的 cast 文件：
 */>}}
 ```
 
-{{< asciinema 
+{{< asciinema
   file="casts/demo.cast"
   theme="dracula"
   speed="2"
   autoplay="true"
   loop="true"
-  markers="1.5:Installation,3.2:Configuration,5.8:Testing"
->}}
+  markers="1.5:Installation,3.2:Configuration,5.8:Testing" >}}
 
 ## 参数
 
-| 参数 | 类型 | 默认值 | 描述 |
-|------|------|--------|------|
-| `file` | string | - | .cast 文件路径（必需）。支持本地文件、绝对路径和远程 URL |
-| `theme` | string | `"asciinema"` | 播放器主题 |
-| `speed` | number | `1` | 播放速度倍数 |
-| `autoplay` | boolean | `false` | 自动开始播放 |
-| `loop` | boolean | `false` | 循环播放 |
-| `poster` | string | `""` | 播放开始前显示的海报（预览帧）。支持 NPT 表示法（如 "npt:1:23"） |
-| `markers` | string | `""` | 逗号分隔的时间标记。格式："时间:标签" 或仅 "时间"（如 "1.5:Installation,3.2:Configuration,5.8"） |
+| 参数       | 类型    | 默认值        | 描述                                                                                             |
+| ---------- | ------- | ------------- | ------------------------------------------------------------------------------------------------ |
+| `file`     | string  | -             | .cast 文件路径（必需）。支持本地文件、绝对路径和远程 URL                                         |
+| `theme`    | string  | `"asciinema"` | 播放器主题                                                                                       |
+| `speed`    | number  | `1`           | 播放速度倍数                                                                                     |
+| `autoplay` | boolean | `false`       | 自动开始播放                                                                                     |
+| `loop`     | boolean | `false`       | 循环播放                                                                                         |
+| `poster`   | string  | `""`          | 播放开始前显示的海报（预览帧）。支持 NPT 表示法（如 "npt:1:23"）                                 |
+| `markers`  | string  | `""`          | 逗号分隔的时间标记。格式："时间:标签" 或仅 "时间"（如 "1.5:Installation,3.2:Configuration,5.8"） |

@@ -1,22 +1,116 @@
 {{- /*
-https://github.com/gohugoio/gohugoioTheme/blob/master/layouts/shortcodes/include.html
+  Include content from another page in this site, or from a remote Markdown file.
 
-Renders the page using the RenderShortcode method on the Page object.
+  Local includes render the target page with RenderShortcodes, so shortcodes in
+  the included page still work. Remote files are fetched at build time and
+  rendered with RenderString: Markdown, render hooks and syntax highlighting all
+  apply, but shortcodes in the remote file are not expanded.
 
-You must call this shortcode using the {{% %}} notation.
+  The remote form replaces Blowfish's separate `mdimporter` shortcode
+  (MIT, Nuno Coração).
 
-@param {string} (positional parameter 0) The path to the page, relative to the content directory.
-@returns template.HTML
+  You must call this shortcode using the percent notation.
 
-@example {{% include "functions/_common/glob-patterns" %}}
+  @param {string} (positional parameter 0) The path to the page, relative to the content directory.
+  @param {string} url URL of a remote Markdown file. Must be http or https, and
+  must be listed in params.include.allowedHosts when that is set.
+  @returns template.HTML
+
+  @example {{% include "functions/_common/glob-patterns" %}}
+@example
+{{% include url="https://example.com/README.md" %}}
 */}}
+{{- $url := .Get "url" -}}
+{{- $path := .Get 0 -}}
 
-{{- with .Get 0 }}
-  {{- with site.GetPage . }}
-    {{- .RenderShortcodes }}
+{{- if and $url $path }}
+  {{- errorf "The %q shortcode takes either a path or a url, not both. See %s" .Name .Position }}
+{{- end }}
+
+{{- if $url }}
+  {{- /*
+    errorf logs and carries on, so these checks have to guard the fetch with
+    an else rather than sit above it - otherwise a rejected URL was reported
+    and then fetched anyway.
+
+    Remote content is rendered with RenderString, which runs it through the
+    same Markdown pipeline as the site's own pages, render hooks and raw HTML
+    included. Set params.include.allowedHosts to restrict where that content
+    may come from.
+  */}}
+  {{- $parsed := urls.Parse $url }}
+  {{- $allowedHosts := site.Params.include.allowedHosts }}
+
+  {{- if not (in (slice "http" "https") $parsed.Scheme) }}
+    {{- errorf "The %q shortcode only fetches http and https URLs, got %q. See %s" .Name $url .Position }}
+  {{- else if and $allowedHosts (not (in $allowedHosts $parsed.Host)) }}
+    {{- errorf "The %q shortcode may not fetch from %q; add it to params.include.allowedHosts. See %s" .Name $parsed.Host .Position }}
+  {{- else if not (partial "utils/remote-fetch-enabled.html" .) }}
+    {{- warnf "include: remote fetching is disabled, skipping %q. See %s" $url .Position }}
   {{- else }}
-    {{- errorf "The %q shortcode was unable to find %q. See %s" $.Name . $.Position }}
+    {{- /* A failed fetch is a warning so a build without network access still succeeds. */}}
+    {{- with try (resources.GetRemote $url) }}
+      {{- with .Err }}
+        {{- warnf "include: unable to fetch %q: %s" $url . }}
+      {{- else with .Value }}
+        {{- $.Page.RenderString (dict "display" "block") .Content }}
+      {{- else }}
+        {{- warnf "include: %q returned no content" $url }}
+      {{- end }}
+    {{- end }}
+
+  {{- end }}
+
+{{- else if $path }}
+  {{- with site.GetPage $path }}
+    {{- $rendered := .RenderShortcodes }}
+
+    {{- /*
+      RenderShortcodes runs the included page's shortcodes with .Page bound to
+      the included page, so a shortcode that announces "this page needs script
+      X" sets the flag on the page being included rather than the one being
+      built. The host then renders the widget's markup and never emits the
+      script that drives it, so charts stay blank and video facades do nothing
+      on click. Render hooks are unaffected - their output is re-rendered as
+      part of the host's own Markdown - so only the shortcode flags need
+      carrying across.
+
+      Reading those flags needs the included page to have been rendered first,
+      and RenderShortcodes above does not do that: it returns placeholders that
+      Hugo substitutes after this template has finished, so at this point the
+      included page's shortcodes have not run and its Store is still empty.
+      Discarding its .Content forces them to run now. Hugo caches the result,
+      so the page is rendered once rather than twice.
+    */}}
+    {{- $included := . }}
+    {{- $_ := .Content }}
+    {{- range slice "hasAds" "hasAsciinema" "hasChart" "hasGallery" "hasLiveCode" "hasMath" "hasTypeIt" "hasYoutubeLite" }}
+      {{- if $included.Store.Get . }}
+        {{- $.Page.Store.Set . true }}
+      {{- end }}
+    {{- end }}
+
+    {{- /*
+      The ad loaders need more than a flag: which networks and which publisher
+      ids were used. Those are slices, so they merge rather than overwrite - the
+      host page may have ads of its own.
+    */}}
+    {{- range $key := slice "hextraAdProviders" "hextraAdClients" }}
+      {{- with $included.Store.Get $key }}
+        {{- $merged := $.Page.Store.Get $key | default slice }}
+        {{- range . }}
+          {{- if not (in $merged .) }}
+            {{- $merged = $merged | append . }}
+          {{- end }}
+        {{- end }}
+        {{- $.Page.Store.Set $key $merged }}
+      {{- end }}
+    {{- end }}
+
+    {{- $rendered }}
+  {{- else }}
+    {{- errorf "The %q shortcode was unable to find %q. See %s" $.Name $path $.Position }}
   {{- end }}
 {{- else }}
-  {{- errorf "The %q shortcode requires a positional parameter indicating the path of the file to include. See %s" .Name .Position }}
+  {{- errorf "The %q shortcode requires either a positional parameter indicating the path of the file to include, or a 'url' parameter. See %s" .Name .Position }}
 {{- end }}

@@ -1,0 +1,23 @@
+{{/* Whether shortcodes may reach the network while the site is being built.
+
+  params.repoCards.enable was the original switch and the check was copied
+  verbatim into five card templates, none of which shared it - so gist,
+  codeimporter, include and youtube-lite kept fetching regardless and a build
+  that must not reach the network still made four classes of outbound request.
+
+  params.remoteFetch.enable is the general switch. repoCards.enable still turns
+  everything off so existing configurations keep working.
+
+  @returns bool
+
+  @example {{ $enabled := partial "utils/remote-fetch-enabled.html" .
+}}
+*/}}
+{{- $enabled := true -}}
+{{- if eq (printf "%v" site.Params.remoteFetch.enable) "false" -}}
+  {{- $enabled = false -}}
+{{- end -}}
+{{- if eq (printf "%v" site.Params.repoCards.enable) "false" -}}
+  {{- $enabled = false -}}
+{{- end -}}
+{{- return $enabled -}}

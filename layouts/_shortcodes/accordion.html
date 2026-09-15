@@ -1,0 +1,27 @@
+{{/* A group of collapsible sections.
+
+  Use `accordion-item` for each section. Hextra already has `details` for a
+  single collapsible block; an accordion adds the grouping, and with
+  mode="collapse" the behaviour where opening one section closes the others.
+
+  That exclusivity is the `name` attribute on <details>, so it needs no
+  JavaScript. In a browser too old to support it the sections simply open
+  independently.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração), where the item is named
+  `accordionItem`.
+
+  @param {string} mode "multiple" (default) or "collapse" for one section at a time.
+
+  @example {{< accordion mode="collapse" >}}{{< /accordion >}}
+*/}}
+{{- $mode := .Get "mode" | default "multiple" -}}
+{{- if not (in (slice "multiple" "collapse" "open") $mode) -}}
+  {{- warnf "accordion: unknown mode %q, falling back to 'multiple'" $mode -}}
+  {{- $mode = "multiple" -}}
+{{- end -}}
+
+
+<div class="hextra-accordion not-prose" data-accordion-mode="{{ $mode }}">
+  {{- .Inner -}}
+</div>

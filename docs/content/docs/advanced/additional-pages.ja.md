@@ -13,7 +13,7 @@ Hextra には明示的に有効化する追加ページがあります。用語�
 ## 用語集
 
 {{< callout type="info" >}}
-  Hugo の用語集サポートの詳細については、[Hugo 用語集クイックリファレンス](https://gohugo.io/quick-reference/glossary/)をご覧ください。
+Hugo の用語集サポートの詳細については、[Hugo 用語集クイックリファレンス](https://gohugo.io/quick-reference/glossary/)をご覧ください。
 {{< /callout >}}
 
 ### データソースファイル
@@ -21,17 +21,17 @@ Hextra には明示的に有効化する追加ページがあります。用語�
 用語の定義は、各[対応言語](../multi-language/)ごとに `termbase.yaml` データファイルに一元管理されています。
 
 {{< filetree/container >}}
-  {{< filetree/folder name="data" state="open" >}}
-    {{< filetree/folder name="en" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="fr" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="ja" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="data" state="open" >}}
+{{< filetree/folder name="en" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="fr" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="ja" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 各 YAML データファイルには、用語の一覧が含まれています。各エントリには以下が含まれます：

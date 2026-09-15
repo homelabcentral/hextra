@@ -1,14 +1,13 @@
-{{- /*
-A folder in a file tree.
+{{/* A folder in a file tree.
 
-@param {string} name The name of the folder.
-@param {string} state The state of the folder.
+  @param {string} name The name of the folder.
+  @param {string} state The state of the folder.
 
-@example {{< filetree/folder name="docs" state="closed" >}}
-*/ -}}
-
+  @example {{< filetree/folder name="docs" state="closed" >}}
+*/}}
 {{- $name := .Get "name" -}}
 {{- $state := .Get "state" | default "open" }}
+
 
 <li class="hx:group hx:flex hx:list-none hx:flex-col">
   <button class="hextra-filetree-folder hx:inline-flex hx:cursor-pointer hx:items-center hx:py-1 hx:hover:opacity-60" aria-expanded="{{ if eq $state "open" }}true{{ else }}false{{ end }}">

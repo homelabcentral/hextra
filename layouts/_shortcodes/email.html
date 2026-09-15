@@ -1,0 +1,96 @@
+{{- /*
+An obfuscated mailto link.
+
+The address is emitted as hexadecimal HTML character references rather than
+plain text, so it survives a browser but not a naive address harvester. No
+JavaScript is involved: the encoding happens at build time and the link works
+with scripting disabled.
+
+Ported from the Blowfish theme (MIT, Nuno Coração), which does not obfuscate.
+
+@param {string} email The address, with or without a "mailto:" prefix.
+@param {string} text Link text. Defaults to the address itself, also obfuscated.
+@param {string} subject Optional subject line.
+@param {string} body Optional message body.
+@param {string} cc Optional carbon copy address.
+@param {string} bcc Optional blind carbon copy address.
+
+@example {{< email email="hello@example.com" >}}
+@example {{< email email="hello@example.com" text="Get in touch" subject="Hello" >}}
+*/ -}}
+
+{{- $address := .Get "email" | default (.Get 0) | strings.TrimSpace -}}
+{{- $address = strings.TrimPrefix "mailto:" $address -}}
+
+{{- if not $address -}}
+  {{- errorf "The %q shortcode requires an 'email' parameter. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- /*
+  The address is interpolated into an href that bypasses the contextual
+  escaper (see below), so it is matched against an explicit allowlist of
+  address characters rather than "anything without a space or a second @".
+  Quotes, angle brackets, backslashes and everything outside ASCII are
+  rejected, which leaves nothing that can end the attribute or start another.
+*/ -}}
+{{- if not (findRE `^[A-Za-z0-9!#$%&'*+/=?^_.{|}~-]+@[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)+$` $address) -}}
+  {{- errorf "The %q shortcode was given %q, which is not an email address it can safely encode. See %s" .Name $address .Position -}}
+{{- end -}}
+
+{{- /* Optional mailto query parameters, percent-encoded by querify. */ -}}
+{{- $query := slice -}}
+{{- with .Get "subject" -}}{{- $query = $query | append "subject" . -}}{{- end -}}
+{{- with .Get "body" -}}{{- $query = $query | append "body" . -}}{{- end -}}
+{{- with .Get "cc" -}}{{- $query = $query | append "cc" . -}}{{- end -}}
+{{- with .Get "bcc" -}}{{- $query = $query | append "bcc" . -}}{{- end -}}
+
+{{- $url := printf "mailto:%s" $address -}}
+{{- with $query -}}
+  {{- /*
+    querify encodes a space as "+", which is right for a form submission and
+    wrong for mailto: mail clients take the plus literally, so subject="Hello
+    there" opened a compose window titled "Hello+there". Any literal plus in
+    the input is already encoded as %2B by this point, so every remaining "+"
+    is a space.
+  */ -}}
+  {{- $url = printf "%s?%s" $url (replace (querify .) "+" "%20") -}}
+{{- end -}}
+
+{{- $text := .Get "text" -}}
+
+{{- $href := partial "inline/obfuscate-ascii.html" $url -}}
+{{- $label := "" -}}
+{{- if $text -}}
+  {{- $label = $text | markdownify -}}
+{{- else -}}
+  {{- $label = partial "inline/obfuscate-ascii.html" $address | safeHTML -}}
+{{- end -}}
+
+{{- /*
+  safeHTMLAttr is required: Hugo would otherwise escape the "&" of every
+  character reference and the obfuscation would be visible in the address bar
+  instead of being decoded. It is safe only because obfuscate-ascii always
+  returns either character references or HTML-escaped text, never raw input.
+*/ -}}
+<a {{ printf `href="%s"` $href | safeHTMLAttr }} class="hextra-email">{{ $label }}</a>
+
+{{- /*
+  Encode an ASCII string as hexadecimal character references. printf "%x" gives
+  the hex of each byte, which findRE splits back into pairs. The encoding is
+  byte-wise, so a string carrying anything outside printable ASCII cannot be
+  split into runes safely and is HTML-escaped instead - never returned raw. The
+  caller marks the result safe, so returning the input unchanged here would let
+  a single non-ASCII byte carry an unescaped quote into the href and open an
+  attribute-injection hole.
+*/ -}}
+{{- define "_partials/inline/obfuscate-ascii.html" -}}
+  {{- $out := "" -}}
+  {{- if findRE `^[\x20-\x7E]*$` . -}}
+    {{- range findRE `[0-9a-f]{2}` (printf "%x" .) -}}
+      {{- $out = printf "%s&#x%s;" $out . -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $out = htmlEscape . -}}
+  {{- end -}}
+  {{- return $out -}}
+{{- end -}}

@@ -1,0 +1,29 @@
+.hextra-typeit {
+  /* Reserve the line so the surrounding content does not jump as text grows. */
+  min-height: 1lh;
+}
+
+.hextra-typeit__caret {
+  @apply hx:inline-block hx:w-px hx:align-text-bottom;
+  @apply hx:bg-current;
+  height: 1em;
+  animation: hextra-typeit-blink 1s step-end infinite;
+}
+
+/* Pause control for a looping animation (WCAG 2.2.2). */
+.hextra-typeit__toggle {
+  @apply hx:mt-2 hx:inline-block hx:cursor-pointer hx:rounded hx:border hx:bg-transparent;
+  @apply hx:px-2 hx:py-1 hx:text-xs;
+  @apply hx:border-neutral-300 hx:text-neutral-700;
+  @apply hx:dark:border-neutral-700 hx:dark:text-neutral-200;
+}
+
+@keyframes hextra-typeit-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}

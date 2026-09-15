@@ -1,8 +1,26 @@
+{{/* Deliberately self-contained: no link to the site stylesheet, so this page
+  still renders when it is served by a host that never loaded the theme's
+  assets. That is why the styles are inline rather than in a component file.
+
+  Fonts come from `params.fonts` like everywhere else, reached by inlining the
+  executed `variables.css` rather than duplicating its logic. If the families
+  fail to load — or `fonts.enable` is false — the `var(--font-*)` stacks fall
+  through to the system fonts this page used before, so the self-contained
+  property is preserved.
+*/}}
+{{- $variables := resources.Get "css/variables.css" | resources.ExecuteAsTemplate "css/404-variables.css" . -}}
 <!doctype html>
 <html lang="{{ .Site.Language.Lang | default "en" }}" dir="{{ partial "utils/hugo-compat/language-direction.html" .Site.Language | default "ltr" }}">
-  <body
-    style='font-family:system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"; height:100vh; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center'
-  >
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 &middot; This page could not be found.</title>
+    {{- partial "google-fonts.html" . -}}
+    <style>
+      {{ $variables.Content | safeCSS }}
+    </style>
+  </head>
+  <body style="font-family: var(--font-body); height: 100vh; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center">
     <main id="content">
       <style>
         body {
@@ -26,14 +44,9 @@
           }
         }
       </style>
-      <h1
-        class="hextra-error-h1"
-        style='display: inline-block; margin: 0 20px 0 0; padding-right: 23px; font-size: 24px; font-weight: 500; vertical-align: top; line-height: 49px; font-feature-settings: "rlig" 1,"calt" 1,"ss01" 1,"ss06" 1 !important;'
-      >
-        404
-      </h1>
+      <h1 class="hextra-error-h1" style='font-family: var(--font-heading); display: inline-block; margin: 0 20px 0 0; padding-right: 23px; font-size: 24px; font-weight: 500; vertical-align: top; line-height: 49px; font-feature-settings: "rlig" 1,"calt" 1,"ss01" 1,"ss06" 1 !important;'>404</h1>
       <div style="display: inline-block; text-align: left">
-        <h2 style="font-size: 14px; font-weight: 400; line-height: 49px; margin: 0">This page could not be found.</h2>
+        <h2 style="font-family: var(--font-heading); font-size: 14px; font-weight: 400; line-height: 49px; margin: 0">This page could not be found.</h2>
       </div>
     </main>
   </body>

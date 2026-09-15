@@ -1,0 +1,24 @@
+{{/* Render a card for a Gitea repository, with its description, language and
+  current star and fork counts.
+
+  Gitea is self-hosted, so `server` is required — there is no central instance.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração).
+
+  @param {string} repo Required. Repository as "owner/name".
+  @param {string} server Required. Instance URL, e.g. "https://git.example.com".
+  @param {bool} showThumbnail Show the owner's avatar. Default false.
+  @param {string} icon Icon shown before the title. Default "gitea".
+
+  @example {{< gitea server="https://git.fsfe.org" repo="FSFE/fsfe-website" >}}
+*/}}
+{{- partial "shortcodes/gitea-card.html" (dict
+  "repo" (.Get "repo")
+  "server" (.Get "server")
+  "icon" (.Get "icon" | default "gitea")
+  "showThumbnail" (.Get "showThumbnail")
+  "provider" "gitea"
+  "shortcode" .Name
+  "position" .Position
+  )
+-}}

@@ -1,10 +1,9 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 **Description**
@@ -13,9 +12,9 @@ assignees: ''
 
 **Steps To Reproduce**
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 <!-- Provide a minimal example or link to a repository that reproduces the bug -->
 

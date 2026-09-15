@@ -22,12 +22,11 @@ title: 步骤
 
 {{% /steps %}}
 
-
 ## 使用方法
 
 {{< callout type="warning" >}}
-  请注意，此短代码**仅适用于Markdown内容**。
-  如果在步骤内容中放入HTML或其他短代码，可能无法按预期渲染。
+请注意，此短代码**仅适用于Markdown内容**。
+如果在步骤内容中放入HTML或其他短代码，可能无法按预期渲染。
 {{< /callout >}}
 
 在`steps`短代码内放置Markdown的三级标题。

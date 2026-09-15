@@ -13,7 +13,7 @@ Hextra includes additional pages that you can enable explicitly: glossary and ar
 ## Glossary
 
 {{< callout type="info" >}}
-  For more information about Hugo's built-in glossary support, see the [Hugo Glossary Quick Reference](https://gohugo.io/quick-reference/glossary/).
+For more information about Hugo's built-in glossary support, see the [Hugo Glossary Quick Reference](https://gohugo.io/quick-reference/glossary/).
 {{< /callout >}}
 
 ### Source Data File
@@ -21,17 +21,17 @@ Hextra includes additional pages that you can enable explicitly: glossary and ar
 Term definitions are centrally stored in a `termbase.yaml` data file for each [supported language](../multi-language/).
 
 {{< filetree/container >}}
-  {{< filetree/folder name="data" state="open" >}}
-    {{< filetree/folder name="en" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="fr" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="ja" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="data" state="open" >}}
+{{< filetree/folder name="en" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="fr" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="ja" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 Each YAML data file contains a list of glossary entries. Every entry includes:

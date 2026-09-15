@@ -32,19 +32,31 @@ Hextra برخی گزینه‌های پیش‌فرض سفارشی‌سازی را
 }
 ```
 
-### رنگ اصلی
+### رنگ تاکیدی
 
-رنگ اصلی تم را می‌توان با تنظیم متغیرهای `--primary-hue`، `--primary-saturation` و `--primary-lightness` سفارشی کرد:
+تم اکنون از یک رنگ تاکیدی واحد پشتیبانی می‌کند که می‌توانید با افزودن متغیرهای رنگ تاکیدی به پرونده `assets/css/custom.css` خود آن را سفارشی کنید:
 
 ```css {filename="assets/css/custom.css"}
 :root {
-  --primary-hue: 100deg;
-  --primary-saturation: 90%;
-  --primary-lightness: 50%;
+  --color-accent-color-50: oklch(0.977 0.013 236.62);
+  --color-accent-color-100: oklch(0.951 0.026 236.824);
+  --color-accent-color-200: oklch(0.901 0.058 230.902);
+  --color-accent-color-300: oklch(0.828 0.111 230.318);
+  --color-accent-color-400: oklch(0.746 0.16 232.661);
+  --color-accent-color-500: oklch(0.685 0.169 237.323);
+  --color-accent-color-600: oklch(0.588 0.158 241.966);
+  --color-accent-color-700: oklch(0.5 0.134 242.749);
+  --color-accent-color-800: oklch(0.443 0.11 240.79);
+  --color-accent-color-900: oklch(0.391 0.09 240.876);
+  --color-accent-color-950: oklch(0.293 0.066 243.157);
 }
 ```
 
-### متغیرهای چیدمان کامپوننت
+این سیستم رنگ تاکیدی یک پالت رنگی کامل با ۱۱ سایه (۵۰-۹۵۰) ارائه می‌دهد که در سراسر تم برای پیوندها، دکمه‌ها، برجسته‌سازی‌ها و سایر عناصر تاکیدی استفاده خواهد شد.
+
+شما می‌توانید پالت‌های رنگی تاکیدی سفارشی را به صورت رایگان با استفاده از [رنگ‌های رابط کاربری](https://uicolors.app) تولید کنید - کافی است رنگ مورد نظر خود را وارد کنید و تمام سایه‌های لازم برای تم شما تولید خواهد شد.
+
+### برجسته‌کردن سینتکس
 
 Hextra متغیرهای CSS را برای سفارشی‌سازی عرض صفحات، نوار ناوبری و پاورقی ارائه می‌دهد:
 
@@ -262,6 +274,6 @@ layouts/_partials/custom/page-end.html
 
 ## سفارشی‌سازی بیشتر
 
-آیا آنچه را که به دنبالش بودید پیدا نکردید؟ با خیال راحت [یک بحث باز کنید](https://github.com/imfing/hextra/discussions) یا به تم کمک کنید!
+آیا آنچه را که به دنبالش بودید پیدا نکردید؟ با خیال راحت [یک بحث باز کنید](https://github.com/homelabcentral/hextra/discussions) یا به تم کمک کنید!
 
 [hugo-template-docs]: https://gohugo.io/templates/

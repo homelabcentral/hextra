@@ -1,0 +1,27 @@
+{{/* Copy the keys that are actually present from one map onto another.
+
+  `with` cannot do this job: it skips a key whose value is false, so
+  `label: false` in a configuration block would silently fall back to the
+  default it was written to override. `isset` has no such blind spot.
+
+  Keys are the lowercase spellings Hugo stores configuration under. `from`
+  being anything other than a map - absent, a bool, a bare string - returns
+  `onto` untouched, so callers do not have to shape-check first.
+
+  @param {dict} onto The defaults being overridden.
+  @param {any} from The configuration block to read overrides from.
+  @param {slice} keys Key names to consider, lowercase.
+  @returns {dict} onto, with every present key from `from` merged over it.
+
+  @example {{ $opts := partial "ads/pick.html" (dict "onto" $common "from" $slot "keys" $keys)
+}}
+*/}}
+{{- $onto := .onto -}}
+{{- if reflect.IsMap .from -}}
+  {{- range $key := .keys -}}
+    {{- if isset $.from $key -}}
+      {{- $onto = merge $onto (dict $key (index $.from $key)) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $onto -}}

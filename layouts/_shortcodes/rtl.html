@@ -1,0 +1,13 @@
+{{- /*
+Render a block of content right-to-left, regardless of the page direction.
+
+Must be called with the percent notation, not the angle-bracket one, so the
+inner content is processed as Markdown. Ported from the Blowfish theme
+(MIT, Nuno Coração).
+
+@example {{% rtl %}}- هذه القائمة باللغة العربية{{% /rtl %}}
+*/ -}}
+
+<div dir="rtl" class="hextra-rtl">
+  {{- .Inner -}}
+</div>

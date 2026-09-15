@@ -5,8 +5,8 @@ next: /docs/guide/deploy-site
 ---
 
 {{< callout type="warning" >}}
-  Some of these are Hugo built-in shortcodes.
-  These shortcodes are considered less stable and may be changed anytime.
+Some of these are Hugo built-in shortcodes.
+These shortcodes are considered less stable and may be changed anytime.
 {{< /callout >}}
 
 ## Badge
@@ -88,14 +88,14 @@ next: /docs/guide/deploy-site
 ### Options
 
 | Name      | Description                                                                                                              |
-|-----------|--------------------------------------------------------------------------------------------------------------------------|
+| --------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `content` | The text of the badge.                                                                                                   |
 | `link`    | The link of the badge.                                                                                                   |
 | `icon`    | The icon of the badge.                                                                                                   |
 | `color`   | The color of the badge. <br/> `gray` (default), `purple`, `indigo`, `blue`, `green`, `yellow`, `amber`, `orange`, `red`. |
 | `class`   | The class of the badge.                                                                                                  |
 | `border`  | Adds or removes the border (default: true).                                                                              |
- 
+
 ## YouTube
 
 Embed a YouTube video.

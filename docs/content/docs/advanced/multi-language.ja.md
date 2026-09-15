@@ -36,13 +36,13 @@ languages:
 Hugo はファイル名による翻訳管理をサポートしています。例えば、英語のファイル `content/docs/_index.md` がある場合、フランス語の翻訳用に `content/docs/_index.fr.md` というファイルを作成できます。
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="_index.fr.md" >}}
-      {{< filetree/file name="_index.ja.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="_index.fr.md" >}}
+{{< filetree/file name="_index.ja.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 注: Hugo は [コンテンツディレクトリによる翻訳](https://gohugo.io/content-management/multilingual/#translation-by-content-directory) もサポートしています。

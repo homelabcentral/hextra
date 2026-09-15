@@ -21,7 +21,7 @@ A shortcode for displaying a feature card.
 ### Options
 
 | Parameter    | Description               |
-|--------------|---------------------------|
+| ------------ | ------------------------- |
 | `title`      | The title of the card.    |
 | `subtitle`   | The subtitle of the card. |
 | `class`      | The class of the card.    |
@@ -48,7 +48,7 @@ A shortcode for displaying a feature grid.
 ### Options
 
 | Parameter | Description            |
-|-----------|------------------------|
+| --------- | ---------------------- |
 | `cols`    | The number of columns. |
 | `style`   | The style of the grid. |
 
@@ -60,7 +60,7 @@ A shortcode for rendering a badge with a link.
 
 ```
 {{</* hextra/hero-badge */>}}
-  <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-primary-400"></div>
+  <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-hextra-accent-400"></div>
   <span>Free, open source</span>
   {{</* icon name="arrow-circle-right" attributes="height=14" */>}}
 {{</* /hextra/hero-badge */>}}
@@ -69,7 +69,7 @@ A shortcode for rendering a badge with a link.
 ### Options
 
 | Parameter | Description             |
-|-----------|-------------------------|
+| --------- | ----------------------- |
 | `link`    | The link of the badge.  |
 | `class`   | The class of the badge. |
 | `style`   | The style of the badge. |
@@ -87,7 +87,7 @@ A shortcode for rendering a button with a link.
 ### Options
 
 | Parameter | Description              |
-|-----------|--------------------------|
+| --------- | ------------------------ |
 | `link`    | The link of the button.  |
 | `text`    | The text of the button.  |
 | `style`   | The style of the button. |
@@ -107,7 +107,7 @@ A simple hero container with an image on the left side.
 ### Options
 
 | Parameter     | Description                                                |
-|---------------|------------------------------------------------------------|
+| ------------- | ---------------------------------------------------------- |
 | `class`       | The class of the container.                                |
 | `cols`        | The number of columns (default: `2`).                      |
 | `image`       | The image of the container.                                |
@@ -135,7 +135,7 @@ A shortcode for displaying a hero headline.
 ### Options
 
 | Parameter | Description                |
-|-----------|----------------------------|
+| --------- | -------------------------- |
 | `style`   | The style of the headline. |
 
 ## `hextra/hero-section`
@@ -151,7 +151,7 @@ A simple hero section with a heading and optional style.
 ### Options
 
 | Parameter | Description                        |
-|-----------|------------------------------------|
+| --------- | ---------------------------------- |
 | `heading` | The heading level (default: `h2`). |
 | `style`   | The style of the heading.          |
 | `content` | The content of the heading.        |
@@ -171,5 +171,5 @@ A shortcode for displaying a hero subtitle.
 ### Options
 
 | Parameter | Description                |
-|-----------|----------------------------|
+| --------- | -------------------------- |
 | `style`   | The style of the subtitle. |

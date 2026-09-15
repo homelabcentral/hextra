@@ -1,0 +1,35 @@
+{{/* Resolves the icon name for a code block filename bar.
+
+  Resolution order: explicit `icon` attribute, filename extension, fence
+  language. Returns an empty string when nothing matches. Mappings live in
+  `data/codeblock-icons.yaml` and can be overridden by the site.
+*/}}
+{{- $filename := .filename | default "" -}}
+{{- $lang := .lang | default "" -}}
+{{- $iconName := .icon | default "" -}}
+
+{{- if not $iconName -}}
+  {{- $siteData := partial "utils/hugo-compat/site-data.html" . -}}
+  {{- $map := index $siteData "codeblock-icons" | default dict -}}
+  {{- $extensions := $map.extensions | default dict -}}
+  {{- $languages := $map.languages | default dict -}}
+
+  {{- with $filename -}}
+    {{- $ext := strings.TrimPrefix "." (path.Ext .) | lower -}}
+    {{- if not $ext -}}
+      {{/* Extensionless files like `Dockerfile` or `Makefile` */}}
+      {{- $ext = path.Base . | lower -}}
+    {{- end -}}
+    {{- with index $extensions $ext -}}
+      {{- $iconName = . -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- if not $iconName -}}
+    {{- with index $languages (lower $lang) -}}
+      {{- $iconName = . -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return $iconName -}}

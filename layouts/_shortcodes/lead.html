@@ -1,0 +1,12 @@
+{{- /*
+A shortcode to emphasise the opening of an article.
+
+Wrap any Markdown content to style it as an introduction or a called-out
+statement. Ported from the Blowfish theme (MIT, Nuno Coração).
+
+@example {{< lead >}}When life gives you lemons, make lemonade.{{< /lead >}}
+*/ -}}
+
+<div class="hextra-lead">
+  {{- .InnerDeindent | .Page.RenderString (dict "display" "block") -}}
+</div>

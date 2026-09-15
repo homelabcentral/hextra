@@ -1,0 +1,18 @@
+# Defaults for local GitHub Actions runs with act (`make ci*`).
+# Defaults chosen so `act` can run this repo's workflows locally.
+
+# The default act image is too minimal for these workflows (no node, sparse
+# apt); catthehacker's image mirrors the ubuntu-latest runner closely enough.
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+
+# On Apple Silicon several toolchains misbehave under arm64 containers;
+# amd64 via Rosetta is act's recommended setting.
+--container-architecture linux/amd64
+
+# Keep job containers between runs so Hugo/Playwright downloads survive and
+# repeat runs are fast. Drop state with `docker rm` of the act-* containers.
+--reuse
+
+# Local stand-in for GitHub's artifact API, so actions/upload-artifact steps
+# (test report uploads) succeed instead of failing on ACTIONS_RUNTIME_TOKEN.
+--artifact-server-path /tmp/act-artifacts

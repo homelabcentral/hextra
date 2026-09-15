@@ -1,0 +1,156 @@
+{{/* A shell command rendered as text rather than as a picture of one.
+
+  Two callers. The `command` shortcode puts one in the page flow. A blog post's
+  `coverText` front matter puts one where the cover image would go, which is
+  why "cover" mode exists at all: covers render at wildly different sizes, from
+  400px inside an article card to the full content width as a hero.
+
+  Sizing in cover mode is the only interesting part. The outer frame declares
+  `container-type: inline-size`, so `1cqi` inside it is one percent of the
+  frame's own width rather than the viewport's - an element cannot query
+  itself, hence the separate wrapper. This partial supplies the multiplier,
+  derived from the longest line so that a long command shrinks to fit instead
+  of overflowing; the stylesheet clamps it at both ends.
+
+  The command itself goes through Hugo's `highlight` with the shell lexer, so
+  it arrives already wrapped in `.highlight > .chroma` and already coloured by
+  `assets/css/chroma/` in both modes. Nothing here picks a syntax colour.
+
+  The prompt glyph is punctuation, not content - a screen reader announcing
+  "dollar" before every line is noise - so it is hidden from assistive
+  technology.
+
+  `dir="ltr"` on the command itself, not on the frame: a shell command is LTR
+  whatever the page is. Under `dir="rtl"` - `fa` in the docs site, set on
+  `<html>` by `baseof.html` - flex main-start moves to the right edge, which
+  puts the prompt after the command, and the bidi-neutral characters a command
+  is full of (`-`, `/`, `.`, `"`) reorder around it. The frame stays in the
+  page direction so its margins and placement still follow the text.
+
+  @param {string|slice} lines One command line, or several. A string is split
+  on newlines, so a YAML block scalar works as well as a sequence.
+  @param {string} [prompt] Prompt glyph. Defaults to `params.command.prompt`, then `$`.
+  @param {string} [mode] "inline" (default) or "cover".
+  @param {string} [class] Extra class for the cover frame.
+  @param {float} [ratio] Cover width over height. Defaults to `params.command.coverRatio`, then 7.2.
+
+  @example {{ partial "components/command-block.html" (dict "lines" (slice "npm install") "mode" "cover")
+}}
+*/}}
+{{/* A string arrives from `coverText` as often as a slice does, and YAML has
+  two ways of writing several lines: a sequence, and a block scalar (`|`) that
+  produces one string with newlines in it. Splitting here rather than only in
+  `command.html` means both spellings reach the same code path - otherwise a
+  block scalar is measured, counted and prompted as a single line, and every
+  line after the first is clipped by the frame.
+*/}}
+{{- $lines := .lines -}}
+{{- if not (reflect.IsSlice $lines) -}}
+  {{- $split := slice -}}
+  {{- range (split (string $lines) "\n") -}}
+    {{- with (trim . " \t\r") -}}
+      {{- $split = $split | append . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $lines = $split -}}
+{{- end -}}
+
+{{/* Read through nested `with` rather than chaining: `site.Params.command.prompt`
+  errors outright when a site has no `command` key at all, which is every site
+  that never customised it.
+*/}}
+{{- $prompt := "$" -}}
+{{- with site.Params.command -}}
+  {{- with .prompt -}}
+    {{- $prompt = . -}}
+  {{- end -}}
+{{- end -}}
+{{/* Not `with`: that skips an empty string as well as a missing key, so
+  `prompt=""` - a deliberate "no glyph" - fell back to `$`. A key absent from
+  the dict reads as nil, which prints as `<nil>`; the same `printf "%v"`
+  comparison `article-card.html` uses for its own tri-state parameters.
+*/}}
+{{- if ne (printf "%v" .prompt) "<nil>" -}}
+  {{- $prompt = .prompt -}}
+{{- end -}}
+
+{{- $cover := eq (.mode | default "inline") "cover" -}}
+
+{{/* 0.62 is the advance width of a monospace glyph as a fraction of the font
+  size, so a line of N characters occupies 0.62 * N ems. Solving for the font
+  size that makes the longest line span 88% of the frame gives 88 / (0.62 * N),
+  expressed in cqi. The stylesheet's clamp handles both ends of the range, so
+  no bounds are applied here.
+*/}}
+{{- $longest := 1 -}}
+{{- range $lines -}}
+  {{- $longest = math.Max $longest (strings.RuneCount (printf "%s %s" $prompt .)) -}}
+{{- end -}}
+{{- $fontSize := div 141.9 $longest -}}
+
+{{- $ratio := 0.0 -}}
+{{- if and $cover $lines -}}
+  {{/* How much empty band sits above and below the command. Only a cover has a
+    fixed box to fill; inline the height just follows the lines. Divided by the
+    line count so that each extra line buys its own height instead of
+    squeezing the ones already there.
+  */}}
+  {{- $coverRatio := 7.2 -}}
+  {{- with site.Params.command -}}
+    {{- with .coverRatio -}}
+      {{- $coverRatio = . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- with .ratio -}}
+    {{- $coverRatio = . -}}
+  {{- end -}}
+  {{/* Cast before dividing: YAML reads `coverRatio: 7` as an int, Hugo's `div`
+    returns an int for int/int, and `printf "%.2f"` on an int emits a Go format
+    error - `%!f(int64=7)` - straight into the style attribute. The custom
+    property is then defined but invalid, so the `7.2` fallback in `command.css`
+    does not apply and every text cover collapses to content height.
+  */}}
+  {{- $ratio = div (float $coverRatio) (len $lines) -}}
+{{- end -}}
+
+{{/* Joined here rather than in the attribute itself: separating the two class
+  names there needs a literal space next to a template action, and Prettier
+  deletes exactly that space, fusing them into one unmatched class.
+*/}}
+{{/* `not-prose` because the frame holds Chroma output and, inline, sits inside
+  `.content`, where `typography.css` styles `pre` and `code` directly - it
+  excludes `.hextra-code-block` and `not-prose` subtrees and nothing else. Left
+  on, the `pre` inherits `--font-code` while the prompt span inherits
+  `--font-monospace` from `.hextra-command`, which is two different faces
+  whenever `params.fonts.code` and `params.fonts.mono` differ, and the
+  advance-width constant above then measures a font that is not laying out the
+  text. `font-medium`, `rounded-xl`, the inner `code`'s own border and the
+  per-line `contrast-more:` rules leak in the same way.
+*/}}
+{{- $frameClass := "hextra-command__frame not-prose" -}}
+{{- with .class -}}
+  {{- $frameClass = printf "%s %s" $frameClass . -}}
+{{- end -}}
+
+{{/* Both modes render the same frame and the same container-query text scaling,
+  so a `command` shortcode and a `coverText` cover are one component. A cover
+  adds only the fixed aspect ratio it has to fill.
+*/}}
+{{/* Nothing to render when the body was blank, and a cover would divide the
+  ratio by a line count of zero.
+*/}}
+{{- if $lines -}}
+  {{- if $cover -}}
+    <div class="{{ $frameClass }} hextra-command__frame--fixed" style="{{ printf "--hextra-command-ratio:%.2f" $ratio | safeCSS }}">
+      <div class="hextra-command hextra-command--cover" dir="ltr" style="{{ printf "--hextra-command-fs:%.2f" $fontSize | safeCSS }}">
+        {{- partial "components/command-lines.html" (dict "lines" $lines "prompt" $prompt "scrollable" false) -}}
+      </div>
+    </div>
+  {{- else -}}
+    <div class="{{ $frameClass }}">
+      <div class="hextra-command hextra-command--inline" dir="ltr" style="{{ printf "--hextra-command-fs:%.2f" $fontSize | safeCSS }}">
+        {{- partial "components/command-lines.html" (dict "lines" $lines "prompt" $prompt "scrollable" true) -}}
+      </div>
+    </div>
+  {{- end -}}
+{{- end -}}

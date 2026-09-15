@@ -105,7 +105,7 @@ menu:
 
 ### ロゴとタイトル
 
-デフォルトのロゴを変更するには、`hugo.yaml` を編集し、`static` ディレクトリ下のロゴファイルへのパスを追加します。
+デフォルトのロゴを変更するには、`hugo.yaml` を編集し、`static/icons` ディレクトリ下のロゴファイルへのパスを追加します。
 オプションで、ロゴをクリックした際のリンク先や、ロゴの幅と高さ（ピクセル単位）を設定できます。
 
 ```yaml {filename="hugo.yaml"}
@@ -114,8 +114,8 @@ params:
     displayTitle: true
     displayLogo: true
     logo:
-      path: images/logo.svg
-      dark: images/logo-dark.svg
+      path: icons/images/logo.svg
+      dark: icons/images/logo-dark.svg
       link: /
       width: 40
       height: 20
@@ -221,20 +221,22 @@ copyright: "© 2024 ここにあなたのテキスト"
 
 ### ファビコン
 
-サイトの [ファビコン](https://ja.wikipedia.org/wiki/Favicon) をカスタマイズするには、[テーマのデフォルトファビコン](https://github.com/imfing/hextra/tree/main/static) を上書きするために `static` フォルダの下にアイコンファイルを配置します：
+サイトの [ファビコン](https://ja.wikipedia.org/wiki/Favicon) をカスタマイズするには、[テーマのデフォルトファビコン](https://github.com/imfing/hextra/tree/main/static) を上書きするために `static/icons` フォルダの下にアイコンファイルを配置します：
 
 {{< filetree/container >}}
-  {{< filetree/folder name="static" >}}
-    {{< filetree/file name="android-chrome-192x192.png" >}}
-    {{< filetree/file name="android-chrome-512x512.png" >}}
-    {{< filetree/file name="apple-touch-icon.png" >}}
-    {{< filetree/file name="favicon-16x16.png" >}}
-    {{< filetree/file name="favicon-32x32.png" >}}
-    {{< filetree/file name="favicon-dark.svg" >}}
-    {{< filetree/file name="favicon.ico" >}}
-    {{< filetree/file name="favicon.svg" >}}
-    {{< filetree/file name="site.webmanifest" >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="static" >}}
+{{< filetree/folder name="icons" >}}
+{{< filetree/file name="android-chrome-192x192.png" >}}
+{{< filetree/file name="android-chrome-512x512.png" >}}
+{{< filetree/file name="apple-touch-icon.png" >}}
+{{< filetree/file name="favicon-16x16.png" >}}
+{{< filetree/file name="favicon-32x32.png" >}}
+{{< filetree/file name="favicon-dark.svg" >}}
+{{< filetree/file name="favicon.ico" >}}
+{{< filetree/file name="favicon.svg" >}}
+{{< filetree/file name="site.webmanifest" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 #### 基本設定
@@ -298,6 +300,22 @@ params:
   # 最終更新の作者を表示
   displayUpdatedAuthor: true
 ```
+
+### ライセンス表記
+
+最終更新日と同じ行の行頭側に、ライセンス表記を表示できます。「This post is licensed under CC BY 4.0 by the author.」と表示され、ライセンス名がその URL にリンクされます。`params.license.enable` が `true` でない限り非表示です。
+
+```yaml {filename="hugo.yaml"}
+params:
+  license:
+    enable: true
+    name: "CC BY 4.0"
+    url: "https://creativecommons.org/licenses/by/4.0/"
+```
+
+設定するのは名前と URL だけなので、`MIT` や `CC BY-SA 4.0` など任意のライセンスを指定できます。それらを囲む文は `license` 翻訳文字列から取得され、その `%s` がリンク付きの名前に置き換わります。他の文字列と同じように、サイトの `i18n/<lang>.yaml` に `license` キーを追加して上書きできます。
+
+表記と日付は独立しています。どちらか一方だけを表示することもできます。
 
 ### タグ
 
@@ -500,6 +518,7 @@ params:
       links:
         - name: ChatGPT で開く
           icon: chatgpt
+          description: このページについて質問する
           url: "https://chatgpt.com/?hints=search&q=I%27m+looking+at+this+documentation%3A+{url}%0AHelp+me+understand+how+to+use+it."
 ```
 
@@ -507,6 +526,7 @@ params:
 
 - `name` - リンクの表示テキスト
 - `icon` - オプションのアイコン名（[アイコン]({{% relref "docs/guide/shortcodes/icon" %}})を参照）
+- `description` - 名前の下に淡色で表示されるオプションの2行目
 - `url` - オプションのプレースホルダーを含む URL
 
 ### FlexSearch インデックス

@@ -8,6 +8,15 @@
 
 .hextra-card img {
   user-select: none;
+  /* Low-quality placeholder, painted as the image's own background; the real
+     pixels cover it, and `assets/js/core/lqip.js` clears it on load so a
+     transparent image does not keep the blur. `cover` matches the default,
+     unfitted image box; a caller who sets `object-fit` via `imageStyle` should
+     set a matching `background-size` there too. */
+  background-image: var(--hextra-lqip, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .hextra-card:hover .hextra-card-icon svg {

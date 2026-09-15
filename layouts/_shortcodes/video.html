@@ -1,0 +1,97 @@
+{{/* Embed a video with an optional poster and caption.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração). Local paths are resolved
+  with the same helper the `pdf` shortcode uses, so an absolute path points at
+  /static and a bare filename is a sibling of the page file.
+
+  @param {string} src Required. Video URL or local path.
+  @param {string} poster Poster image URL or local path.
+  @param {string} caption Markdown caption shown below the video.
+  @param {bool} autoplay Play on load. Implies muted. Default false.
+  @param {bool} loop Loop playback. Default false.
+  @param {bool} muted Start muted. Default false.
+  @param {bool} controls Show playback controls. Default true.
+  @param {bool} playsinline Play inline on mobile rather than fullscreen. Default true.
+  @param {string} preload One of metadata (default), none, auto.
+  @param {int} start Start time in seconds.
+  @param {int} end End time in seconds.
+  @param {string} ratio Aspect ratio as W/H. Default 16/9.
+  @param {string} fit One of contain (default), cover, fill.
+
+  @example {{< video src="demo.mp4" caption="A short demo" >}}
+@example
+{{< video src="demo.mp4" autoplay=true loop=true ratio="4/3" >}}
+*/}}
+{{- $src := .Get "src" | default (.Get 0) -}}
+
+{{- if not $src -}}
+  {{- errorf "The %q shortcode requires a 'src' parameter. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- $src = partial "utils/file-path" (dict "page" .Page "path" $src) -}}
+
+{{- $poster := .Get "poster" -}}
+{{- with $poster -}}
+  {{- $poster = partial "utils/file-path" (dict "page" $.Page "path" .) -}}
+{{- end -}}{{/* Booleans are compared through printf so an explicit `false` is honoured:
+  `default` treats false as empty and would restore the default instead.
+*/}}
+{{- $autoplay := eq (printf "%v" (.Get "autoplay")) "true" -}}
+{{- $loop := eq (printf "%v" (.Get "loop")) "true" -}}
+{{- $muted := eq (printf "%v" (.Get "muted")) "true" -}}
+{{- $controls := ne (printf "%v" (.Get "controls")) "false" -}}
+{{- $playsinline := ne (printf "%v" (.Get "playsinline")) "false" -}}
+
+{{- /* Browsers block autoplay with sound, so autoplay forces muted. */ -}}
+{{- if and $autoplay (not $muted) -}}
+  {{- $muted = true -}}
+{{- end -}}
+
+{{- $preload := .Get "preload" | default "metadata" -}}
+{{- if not (in (slice "metadata" "none" "auto") $preload) -}}
+  {{- warnf "video: unknown preload %q, falling back to 'metadata'" $preload -}}
+  {{- $preload = "metadata" -}}
+{{- end -}}
+
+{{- $fit := .Get "fit" | default "contain" -}}
+{{- if not (in (slice "contain" "cover" "fill") $fit) -}}
+  {{- warnf "video: unknown fit %q, falling back to 'contain'" $fit -}}
+  {{- $fit = "contain" -}}
+{{- end -}}
+
+{{- $ratio := .Get "ratio" | default "16/9" -}}
+{{- $ratio = printf "%v" $ratio -}}
+{{- if not (findRE `^[0-9]+ ?/ ?[0-9]+$` $ratio) -}}
+  {{- warnf "video: invalid ratio %q, falling back to 16/9" $ratio -}}
+  {{- $ratio = "16/9" -}}
+{{- end -}}
+
+{{- /* A media fragment is the standard way to bound playback without JS. */ -}}
+{{- $start := .Get "start" -}}
+{{- $end := .Get "end" -}}
+{{- if or $start $end -}}
+  {{- $src = printf "%s#t=%v,%v" $src ($start | default "") ($end | default "") -}}
+  {{- $src = strings.TrimSuffix "," $src -}}
+{{- end -}}
+
+
+<figure class="hextra-video not-prose">
+  <video
+    class="hextra-video__player"
+    style="{{ printf "aspect-ratio: %s; object-fit: %s;" $ratio $fit | safeCSS }}"
+    src="{{ $src }}"
+    {{ with $poster }}poster="{{ . }}"{{ end }}
+    preload="{{ $preload }}"
+    {{ if $controls }}controls{{ end }}
+    {{ if $autoplay }}autoplay{{ end }}
+    {{ if $loop }}loop{{ end }}
+    {{ if $muted }}muted{{ end }}
+    {{ if $playsinline }}playsinline{{ end }}
+  >
+    {{ (T "videoUnsupported") | default "Your browser cannot play this video." }}
+    <a href="{{ $src }}" download>{{ (T "downloadVideo") | default "Download the video" }}</a>
+  </video>
+  {{- with .Get "caption" -}}
+    <figcaption class="hextra-video__caption">{{ . | markdownify }}</figcaption>
+  {{- end -}}
+</figure>

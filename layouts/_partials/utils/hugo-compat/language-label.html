@@ -1,8 +1,7 @@
-{{/*
-Returns the language label using the supported Hugo API for the running version.
+{{/* Returns the language label using the supported Hugo API for the running version.
 
-Hugo v0.158.0 deprecated Language.LanguageName in favor of Language.Label.
-Keep the fallback so Hextra can continue supporting Hugo >= 0.146.0.
+  Hugo v0.158.0 deprecated Language.LanguageName in favor of Language.Label.
+  Keep the fallback so Hextra can continue supporting Hugo >= 0.146.0.
 */}}
 {{- $language := . -}}
 {{- $label := "" -}}

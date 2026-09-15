@@ -1,0 +1,153 @@
+/* A shell command rendered as text - the `command` shortcode, and the
+   `coverText` front matter key that puts one where a post's cover image goes.
+
+   The command arrives as Chroma output, so it is already wrapped in
+   `.highlight > .chroma` and already coloured by `assets/css/chroma/` in both
+   modes. Everything here undoes that wrapper's *block* styling - background,
+   padding, margin, its own font size - so the command reads as text on the
+   page rather than as a code block, and takes its size from the container
+   instead of from `highlight.css`. */
+
+.hextra-command {
+  @apply hx:font-mono hx:leading-snug;
+
+  .highlight,
+  .chroma,
+  code {
+    @apply hx:m-0 hx:overflow-visible hx:bg-transparent hx:p-0;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  /* The one element that keeps an overflow of its own. `pre` never wraps, the
+     fit-to-width maths clamps rather than shrinking indefinitely, and the
+     frame clips - so a line past the clamp would be silently truncated with
+     no way to reach the rest. Inline, `command-lines.html` leaves Chroma's
+     `tabindex="0"` in place so the scroll is reachable by keyboard too. */
+  pre {
+    @apply hx:m-0 hx:min-w-0 hx:overflow-x-auto hx:bg-transparent hx:p-0;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  /* Chroma puts the whole line in a block-level <pre>, which would push the
+     prompt onto a line of its own. */
+  .highlight {
+    @apply hx:inline hx:min-w-0;
+  }
+}
+
+.hextra-command__line {
+  @apply hx:flex hx:items-baseline hx:gap-[0.6em];
+}
+
+/* accent-600 in light, not accent-500: the prompt sits on the frame's
+   `neutral-50`, where accent-500 measures 2.60:1 - under the 3:1 floor even
+   for large text. accent-600 is 3.81:1 there (`toc.css` records 3.71:1 for the
+   same value against the page, which is marginally darker).
+
+   That clears 3:1 but not 4.5:1, which is a deliberate call rather than an
+   oversight. The glyph is decorative punctuation, marked `aria-hidden`, and it
+   scales with the container: `clamp(0.7rem, ..., 4rem)` as a cover and
+   `clamp(0.9rem, ..., 2.5rem)` inline, so most of that range is large text at
+   the 3:1 bar. At the bottom of the range it is not, and accent-700 would have
+   covered that case - it was traded for keeping the prompt recognisably the
+   accent rather than a near-navy. Dark mode passes at 8.21:1 either way. */
+.hextra-command__prompt {
+  @apply hx:shrink-0 hx:select-none hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
+}
+
+/* ----------------------------------------------------------------- inline */
+
+/* Identical to a cover apart from the height, which follows the lines rather
+   than a fixed ratio - same frame, same padding, same container-query scaling,
+   so `{{< command >}}` mid-page and a `coverText` cover are one component. */
+.hextra-command--inline {
+  @apply hx:flex hx:flex-col hx:gap-[0.3em];
+  @apply hx:px-[5cqi] hx:py-[4cqi];
+  font-size: clamp(0.9rem, calc(var(--hextra-command-fs, 6) * 1cqi), 2.5rem);
+}
+
+/* ------------------------------------------------------------------ cover */
+
+/* The frame is what the command sizes itself against. `container-type:
+   inline-size` makes `1cqi` one percent of *this* element's width, and an
+   element cannot query itself, so the multiplier has to be applied to a child
+   - hence the frame/command split rather than one element.
+
+   The aspect ratio is what decides how much empty band sits above and below a
+   short command, so it is the knob worth exposing: `params.command.coverRatio`,
+   width over height, larger being shorter. The partial divides it by the line
+   count before writing it here, so a three-line block gets three times the
+   height rather than squeezing.
+
+   Declaring a ratio at all is also why a text cover cannot shift the layout:
+   there is nothing to measure and nothing to wait for. */
+.hextra-command__frame {
+  @apply hx:w-full hx:overflow-hidden hx:rounded-lg hx:border;
+  /* Without a fill the frame is transparent and takes the colour of whatever
+     is behind it: the page as an article hero, `.hextra-blog-card-cover` in a
+     card.
+
+     Light is `neutral-100`, not the `neutral-50` the collapsibles use
+     (`series.css`, the accordion). Those sit on the page, where `neutral-50`
+     reads as raised. This one mostly sits in a card, and both
+     `.hextra-blog-card` and `.hextra-article-card` are themselves
+     `neutral-50` - the cover was rendering in the exact same colour as the
+     body beside it, with nothing to separate them once the frame's own border
+     was dropped inside card slots. Dark never had the problem: the card drops
+     to `neutral-950` while the frame stays at `neutral-900`.
+
+     `neutral-100` is also the Overlay level `.hextra-blog-card-cover` uses, so
+     an image cover and a text cover now sit on the same surface. */
+  @apply hx:border-neutral-400 hx:bg-neutral-100;
+  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
+  @apply hx:my-6;
+  container-type: inline-size;
+}
+
+/* Only a cover has a box to fill. Inline, the height follows the content. */
+.hextra-command__frame--fixed {
+  @apply hx:my-0;
+  aspect-ratio: var(--hextra-command-ratio, 7.2);
+}
+
+.hextra-command--cover {
+  @apply hx:flex hx:h-full hx:flex-col hx:justify-center hx:gap-[0.3em];
+  @apply hx:px-[5cqi] hx:py-[1.5cqi];
+  /* The partial picks the middle term from the longest line. The bounds stop a
+     two-word command from filling the frame edge to edge and a very long one
+     from becoming unreadable. */
+  font-size: clamp(0.7rem, calc(var(--hextra-command-fs, 6) * 1cqi), 4rem);
+}
+
+/* The two side-by-side card layouts give the cover column a height of its own:
+   `.hextra-article-card__cover` (article-card.css) stretches to the card, and
+   `.hextra-blog-card-h-cover` (blog.css) to the card's `sm:h-64`. A fixed
+   aspect ratio there sizes the frame independently of the column - at 288px
+   wide a 7.2 ratio is 40px tall in a ~130px slot - so the ratio is dropped and
+   the frame fills the column instead. `.hextra-blog-card-cover` is full-width
+   with no height of its own, so it keeps the ratio. */
+.hextra-article-card__cover .hextra-command__frame--fixed,
+.hextra-blog-card-h-cover .hextra-command__frame--fixed {
+  @apply hx:h-full;
+  aspect-ratio: auto;
+}
+
+/* In a card the slot is already inside the card's own rounded, clipped border
+   - `.hextra-blog-card` (blog.css) and `.hextra-article-card`
+   (article-card.css) - so the frame's edge sits flush inside it and reads as a
+   doubled border. The frame keeps its own edge everywhere else, including as a
+   hero, where there is no card around it. */
+.hextra-blog-card-cover .hextra-command__frame,
+.hextra-blog-card-h-cover .hextra-command__frame,
+.hextra-article-card__cover .hextra-command__frame {
+  @apply hx:rounded-none hx:border-0;
+}
+
+/* Hero covers sit between the breadcrumb and the title, where the image variant
+   carries the same spacing - see `.hextra-blog-hero`. The border comes from the
+   frame itself, so only the margins are left here. */
+.hextra-command__frame.hextra-command--hero {
+  @apply hx:mt-4 hx:mb-4;
+}

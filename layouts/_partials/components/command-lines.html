@@ -1,0 +1,44 @@
+{{/* The lines of a command block. Split out of `command-block.html` only so
+  that each branch there wraps balanced markup: an element opened inside one
+  template action and closed inside another parses fine in Hugo, but Prettier's
+  Go-template plugin cannot print it.
+
+  @param {slice} lines The command lines.
+  @param {string} prompt Prompt glyph, already resolved.
+  @param {bool} [scrollable] Keep the `pre` a keyboard-reachable scroll container.
+
+  @example {{ partial "components/command-lines.html" (dict "lines" (slice "npm install") "prompt" "$")
+}}
+*/}}
+{{- $prompt := .prompt -}}
+{{- $scrollable := eq (printf "%v" .scrollable) "true" -}}
+{{- range .lines -}}
+  {{/* A div, not a span: `highlight` wraps its output in `<div class="highlight">`,
+    and a div inside a span is invalid - the parser's repair leaves the two on
+    separate lines whatever `display` the stylesheet asks for.
+  */}}
+  <div class="hextra-command__line">
+    {{/* Omitted entirely when empty rather than rendered as an empty span: the
+      line is a flex row with a gap, so an empty glyph would still indent the
+      command by one gap with nothing in it.
+    */}}
+    {{- with $prompt -}}
+      <span class="hextra-command__prompt" aria-hidden="true">{{ . }}</span>
+    {{- end -}}
+    {{/* `highlight` emits `<pre tabindex="0">` so that a wide block can be
+      scrolled by keyboard, and the `pre` really is a scroll container: the
+      fit-to-width maths clamps, so a long enough line overflows and the frame
+      clips it. Inline the stop is kept for exactly that reason.
+
+      A cover drops it. A cover sits inside the post's own link in every card,
+      and `<a>` may not contain interactive content - a focusable descendant
+      there is invalid markup and an extra stop over the same destination. It
+      is still scrollable by pointer, and it is sized to fit.
+    */}}
+    {{- $html := highlight . "shell" "" -}}
+    {{- if not $scrollable -}}
+      {{- $html = replaceRE ` tabindex="0"` "" $html -}}
+    {{- end -}}
+    {{- $html | safeHTML -}}
+  </div>
+{{- end -}}

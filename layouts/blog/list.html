@@ -1,13 +1,14 @@
 {{ define "main" }}
+  {{- $cfg := partial "blog/config.html" . -}}
   {{- $readMore := (T "readMore") | default "Read more →" -}}
   <div class="hx:mx-auto hx:flex hextra-max-page-width">
-    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" true) }}
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" (not $cfg.rail.enable)) }}{{ partial "blog/rail.html" (dict "context" . "config" $cfg) }}
     <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--hextra-navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">
       <main id="content" class="hx:w-full hx:min-w-0 hextra-max-content-width hx:px-6 hx:pt-4 hx:md:px-12">
         {{ partial "custom/page-begin.html" . }}
-        {{ partial "breadcrumb.html" (dict "page" . "enable" false) }}
-        <br class="hx:mt-1.5 hx:text-sm" />
-        {{ if .Title }}<h1 class="hx:text-center hx:mt-2 hx:text-4xl hx:font-bold hx:tracking-tight hx:text-slate-900 hx:dark:text-slate-100">{{ .Title }}</h1>{{ end }}
+        {{ partial "breadcrumb.html" (dict "page" . "enable" false) }}{{ if $cfg.rail.enable }}{{ partial "blog/identity.html" (dict "context" . "config" $cfg "layout" "banner") }}{{ end }}
+        <br class="hx:mt-1.5 hx:text-sm" />{{ $titleClass := "hx:text-center hx:mt-2 hx:text-4xl hx:font-bold hx:tracking-tight hx:text-neutral-900 hx:dark:text-neutral-100" }}{{ if $cfg.card.enable }}{{ $titleClass = "hx:sr-only" }}{{ end }}
+        {{ if .Title }}<h1 class="{{ $titleClass }}">{{ .Title }}</h1>{{ end }}
         <div class="content">
           {{ partial "custom/content-begin.html" . }}
           {{ .Content }}
@@ -16,34 +17,51 @@
         {{- $pages := partial "utils/sort-pages" (dict "page" . "by" site.Params.blog.list.sortBy "order" site.Params.blog.list.sortOrder) -}}
         {{- $pagerSize := site.Params.blog.list.pagerSize | default 10 -}}
         {{- $paginator := .Paginate $pages $pagerSize -}}
-        {{- range $paginator.Pages }}
-          <div class="hx:mb-10">
-            <h3><a style="color: inherit; text-decoration: none;" class="hx:block hx:font-semibold hx:mt-8 hx:text-2xl " href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-            {{ if site.Params.blog.list.displayTags }}
-              <div class="hx:text-sm hx:leading-7">
-                {{ partial "tags.html" (dict "context" .) }}
-              </div>
-            {{ end }}
-            <p class="hx:opacity-80 hx:mt-4 hx:leading-7">{{- partial "utils/page-description" . -}}</p>
-            <p class="hx:opacity-80 hx:mt-1 hx:leading-7">
-              <a
-                class="hx:text-[color:hsl(var(--primary-hue),100%,50%)] hx:underline hx:underline-offset-2 hx:decoration-from-font"
-                href="{{ .RelPermalink }}"
-                aria-label="{{ printf "%s %s" $readMore .Title }}"
-              >
-                {{- $readMore -}}
-              </a>
-            </p>
-            <p class="hx:opacity-50 hx:text-sm hx:mt-4 hx:leading-7">{{ partial "utils/format-date" .Date }}</p>
-          </div>
-        {{ end -}}
+        {{- $adSlot := "" -}}
+        {{- with (partialCached "ads/config.html" . .RelPermalink) }}{{ $adSlot = index .slots "bloglist" }}{{ end -}}
+        {{- $adTotal := len $paginator.Pages -}}
+        {{- if $cfg.card.enable -}}
+          <ul class="hextra-blog-list">
+            {{- range $i, $post := $paginator.Pages -}}
+              <li>{{ partial "blog/post-card.html" (dict "page" $post "config" $cfg) }}</li>
+              {{/* A bare div is not valid inside a ul, so the ad gets a list
+                item of its own; .hextra-blog-list is already list-none.
+              */}}
+              {{- if partial "ads/interleave.html" (dict "slot" $adSlot "index" $i "total" $adTotal) -}}
+                <li>{{ partial "ads/slot.html" (dict "context" $ "name" "bloglist" "variant" "list") }}</li>
+              {{- end -}}
+            {{- end -}}
+          </ul>
+        {{- else -}}
+          {{- range $i, $post := $paginator.Pages }}
+            <div class="hx:mb-10">
+              <h3><a style="color: inherit; text-decoration: none;" class="hx:block hx:font-semibold hx:mt-8 hx:text-2xl " href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+              {{ if site.Params.blog.list.displayTags }}
+                <div class="hx:text-sm hx:leading-7">
+                  {{ partial "tags.html" (dict "context" .) }}
+                </div>
+              {{ end }}
+              <p class="hx:opacity-80 hx:mt-4 hx:leading-7">{{- partial "utils/page-description" . -}}</p>
+              <p class="hx:opacity-80 hx:mt-1 hx:leading-7">
+                <a class="hx:text-hextra-accent-500 hx:underline hx:underline-offset-2 hx:decoration-from-font" href="{{ .RelPermalink }}" aria-label="{{ printf "%s %s" $readMore .Title }}">
+                  {{- $readMore -}}
+                </a>
+              </p>
+              <p class="hx:opacity-50 hx:text-sm hx:mt-4 hx:leading-7">{{ partial "utils/format-date" .Date }}</p>
+            </div>
+            {{- if partial "ads/interleave.html" (dict "slot" $adSlot "index" $i "total" $adTotal) -}}
+              {{- partial "ads/slot.html" (dict "context" $ "name" "bloglist") -}}
+            {{- end -}}
+          {{ end -}}
+        {{- end -}}
 
         {{- if gt $paginator.TotalPages 1 -}}
           {{ partial "components/blog-pager.html" $paginator }}
         {{- end -}}
+        {{- partial "blog/widgets.html" (dict "context" . "config" $cfg "layout" "inline") -}}
         {{ partial "custom/page-end.html" . }}
       </main>
     </article>
-    <div class="hx:max-xl:hidden hx:h-0 hx:w-64 hx:shrink-0"></div>
+    {{ if $cfg.widgets.enable }}{{- partial "blog/widgets.html" (dict "context" . "config" $cfg "layout" "rail") -}}{{ else }}<div class="hx:max-xl:hidden hx:h-0 hx:w-64 hx:shrink-0"></div>{{ end }}
   </div>
 {{- end -}}

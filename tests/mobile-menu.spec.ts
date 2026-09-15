@@ -1,13 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { execFileSync } from "node:child_process";
-import {
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -20,9 +13,7 @@ test("clicking mobile hamburger does not focus command palette search", async ({
 
   const searchTrigger = page.locator("[data-search-open]").first();
   await expect(searchTrigger).toBeVisible();
-  await expect(
-    page.locator(".hextra-sidebar-container .hextra-search-input"),
-  ).toHaveCount(0);
+  await expect(page.locator(".hextra-sidebar-container .hextra-search-input")).toHaveCount(0);
 
   const searchDialog = page.locator("#hextra-search-dialog");
   const searchInput = searchDialog.locator(".hextra-search-input");
@@ -68,9 +59,7 @@ test("mobile sidebar uses localized page titles for zh-cn docs navigation", asyn
   await expect(guide).not.toHaveText("Guide");
 });
 
-test("mobile sidebar falls back to content tree when main menu has no eligible entries", async ({
-  page,
-}) => {
+test("mobile sidebar falls back to content tree when main menu has no eligible entries", async ({ page }) => {
   const siteDir = mkdtempSync(join(tmpdir(), "hextra-mobile-menu-"));
   const contentDir = join(siteDir, "content");
   const publishDir = join(siteDir, "public");
@@ -98,7 +87,7 @@ menu:
       url: "https://github.com/imfing/hextra"
       params:
         icon: github
-`,
+`
   );
   writeFileSync(
     join(contentDir, "_index.md"),
@@ -107,21 +96,21 @@ title: Home
 cascade:
   type: docs
 ---
-`,
+`
   );
   writeFileSync(
     join(contentDir, "docs", "_index.md"),
     `---
 title: Docs
 ---
-`,
+`
   );
   writeFileSync(
     join(contentDir, "docs", "getting-started.md"),
     `---
 title: Getting Started
 ---
-`,
+`
   );
   writeFileSync(
     join(contentDir, "donate", "index.md"),
@@ -130,22 +119,11 @@ title: Donate
 sidebar:
   exclude: true
 ---
-`,
+`
   );
 
   try {
-    execFileSync(
-      "hugo",
-      [
-        "--source",
-        siteDir,
-        "--themesDir",
-        themesDir,
-        "--destination",
-        publishDir,
-      ],
-      { cwd: process.cwd(), stdio: "pipe" },
-    );
+    execFileSync("hugo", ["--source", siteDir, "--themesDir", themesDir, "--destination", publishDir], { cwd: process.cwd(), stdio: "pipe" });
 
     const html = readFileSync(join(publishDir, "index.html"), "utf8");
     await page.setContent(html);
@@ -156,9 +134,7 @@ sidebar:
       .first();
 
     await expect(mobileSidebar.locator('a[href="/docs/"]')).toHaveText("Docs");
-    await expect(
-      mobileSidebar.locator('a[href="/docs/getting-started/"]'),
-    ).toHaveText("Getting Started");
+    await expect(mobileSidebar.locator('a[href="/docs/getting-started/"]')).toHaveText("Getting Started");
   } finally {
     rmSync(siteDir, { recursive: true, force: true });
   }

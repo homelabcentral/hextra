@@ -1,0 +1,25 @@
+{{/* "Trending tags" widget: the site's tags ordered by post count.
+
+  @param {int} count How many tags to list.
+
+  @example {{ partial "blog/widgets/tags.html" (dict "count" 10)
+}}
+*/}}
+{{- $count := .count -}}
+{{- with site.Taxonomies.tags -}}
+  {{- $terms := first $count .ByCount -}}
+  {{- with $terms -}}
+    {{- $title := (T "trendingTags") | default "Trending tags" -}}
+    <section class="hextra-blog-widget">
+      {{- partial "blog/widget-heading.html" (dict "title" $title "icon" "hashtag") -}}
+      <div class="hextra-tag-cloud">
+        {{- range . -}}
+          <a class="hextra-tag-chip" href="{{ .Page.RelPermalink }}">
+            <span>#{{ .Page.LinkTitle }}</span>
+            <span class="hextra-tag-count">{{ .Count }}</span>
+          </a>
+        {{- end -}}
+      </div>
+    </section>
+  {{- end -}}
+{{- end -}}

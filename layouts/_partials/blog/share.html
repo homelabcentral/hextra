@@ -1,0 +1,55 @@
+{{/* Share links for a post.
+
+  Link URLs are templates using the same `{placeholder}` convention as
+  `params.page.contextMenu.links`; `{url}` and `{title}` are substituted and
+  URL-encoded by `utils/template-url`.
+
+  An entry with `type: copy` renders a button that copies the address the
+  reader is on to the clipboard instead of a link, and needs no `url` of its
+  own. The permalink is deliberately not used: it is built from `baseURL`, so
+  a preview build would hand out links to the production host and vice versa.
+
+  @param {page} context The post.
+  @param {dict} config The dict returned by `blog/config.html`.
+
+  @example {{ partial "blog/share.html" (dict "context" . "config" $cfg)
+}}
+*/}}
+{{- $share := .config.article.share -}}
+{{- if $share.enable -}}
+  {{- $context := .context -}}
+  {{- $values := dict "url" $context.Permalink "title" $context.Title -}}
+  {{- $label := (T "sharePost") | default "Share this post" -}}
+  {{- $copiedLabel := (T "copied") | default "Copied!" -}}
+  <div class="hextra-blog-share">
+    <span class="hextra-blog-share-label">{{ $label }}</span>
+    <ul class="hextra-blog-share-links">
+      {{- range $share.links -}}
+        {{- $hasIcon := and .icon (partial "utils/icon-exists.html" (dict "name" .icon)) -}}
+        {{- if and .icon (not $hasIcon) -}}{{- warnf "hextra: blog share icon %q not found in data/icons.yaml; skipping" .icon -}}{{- end -}}
+        <li>
+          {{- if eq (.type | default "link") "copy" -}}
+            <button type="button" class="hextra-blog-share-link hextra-blog-share-copy hx:group/sharecopy" data-copied-label="{{ $copiedLabel }}" title="{{ .name }}" aria-label="{{ .name }}">
+              <span class="hx:pointer-events-none hx:inline-flex hx:group-[.copied]/sharecopy:hidden">
+                {{- if $hasIcon -}}
+                  {{- partial "utils/icon.html" (dict "name" .icon "attributes" `height="18" width="18"`) -}}
+                {{- end -}}
+              </span>
+              <span class="hx:pointer-events-none hx:hidden hx:group-[.copied]/sharecopy:inline-flex">
+                {{- partial "utils/icon.html" (dict "name" "check" "attributes" `height="18" width="18"`) -}}
+              </span>
+            </button>
+          {{- else -}}
+            {{- $url := partial "utils/template-url" (dict "template" .url "values" $values) -}}
+            <a class="hextra-blog-share-link" href="{{ $url }}" target="_blank" rel="noreferrer" title="{{ .name }}">
+              {{- if $hasIcon -}}
+                {{- partial "utils/icon.html" (dict "name" .icon "attributes" `height="18" width="18"`) -}}
+              {{- end -}}
+              <span class="hx:sr-only">{{ .name }}</span>
+            </a>
+          {{- end -}}
+        </li>
+      {{- end -}}
+    </ul>
+  </div>
+{{- end -}}

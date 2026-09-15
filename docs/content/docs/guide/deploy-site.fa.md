@@ -9,7 +9,6 @@ Hugo وبسایت‌های استاتیک تولید می‌کند که امکا
 
 <!--more-->
 
-
 ## GitHub Pages
 
 [GitHub Pages](https://docs.github.com/pages) روش توصیه‌شده برای استقرار و میزبانی رایگان وبسایت شماست.
@@ -101,10 +100,9 @@ jobs:
 
 {{% /details %}}
 
-
 {{< callout >}}
-  در تنظیمات مخزن، بخش **Pages** > **Build and deployment** > **Source** را روی **GitHub Actions** تنظیم کنید:
-  ![](https://user-images.githubusercontent.com/5097752/266784808-99676430-884e-42ab-b901-f6534a0d6eee.png)
+در تنظیمات مخزن، بخش **Pages** > **Build and deployment** > **Source** را روی **GitHub Actions** تنظیم کنید:
+![](https://user-images.githubusercontent.com/5097752/266784808-99676430-884e-42ab-b901-f6534a0d6eee.png)
 {{< /callout >}}
 
 به طور پیش‌فرض، گردش کار GitHub Actions فوق `.github/workflows/pages.yaml` فرض می‌کند که سایت در `https://<USERNAME>.github.io/<REPO>/` مستقر می‌شود.
@@ -120,7 +118,6 @@ run: |
 
 اگر در دامنه خود مستقر می‌کنید، لطفاً مقدار `--baseURL` را متناسب با آن تغییر دهید.
 
-
 ## Cloudflare Pages
 
 1. کد منبع سایت را در یک مخزن Git (مثلاً GitHub) قرار دهید.
@@ -128,16 +125,16 @@ run: |
 3. در صفحه اصلی حساب، **Workers & Pages** > **Create application** > **Pages** > **Connect to Git** را انتخاب کنید.
 4. مخزن را انتخاب کنید و در بخش **Set up builds and deployments** اطلاعات زیر را ارائه دهید:
 
-| تنظیمات          | مقدار                |
-| ---------------- | -------------------- |
-| شاخه تولید      | `main`               |
-| دستور ساخت      | `hugo --gc --minify` |
-| دایرکتوری ساخت  | `public`             |
+| تنظیمات        | مقدار                |
+| -------------- | -------------------- |
+| شاخه تولید     | `main`               |
+| دستور ساخت     | `hugo --gc --minify` |
+| دایرکتوری ساخت | `public`             |
 
 برای جزئیات بیشتر، بررسی کنید:
+
 - [استقرار یک سایت Hugo](https://developers.cloudflare.com/pages/framework-guides/deploy-a-hugo-site/#deploy-with-cloudflare-pages).
 - [پشتیبانی زبان و ابزارها](https://developers.cloudflare.com/pages/platform/language-support-and-tools/).
-
 
 ## Netlify
 
@@ -150,7 +147,6 @@ run: |
 4. استقرار دهید!
 
 برای جزئیات بیشتر، [Hugo در Netlify](https://docs.netlify.com/integrations/frameworks/hugo/) را بررسی کنید.
-
 
 ## Vercel
 

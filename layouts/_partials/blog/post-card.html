@@ -1,0 +1,35 @@
+{{/* A single post card in the blog list.
+
+  The whole card is clickable: the title link is stretched over the card with
+  a pseudo-element, so there is still exactly one link to the post and its
+  accessible name is the post title. Tag links sit above that overlay and stay
+  clickable in their own right.
+
+  @param {page} page The post.
+  @param {dict} config The dict returned by `blog/config.html`.
+
+  @example {{ partial "blog/post-card.html" (dict "page" . "config" $cfg)
+}}
+*/}}
+{{- $page := .page -}}
+{{- $card := .config.card -}}
+{{- $displayTags := site.Params.blog.list.displayTags -}}
+
+
+<article class="hextra-blog-card">
+  {{- if $card.cover -}}
+    {{- $cover := partialCached "blog/cover.html" (dict "page" $page "variant" "card") $page.RelPermalink "card" -}}
+    {{- if trim $cover " \n\t" -}}
+      <div class="hextra-blog-card-cover">
+        {{- $cover | safeHTML -}}
+      </div>
+    {{- end -}}
+  {{- end -}}
+  <div class="hextra-blog-card-body">
+    <h2 class="hextra-blog-card-title">
+      <a class="hextra-blog-card-link" href="{{ $page.RelPermalink }}">{{ $page.Title }}</a>
+    </h2>
+    {{- partial "blog/post-meta.html" (dict "page" $page "readingTime" $card.readingTime "tags" $displayTags) -}}
+    <p class="hextra-blog-card-excerpt">{{ partial "utils/page-description" $page }}</p>
+  </div>
+</article>

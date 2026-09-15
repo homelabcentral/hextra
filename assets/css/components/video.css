@@ -1,0 +1,16 @@
+.hextra-video {
+  @apply hx:my-6;
+}
+
+.hextra-video__player {
+  @apply hx:w-full hx:rounded-lg hx:bg-black;
+}
+
+.hextra-video__caption {
+  @apply hx:mt-2 hx:text-sm hx:text-center;
+  @apply hx:text-neutral-600 hx:dark:text-neutral-400;
+
+  > p {
+    @apply hx:m-0 hx:inline;
+  }
+}

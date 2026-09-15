@@ -17,14 +17,14 @@ sidebar:
 To use the Jupyter Notebook shortcode, you need to have a Jupyter Notebook file in your project. Similar to how you would [add images](../../organize-files#add-images) to the project, you can add Jupyter Notebooks to the `assets` folder.
 
 {{< filetree/container >}}
-  {{< filetree/folder name="assets" >}}
-    {{< filetree/file name="notebook.ipynb" >}}
-  {{< /filetree/folder >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="assets" >}}
+{{< filetree/file name="notebook.ipynb" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 Include the Jupyter Notebook in the page using the `jupyter` shortcode:
@@ -41,14 +41,14 @@ math: true
 Alternatively, you can utilize the [page bundles][page-bundles] feature of Hugo to organize the Jupyter Notebooks together with the Markdown file.
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/folder name="my-page" >}}
-            {{< filetree/file name="index.md" >}}
-            {{< filetree/file name="notebook.ipynb" >}}
-        {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/folder name="my-page" >}}
+{{< filetree/file name="index.md" >}}
+{{< filetree/file name="notebook.ipynb" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 ```markdown {filename="content/docs/my-page/index.md"}

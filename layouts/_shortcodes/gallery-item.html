@@ -1,4 +1,4 @@
-{{- /*
+{{/*
   A single item inside a gallery container.
 
   @param {string} src     Image source. Page resource, global asset, static path, or remote URL. Required.
@@ -109,7 +109,7 @@
 {{- if not $thumbURL }}{{ $thumbURL = $full }}{{ end -}}
 
 {{- /* PhotoSwipe needs both data-pswp-width and data-pswp-height to bind;
-       without them the click falls through to a plain image link. */ -}}
+       without them the click falls through to a plain image link. */}}
 {{- if and (not $link) (or (le $width 0) (le $height 0)) -}}
   {{- warnf "gallery-item: %q is missing width/height for %q; the lightbox will be skipped. Pass width= and height= explicitly for remote images." .Position $src -}}
 {{- end -}}

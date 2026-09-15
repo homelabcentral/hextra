@@ -1,0 +1,17 @@
+.hextra-swatches {
+  @apply hx:flex hx:flex-wrap hx:gap-3 hx:my-6;
+}
+
+.hextra-swatch {
+  @apply hx:flex hx:flex-col hx:items-center hx:gap-1.5;
+}
+
+.hextra-swatch__color {
+  @apply hx:block hx:size-16 hx:rounded-lg hx:border;
+  @apply hx:border-neutral-300 hx:dark:border-neutral-700;
+}
+
+.hextra-swatch__label {
+  @apply hx:font-mono hx:text-xs hx:tabular-nums;
+  @apply hx:text-neutral-600 hx:dark:text-neutral-400;
+}

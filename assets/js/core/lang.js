@@ -1,20 +1,20 @@
 (function () {
-  const languageSwitchers = document.querySelectorAll('.hextra-language-switcher');
+  const languageSwitchers = document.querySelectorAll(".hextra-language-switcher");
   const closeSwitcher = (switcher, focusSwitcher = false) => {
-    switcher.dataset.state = 'closed';
-    switcher.setAttribute('aria-expanded', 'false');
+    switcher.dataset.state = "closed";
+    switcher.setAttribute("aria-expanded", "false");
     const optionsElement = switcher.nextElementSibling;
-    optionsElement.classList.add('hx:hidden');
+    optionsElement.classList.add("hx:hidden");
     if (focusSwitcher) {
       switcher.focus();
     }
   };
 
   const openSwitcher = (switcher, focusTarget = "none") => {
-    switcher.dataset.state = 'open';
-    switcher.setAttribute('aria-expanded', 'true');
+    switcher.dataset.state = "open";
+    switcher.setAttribute("aria-expanded", "true");
     const optionsElement = switcher.nextElementSibling;
-    if (optionsElement.classList.contains('hx:hidden')) {
+    if (optionsElement.classList.contains("hx:hidden")) {
       toggleMenu(switcher);
     } else {
       resizeMenu(switcher);
@@ -30,29 +30,29 @@
   };
 
   languageSwitchers.forEach((switcher) => {
-    switcher.addEventListener('click', (e) => {
+    switcher.addEventListener("click", (e) => {
       e.preventDefault();
 
-      if (switcher.dataset.state === 'open') {
+      if (switcher.dataset.state === "open") {
         closeSwitcher(switcher);
       } else {
         openSwitcher(switcher);
       }
     });
 
-    switcher.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown') {
+    switcher.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") {
         e.preventDefault();
-        openSwitcher(switcher, 'first');
-      } else if (e.key === 'ArrowUp') {
+        openSwitcher(switcher, "first");
+      } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        openSwitcher(switcher, 'last');
+        openSwitcher(switcher, "last");
       }
     });
   });
 
-  document.querySelectorAll('.hextra-language-options[role=menu]').forEach((menu) => {
-    menu.addEventListener('keydown', (e) => {
+  document.querySelectorAll(".hextra-language-options[role=menu]").forEach((menu) => {
+    menu.addEventListener("keydown", (e) => {
       const items = Array.from(menu.querySelectorAll('[role="menuitem"]'));
       if (items.length === 0) return;
 
@@ -60,25 +60,25 @@
       let newIndex;
 
       switch (e.key) {
-        case 'ArrowDown':
+        case "ArrowDown":
           e.preventDefault();
           newIndex = (currentIndex + 1) % items.length;
           items[newIndex].focus();
           break;
-        case 'ArrowUp':
+        case "ArrowUp":
           e.preventDefault();
           newIndex = (currentIndex - 1 + items.length) % items.length;
           items[newIndex].focus();
           break;
-        case 'Home':
+        case "Home":
           e.preventDefault();
           items[0].focus();
           break;
-        case 'End':
+        case "End":
           e.preventDefault();
           items[items.length - 1].focus();
           break;
-        case 'Escape': {
+        case "Escape": {
           e.preventDefault();
           const switcher = menu.previousElementSibling;
           if (switcher) {
@@ -93,8 +93,8 @@
   window.addEventListener("resize", () => languageSwitchers.forEach(resizeMenu));
 
   // Dismiss language switcher when clicking outside.
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.hextra-language-switcher') && !e.target.closest('.hextra-language-options')) {
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".hextra-language-switcher") && !e.target.closest(".hextra-language-options")) {
       languageSwitchers.forEach((switcher) => {
         closeSwitcher(switcher);
       });

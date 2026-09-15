@@ -1,0 +1,29 @@
+{{/* "Recently updated" widget: the most recently modified posts in the section.
+
+  Note that `Lastmod` falls back to `Date` unless the site sets
+  `enableGitInfo` or posts carry a `lastmod` front matter key, in which case
+  this list mirrors the date-sorted feed.
+
+  @param {pages} pages Candidate pages.
+  @param {int} count How many to list.
+
+  @example {{ partial "blog/widgets/recent.html" (dict "pages" $pages "count" 5)
+}}
+*/}}
+{{- $pages := first .count (.pages.ByLastmod.Reverse) -}}
+{{- with $pages -}}
+  {{- $title := (T "recentlyUpdated") | default "Recently updated" -}}
+  <section class="hextra-blog-widget">
+    {{- partial "blog/widget-heading.html" (dict "title" $title "icon" "clock") -}}
+    <ul class="hextra-blog-widget-list">
+      {{- range . -}}
+        <li>
+          <a class="hextra-blog-widget-link" href="{{ .RelPermalink }}">
+            <span class="hextra-blog-widget-label">{{ .LinkTitle }}</span>
+            <span class="hextra-blog-widget-meta">{{ partial "utils/format-date" .Lastmod }}</span>
+          </a>
+        </li>
+      {{- end -}}
+    </ul>
+  </section>
+{{- end -}}

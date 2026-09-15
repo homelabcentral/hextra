@@ -1,21 +1,29 @@
-{{- /* KaTeX CSS loader
+{{/* KaTeX CSS loader
 
-  Behavior (driven by site.params.math.katex):
-  - base (remote URL) + optional css:
-    - Construct remote CSS URL: "{{ base }}/{{ css | default "katex[.min].css" }}".
-    - Fetch via resources.GetRemote, rewrite font URLs to "{{ base }}/fonts/...".
-    - Build and fingerprint; emit <link rel="stylesheet" integrity>.
-  - base (local path or not set) + css (asset path):
-    - Read CSS from Hugo assets via resources.Get; DO NOT rewrite font URLs.
-    - Build and fingerprint; emit <link rel="stylesheet" integrity>.
-  - base (local path) only (no css):
-    - Link directly to "{{ base }}/katex[.min].css" (no processing).
-  - Nothing set:
-    - Default to CDN latest base; same as remote path above.
+  Driven by site.params.math.katex. In each case the stylesheet is fingerprinted
+  and emitted as a link tag carrying an integrity attribute.
+
+  - base (remote URL), css optional:
+  Fetch base + css (default katex[.min].css) with resources.GetRemote and
+  rewrite the font URLs to sit under base + /fonts/.
+  - base (local path or unset) plus css (asset path):
+  Read the CSS from Hugo assets with resources.Get; font URLs are left alone.
+  - base (local path) only:
+  Link straight to base + katex[.min].css, with no processing.
+  - nothing set:
+  Default to the CDN, on a KaTeX release line compatible with Hugo.
 
   Additional:
-  - assets: optional list to publish extra assets. CSS/JS get tags with integrity (JS loads async).
-*/ -}}
+  - assets: optional list of extra assets to publish. Each entry is an asset
+  path, a glob containing a star, or a directory path ending in a slash
+  (published recursively). CSS and JS entries get tags with integrity; JS
+  loads async.
+
+  Two formatting constraints, both from prettier-plugin-go-template:
+  the trim markers are omitted here because it splits the closing delimiter of a
+  multi-line comment, which Hugo cannot parse; and this prose avoids template
+  actions and HTML tags because it reflows anything that parses as either.
+*/}}
 {{- $noop := .WordCount -}}
 
 {{- $katexBase := "" -}}
@@ -23,7 +31,12 @@
   {{- $katexBase = . -}}
 {{- else -}}
   {{- if not site.Params.math.katex.css -}}
-    {{- $katexBase = "https://cdn.jsdelivr.net/npm/katex@latest/dist" -}}
+    {{- /* KaTeX 0.18 renamed CSS classes, so the stylesheet must match Hugo's embedded renderer: 0.16 before Hugo 0.166.0, 0.18.4 from 0.166.0 on. See https://github.com/gohugoio/hugo/pull/15259 */ -}}
+    {{- $katexVersion := "0.16" -}}
+    {{- if ge hugo.Version "0.166.0" -}}
+      {{- $katexVersion = "0.18.4" -}}
+    {{- end -}}
+    {{- $katexBase = printf "https://cdn.jsdelivr.net/npm/katex@%s/dist" $katexVersion -}}
   {{- end -}}
 {{- end -}}
 
@@ -73,10 +86,29 @@
   {{- end -}}
 {{- end -}}
 
-{{- /* Optionally publish files (fonts, css, js, etc.) from assets and emit tags for css/js with integrity and crossorigin */ -}}
+{{- /* Optionally publish files (fonts, css, js, etc.) from assets and emit tags for css/js with integrity and crossorigin.
+  An entry ending in "/" publishes that asset directory recursively; an entry containing "*" is treated as a glob. */
+-}}
 {{- with site.Params.math.katex.assets -}}
-  {{- range . -}}
-    {{- with resources.Get . -}}
+  {{- range $entry := . -}}
+    {{- $files := slice -}}
+    {{- if strings.HasSuffix $entry "/" -}}
+      {{- $files = resources.Match (printf "%s**" $entry) -}}
+    {{- else if strings.Contains $entry "*" -}}
+      {{- $files = resources.Match $entry -}}
+    {{- else -}}
+      {{- with resources.Get $entry -}}
+        {{- $files = slice . -}}
+      {{- else -}}
+        {{- errorf "KaTeX asset not found at %q" $entry -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- if not $files -}}
+      {{- warnf "KaTeX assets entry %q matched no files." $entry -}}
+    {{- end -}}
+
+    {{- range $files -}}
       {{- $name := .Name | lower -}}
       {{- if strings.HasSuffix $name ".css" -}}
         {{- $built := . | fingerprint "sha512" -}}

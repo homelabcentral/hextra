@@ -1,0 +1,63 @@
+/* Ad slots: the `ad` shortcode and the configured layout slots.
+
+   Only `hextra-ad` classes appear in the templates, never a bare `hx:`
+   utility. Tailwind tree-shakes from docs/hugo_stats.json, which records the
+   classes the built site actually rendered - and a site that has not enabled
+   ads renders none of them. Everything here is `@apply`d into a component
+   class, which ships regardless.
+
+   The reserved height is the point: the box occupies its final size before
+   the ad paints, so arriving creative does not shove the page down. */
+
+.hextra-ad {
+  @apply hx:flex hx:flex-col hx:gap-1.5 hx:my-8 hx:w-full hx:print:hidden;
+
+  max-width: var(--hextra-ad-max-width, 100%);
+}
+
+.hextra-ad--left {
+  @apply hx:items-start hx:mr-auto;
+}
+
+.hextra-ad--center {
+  @apply hx:items-center hx:mx-auto;
+}
+
+.hextra-ad--right {
+  @apply hx:items-end hx:ml-auto;
+}
+
+/* Inside the blog index the list's own `gap-6` sets the spacing. */
+.hextra-ad--list {
+  @apply hx:my-0;
+}
+
+.hextra-ad__label {
+  @apply hx:text-xs hx:font-medium hx:uppercase hx:tracking-wider;
+  @apply hx:text-neutral-400 hx:dark:text-neutral-500;
+}
+
+.hextra-ad__slot {
+  @apply hx:flex hx:w-full hx:items-center hx:justify-center hx:overflow-hidden hx:rounded-lg;
+
+  min-height: var(--hextra-ad-height, 280px);
+}
+
+.hextra-ad--bordered .hextra-ad__slot {
+  @apply hx:border hx:border-neutral-200 hx:dark:border-neutral-800;
+}
+
+.hextra-ad--filled .hextra-ad__slot {
+  @apply hx:bg-neutral-50 hx:dark:bg-neutral-900;
+}
+
+/* Development only: what a slot looks like before an ad network fills it.
+   Dashed rather than solid so it cannot be mistaken for a real unit. */
+.hextra-ad--placeholder .hextra-ad__slot {
+  @apply hx:border hx:border-dashed hx:border-neutral-300 hx:dark:border-neutral-700;
+  @apply hx:bg-transparent;
+}
+
+.hextra-ad__note {
+  @apply hx:px-4 hx:text-center hx:text-xs hx:text-neutral-400 hx:dark:text-neutral-500;
+}

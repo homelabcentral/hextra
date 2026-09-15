@@ -1,0 +1,25 @@
+{{/* "Pinned" widget: posts with `pinned: true` in front matter.
+
+  @param {pages} pages Candidate pages.
+  @param {int} count How many to list.
+
+  @example {{ partial "blog/widgets/pinned.html" (dict "pages" $pages "count" 3)
+}}
+*/}}
+{{- $pages := first .count (where .pages "Params.pinned" true) -}}
+{{- with $pages -}}
+  {{- $title := (T "pinnedPosts") | default "Pinned" -}}
+  <section class="hextra-blog-widget">
+    {{- partial "blog/widget-heading.html" (dict "title" $title "icon" "bookmark") -}}
+    <ul class="hextra-blog-widget-list">
+      {{- range . -}}
+        <li>
+          <a class="hextra-blog-widget-link" href="{{ .RelPermalink }}">
+            <span class="hextra-blog-widget-label">{{ .LinkTitle }}</span>
+            <span class="hextra-blog-widget-meta">{{ partial "utils/format-date" .Date }}</span>
+          </a>
+        </li>
+      {{- end -}}
+    </ul>
+  </section>
+{{- end -}}

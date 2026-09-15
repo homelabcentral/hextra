@@ -1,0 +1,41 @@
+.hextra-stats {
+  @apply hx:grid hx:gap-4 hx:my-6;
+  grid-template-columns: repeat(auto-fit, minmax(max(180px, calc((100% - 1rem * 2) / var(--hextra-stats-grid-cols))), 1fr));
+}
+
+.hextra-stat {
+  @apply hx:rounded-lg hx:border hx:p-5;
+  @apply hx:border-neutral-200 hx:bg-neutral-50;
+  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
+}
+
+.hextra-stat__icon {
+  @apply hx:mb-2 hx:text-neutral-400 hx:dark:text-neutral-500;
+
+  svg {
+    @apply hx:inline-block;
+  }
+}
+
+.hextra-stat__value {
+  @apply hx:text-3xl hx:font-bold hx:leading-tight;
+  @apply hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
+}
+
+.hextra-stat__label {
+  @apply hx:mt-1 hx:text-sm hx:font-medium hx:tracking-wide;
+  @apply hx:text-neutral-600 hx:dark:text-neutral-300;
+}
+
+.hextra-stat__body {
+  @apply hx:mt-2 hx:text-sm hx:leading-relaxed;
+  @apply hx:text-neutral-600 hx:dark:text-neutral-400;
+
+  > :first-child {
+    @apply hx:mt-0;
+  }
+
+  > :last-child {
+    @apply hx:mb-0;
+  }
+}
