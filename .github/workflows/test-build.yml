@@ -26,7 +26,7 @@ jobs:
     # running the suite twice.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     env:
-      HUGO_VERSION: 0.161.1
+      HUGO_VERSION: 0.166.0
       # These specs build temporary Hugo sites and inspect the output files
       # directly, so no browser or web server is needed. Setting BASE_URL
       # keeps Playwright from starting the docs webServer.

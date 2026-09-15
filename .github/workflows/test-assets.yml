@@ -43,7 +43,7 @@ jobs:
     # running the check twice.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     env:
-      HUGO_VERSION: 0.161.1
+      HUGO_VERSION: 0.166.0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
