@@ -225,6 +225,49 @@ compose override, because compose interpolates at `up` time.
 Use a fine-grained token scoped to this repository (Pull requests: write,
 Contents: read, Metadata: read), not a classic `repo` token.
 
+#### Pointing gh at the right repository
+
+`gh` works out which repository it is talking to by parsing `git remote`. That
+fails here, because the remote is a custom SSH host alias
+(`git@github-homelabcentral:owner/repo.git`) chosen so ssh can select the right
+key - gh cannot map an alias back to a github.com repository, and every command
+errors with "none of the git remotes configured for this repository point to a
+known GitHub host".
+
+Tell it explicitly, once per clone:
+
+```bash
+gh repo set-default <owner>/<repo>
+```
+
+`postCreateCommand` runs this automatically, so a fresh clone needs nothing.
+Change the value there if you fork, or run the command by hand - the two are
+equivalent.
+
+It writes `remote.origin.gh-resolved` to `.git/config`. That lives in the
+bind-mounted workspace, so it survives container rebuilds, but `.git/config` is
+never pushed - a clone on another machine starts without it, which is the whole
+reason it is in `postCreateCommand` rather than a one-off setup note.
+
+To re-point a clone at a different repository entirely:
+
+```bash
+git remote set-url origin git@github-<alias>:<owner>/<repo>.git
+gh repo set-default <owner>/<repo>
+```
+
+Both are needed. The first decides where `git push` goes and which SSH key
+authenticates; the second decides which repository `gh pr`, `gh issue` and
+`gh run` act on. Changing only one leaves git and gh pointed at different
+repositories, which fails in a way that reads like an auth problem.
+
+Verify with:
+
+```bash
+git remote -v
+gh repo set-default --view
+```
+
 #### Three things that will waste your time
 
 - **VS Code resolves `~/.zshrc` once, at startup.** A running instance will not
