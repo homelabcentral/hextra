@@ -1,6 +1,7 @@
 name: Build Tests
 
 on:
+  push:
   pull_request:
     branches: [main]
 
@@ -15,6 +16,11 @@ defaults:
 jobs:
   build-tests:
     runs-on: ubuntu-latest
+    # Push covers every branch in this repository; pull_request is kept only for
+    # PRs opened from a fork, whose pushes land in the fork and never fire here.
+    # Without this guard both events fire for a same-repo push with an open PR,
+    # running the suite twice.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     env:
       HUGO_VERSION: 0.161.1
       # These specs build temporary Hugo sites and inspect the output files

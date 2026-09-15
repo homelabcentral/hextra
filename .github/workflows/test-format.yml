@@ -1,0 +1,49 @@
+name: Format Check
+
+# Nothing in CI checked formatting until now. AGENTS.md tells contributors to
+# run `make verify` before committing, and the other workflows were written
+# assuming that happened - which holds right up until it doesn't, and a
+# misformatted file merges with three green checks.
+#
+# Kept as its own workflow rather than a step inside another so a failure names
+# itself: "Format Check" failing means run `make fmt`, nothing else.
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: format-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    # Push covers every branch in this repository; pull_request is kept only for
+    # PRs opened from a fork, whose pushes land in the fork and never fire here.
+    # Without this guard both events fire for a same-repo push with an open PR,
+    # running the check twice.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      # Needs the real install, not just prettier: .prettierrc loads
+      # prettier-plugin-go-template, and without it prettier fails outright on
+      # the Go templates rather than checking them.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting
+        run: npx prettier --check . --log-level warn
