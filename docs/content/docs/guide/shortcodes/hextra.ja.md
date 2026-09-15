@@ -20,16 +20,16 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter    | Description |
-|--------------|-------------|
-| `title`      | カードのタイトル。   |
+| Parameter    | Description            |
+| ------------ | ---------------------- |
+| `title`      | カードのタイトル。     |
 | `subtitle`   | カードのサブタイトル。 |
-| `class`      | カードのクラス。    |
-| `image`      | カードの画像。     |
-| `imageClass` | 画像のクラス。     |
-| `style`      | カードのスタイル。   |
-| `icon`       | カードのアイコン。   |
-| `link`       | カードのリンク。    |
+| `class`      | カードのクラス。       |
+| `image`      | カードの画像。         |
+| `imageClass` | 画像のクラス。         |
+| `style`      | カードのスタイル。     |
+| `icon`       | カードのアイコン。     |
+| `link`       | カードのリンク。       |
 
 ## `hextra/feature-grid`
 
@@ -47,10 +47,10 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `cols`    | 列の数。        |
-| `style`   | グリッドのスタイル。  |
+| Parameter | Description          |
+| --------- | -------------------- |
+| `cols`    | 列の数。             |
+| `style`   | グリッドのスタイル。 |
 
 ## `hextra/hero-badge`
 
@@ -60,7 +60,7 @@ next: /docs/guide/deploy-site
 
 ```
 {{</* hextra/hero-badge */>}}
-  <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-primary-400"></div>
+  <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-hextra-accent-400"></div>
   <span>Free, open source</span>
   {{</* icon name="arrow-circle-right" attributes="height=14" */>}}
 {{</* /hextra/hero-badge */>}}
@@ -68,11 +68,11 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `link`    | バッジのリンク。    |
-| `class`   | バッジのクラス。    |
-| `style`   | バッジのスタイル。   |
+| Parameter | Description        |
+| --------- | ------------------ |
+| `link`    | バッジのリンク。   |
+| `class`   | バッジのクラス。   |
+| `style`   | バッジのスタイル。 |
 
 ## `hextra/hero-button`
 
@@ -86,11 +86,11 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `link`    | ボタンのリンク。    |
-| `text`    | ボタンのテキスト。   |
-| `style`   | ボタンのスタイル。   |
+| Parameter | Description        |
+| --------- | ------------------ |
+| `link`    | ボタンのリンク。   |
+| `text`    | ボタンのテキスト。 |
+| `style`   | ボタンのスタイル。 |
 
 ## `hextra/hero-container`
 
@@ -106,19 +106,19 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter     | Description                       |
-|---------------|-----------------------------------|
-| `class`       | コンテナのクラス。                         |
-| `cols`        | 列数（デフォルト：`2`）。                    |
-| `image`       | コンテナの画像。                          |
+| Parameter     | Description                                                 |
+| ------------- | ----------------------------------------------------------- |
+| `class`       | コンテナのクラス。                                          |
+| `cols`        | 列数（デフォルト：`2`）。                                   |
+| `image`       | コンテナの画像。                                            |
 | `imageCard`   | 画像をカードとして表示するかどうか（デフォルト：`false`）。 |
-| `imageClass`  | 画像のクラス。                           |
-| `imageLink`   | 画像のリンク。                           |
-| `imageStyle`  | 画像のスタイル。                          |
-| `imageTitle`  | 画像のタイトル。                          |
-| `imageWidth`  | 画像の幅（デフォルト：`350`）。                |
-| `imageHeight` | 画像の高さ（デフォルト：`350`）。               |
-| `style`       | コンテナのスタイル。                        |
+| `imageClass`  | 画像のクラス。                                              |
+| `imageLink`   | 画像のリンク。                                              |
+| `imageStyle`  | 画像のスタイル。                                            |
+| `imageTitle`  | 画像のタイトル。                                            |
+| `imageWidth`  | 画像の幅（デフォルト：`350`）。                             |
+| `imageHeight` | 画像の高さ（デフォルト：`350`）。                           |
+| `style`       | コンテナのスタイル。                                        |
 
 ## `hextra/hero-headline`
 
@@ -134,9 +134,9 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `style`   | 見出しのスタイル。   |
+| Parameter | Description        |
+| --------- | ------------------ |
+| `style`   | 見出しのスタイル。 |
 
 ## `hextra/hero-section`
 
@@ -150,11 +150,11 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description          |
-|-----------|----------------------|
+| Parameter | Description                        |
+| --------- | ---------------------------------- |
 | `heading` | 見出しレベル（デフォルト: `h2`）。 |
-| `style`   | 見出しのスタイル。            |
-| `content` | 見出しの内容。              |
+| `style`   | 見出しのスタイル。                 |
+| `content` | 見出しの内容。                     |
 
 ## `hextra/hero-subtitle`
 
@@ -170,6 +170,6 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `style`   | 字幕のスタイル。    |
+| Parameter | Description      |
+| --------- | ---------------- |
+| `style`   | 字幕のスタイル。 |

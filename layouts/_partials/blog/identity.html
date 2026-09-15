@@ -1,0 +1,91 @@
+{{- /*
+  Profile block, navigation and social links for the blog rail.
+
+  Each element renders only when its configuration key is present, so a site
+  that sets just `params.blog.rail.profile.name` gets a name and nothing else.
+
+  @param {page} context The page being rendered.
+  @param {dict} config The dict returned by `blog/config.html`.
+  @param {string} layout "rail" (stacked, default) or "banner" (mobile, inline).
+
+  @example {{ partial "blog/identity.html" (dict "context" . "config" $cfg "layout" "banner")
+}}
+*/ -}}
+{{- $context := .context -}}
+{{- $rail := .config.rail -}}
+{{- $banner := eq (.layout | default "rail") "banner" -}}
+{{- $menu := partial "blog/menu.html" (dict "context" $context) -}}
+{{- $socialLinksLabel := (T "socialLinks") | default "Social links" -}}
+
+
+<div class="{{ cond $banner "hextra-blog-banner" "hextra-blog-profile" }}">
+  {{- with $rail.profile -}}
+    <div class="hextra-blog-profile-head">
+      {{- with .avatar -}}
+        {{- $avatar := . -}}
+        {{- if not (urls.Parse $avatar).Scheme -}}
+          {{- with or ($context.Resources.Get $avatar) (resources.Get $avatar) -}}
+            {{- $avatar = (cond (eq .MediaType.SubType "svg") . (.Process "Resize 160x webp q85")).RelPermalink -}}
+          {{- else -}}
+            {{- if hasPrefix $avatar "/" -}}{{- $avatar = relURL (strings.TrimPrefix "/" $avatar) -}}{{- end -}}
+          {{- end -}}
+        {{- end -}}
+        {{- /* Above the fold on every page: eager load with high priority, so
+        the cached avatar paints with the text instead of popping in a frame
+        later on each navigation. */ -}}
+        <img class="hextra-blog-avatar" src="{{ $avatar | safeURL }}" alt="" aria-hidden="true" width="80" height="80" fetchpriority="high" />
+      {{- end -}}
+      {{- if or .name .tagline -}}
+        <div class="hextra-blog-profile-text">
+          {{- with .name }}<p class="hextra-blog-name">{{ . }}</p>{{ end -}}
+          {{- with .tagline }}<p class="hextra-blog-tagline">{{ . }}</p>{{ end -}}
+        </div>
+      {{- end -}}
+    </div>
+  {{- end -}}
+
+  {{- with $menu.nav -}}
+    <ul class="{{ cond $banner "hextra-blog-chips" "hextra-blog-nav" }}">
+      {{- range . -}}
+        <li>
+          <a
+            class="{{ cond $banner "hextra-blog-chip" "hextra-blog-nav-link" }}"
+            href="{{ .link }}"
+            {{ if .active }}aria-current="page"{{ end }}
+            {{ if .external }}target="_blank" rel="{{ .rel }}"{{ end }}
+          >
+            {{- with .icon -}}
+              {{- if partial "utils/icon-exists.html" (dict "name" .) -}}
+                {{- partial "utils/icon.html" (dict "name" . "attributes" `height="1em" class="hextra-blog-nav-icon"`) -}}
+              {{- else -}}
+                {{- warnf "hextra: blog menu icon %q not found in data/icons.yaml; skipping" . -}}
+              {{- end -}}
+            {{- end -}}
+            <span>{{ .label }}</span>
+          </a>
+        </li>
+      {{- end -}}
+    </ul>
+  {{- end -}}
+
+  {{- with $menu.socials -}}
+    <ul class="hextra-blog-socials" aria-label="{{ $socialLinksLabel }}">
+      {{- range . -}}
+        {{- $hasIcon := partial "utils/icon-exists.html" (dict "name" .icon) -}}
+        {{- if not $hasIcon -}}{{- warnf "hextra: blog menu icon %q not found in data/icons.yaml; skipping" .icon -}}{{- end -}}
+        <li>
+          <a class="hextra-blog-social" href="{{ .link }}" {{ if .external }}target="_blank" rel="{{ .rel }}"{{ end }} title="{{ .label }}">
+            {{- if $hasIcon -}}
+              {{- partial "utils/icon.html" (dict "name" .icon "attributes" `height="18" width="18"`) -}}
+            {{- end -}}
+            <span class="hx:sr-only">{{ .label }}</span>
+          </a>
+        </li>
+      {{- end -}}
+    </ul>
+  {{- end -}}
+
+  {{- if not $banner -}}
+    {{- partial "blog/sponsor.html" (dict "config" .config) -}}
+  {{- end -}}
+</div>

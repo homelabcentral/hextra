@@ -105,7 +105,7 @@ menu:
 
 ### 徽标与标题
 
-要修改默认徽标，编辑 `hugo.yaml` 并在 `static` 目录下添加徽标文件路径。
+要修改默认徽标，编辑 `hugo.yaml` 并在 `static/icons` 目录下添加徽标文件路径。
 可选地，可以更改点击徽标时的跳转链接，以及设置徽标的像素宽度和高度。
 
 ```yaml {filename="hugo.yaml"}
@@ -114,8 +114,8 @@ params:
     displayTitle: true
     displayLogo: true
     logo:
-      path: images/logo.svg
-      dark: images/logo-dark.svg
+      path: icons/images/logo.svg
+      dark: icons/images/logo-dark.svg
       link: /
       width: 40
       height: 20
@@ -221,20 +221,22 @@ copyright: "© 2024 你的文本内容"
 
 ### 网站图标
 
-要自定义网站的 [favicon](https://en.wikipedia.org/wiki/Favicon)，将图标文件放在 `static` 文件夹下以覆盖[主题默认的网站图标](https://github.com/imfing/hextra/tree/main/static)：
+要自定义网站的 [favicon](https://en.wikipedia.org/wiki/Favicon)，将图标文件放在 `static/icons` 文件夹下以覆盖[主题默认的网站图标](https://github.com/imfing/hextra/tree/main/static)：
 
 {{< filetree/container >}}
-  {{< filetree/folder name="static" >}}
-    {{< filetree/file name="android-chrome-192x192.png" >}}
-    {{< filetree/file name="android-chrome-512x512.png" >}}
-    {{< filetree/file name="apple-touch-icon.png" >}}
-    {{< filetree/file name="favicon-16x16.png" >}}
-    {{< filetree/file name="favicon-32x32.png" >}}
-    {{< filetree/file name="favicon-dark.svg" >}}
-    {{< filetree/file name="favicon.ico" >}}
-    {{< filetree/file name="favicon.svg" >}}
-    {{< filetree/file name="site.webmanifest" >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="static" >}}
+{{< filetree/folder name="icons" >}}
+{{< filetree/file name="android-chrome-192x192.png" >}}
+{{< filetree/file name="android-chrome-512x512.png" >}}
+{{< filetree/file name="apple-touch-icon.png" >}}
+{{< filetree/file name="favicon-16x16.png" >}}
+{{< filetree/file name="favicon-32x32.png" >}}
+{{< filetree/file name="favicon-dark.svg" >}}
+{{< filetree/file name="favicon.ico" >}}
+{{< filetree/file name="favicon.svg" >}}
+{{< filetree/file name="site.webmanifest" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 #### 基本设置
@@ -298,6 +300,22 @@ params:
   # 显示最后修改的作者
   displayUpdatedAuthor: true
 ```
+
+### 许可声明
+
+可以在显示最后修改日期的同一行的行首侧显示许可声明，内容为 “This post is licensed under CC BY 4.0 by the author.”，其中许可名称链接到对应网址。除非 `params.license.enable` 为 `true`，否则不会显示。
+
+```yaml {filename="hugo.yaml"}
+params:
+  license:
+    enable: true
+    name: "CC BY 4.0"
+    url: "https://creativecommons.org/licenses/by/4.0/"
+```
+
+只需配置名称和网址，因此任何许可都适用 —— `MIT`、`CC BY-SA 4.0` 等等。包裹它们的句子来自 `license` 翻译字符串，其中的 `%s` 会被替换为带链接的名称；与其他字符串一样，在站点的 `i18n/<lang>.yaml` 中添加 `license` 键即可覆盖。
+
+声明与日期相互独立：任意一个都可以单独显示。
 
 ### 标签
 
@@ -500,6 +518,7 @@ params:
       links:
         - name: 在 ChatGPT 中打开
           icon: chatgpt
+          description: 就这个页面提问
           url: "https://chatgpt.com/?hints=search&q=I%27m+looking+at+this+documentation%3A+{url}%0AHelp+me+understand+how+to+use+it."
 ```
 
@@ -507,6 +526,7 @@ params:
 
 - `name` - 链接的显示文本
 - `icon` - 可选的图标名称（参见[图标]({{% relref "docs/guide/shortcodes/icon" %}})）
+- `description` - 可选的第二行说明，以浅色显示在名称下方
 - `url` - 包含可选占位符的 URL
 
 ### FlexSearch 索引

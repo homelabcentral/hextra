@@ -1,0 +1,31 @@
+.hextra-list {
+  @apply hx:my-6;
+}
+
+.hextra-list__title {
+  @apply hx:mb-3 hx:text-lg hx:font-semibold;
+  @apply hx:text-neutral-900 hx:dark:text-neutral-100;
+}
+
+.hextra-list__items {
+  @apply hx:flex hx:flex-col hx:gap-3;
+
+  /* The cards space themselves through the container's gap. */
+  .hextra-article-card {
+    @apply hx:my-0;
+  }
+}
+
+.hextra-list--cards .hextra-list__items {
+  @apply hx:grid hx:gap-4;
+  grid-template-columns: repeat(auto-fill, minmax(max(280px, calc((100% - 1rem) / 2)), 1fr));
+
+  /* In the grid the cover reads better above the text than beside it. */
+  .hextra-article-card {
+    @apply hx:flex-col;
+  }
+
+  .hextra-article-card__cover {
+    @apply hx:w-full hx:aspect-video;
+  }
+}

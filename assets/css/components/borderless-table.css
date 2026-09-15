@@ -1,0 +1,104 @@
+/* The `borderless-table` shortcode: a Markdown table rendered as a quiet
+   reference block rather than a ruled grid.
+
+   The table inside is ordinary Markdown, so it arrives already carrying the
+   default table styling from typography.css. `not-prose` is not an option
+   for shedding it: that would also strip the `code` styling the cells depend
+   on. The `:where()` in those selectors zeroes only the table part of them,
+   and they are nested under `.content`, so the compiled descendant rules are
+   `.content :where(table):not(...) thead|th|tr|td` at (0,1,1) - exactly
+   tying the (0,1,1) of `.hextra-borderless-table thead|th|tr|td`. Only the
+   `table` and `tbody tr` rules below genuinely outrank their counterparts.
+   The rest win on source order alone, which is why this file must stay after
+   `@import "./typography.css"` in styles.css. Reordering that import list
+   silently restores the header fill and the cell borders, with no error. */
+
+/* The scroll container is this wrapper, not the table. The default table
+   styling in typography.css makes the table itself `display: block` with
+   `overflow-x: auto`, which stops it generating a table box: the rows fall
+   into an anonymous table box that shrinks to fit its content, so `w-full`
+   stretches the block and leaves the table narrow inside it. Scrolling the
+   wrapper instead lets the table stay a table and actually fill the column. */
+/* The 3px inline padding is room for a focus ring, not a gutter. The theme's
+   focus indicator is `ring-2` plus `ring-offset-1` - box-shadow with
+   `outline-style: none` - and box-shadow is clipped by any ancestor whose
+   overflow is not visible. The cells are flush to the edge, so a link in the
+   first or last column would have its ring clipped at the scrollport edge,
+   unreachable in LTR because you cannot scroll to negative x. The matching
+   negative margin pulls the border box back out, so the table still lines up
+   with the surrounding body text. */
+.hextra-borderless-table {
+  @apply hx:my-6 hx:overflow-x-auto;
+  @apply hx:px-[3px] hx:-mx-[3px];
+
+  /* Mirrors the `first:mt-0` typography.css puts on tables. The wrapper is
+     what sits first in the flow now, and the inner table's `my-0` cannot
+     undo a margin on its parent. Padding on a container - a tab panel, say -
+     blocks margin collapsing, so without this a borderless table opening a
+     panel is pushed down where a plain Markdown table is not. */
+  &:first-child {
+    @apply hx:mt-0;
+  }
+
+  /* `border-collapse` is set explicitly rather than inherited from
+     typography.css: those rules are nested under `.content`, and
+     layouts/hextra-home.html renders `.Content` without that wrapper. In the
+     separated model CSS 2.1 17.6.1 makes user agents ignore borders on rows
+     and row groups - which is every border this component has - so the table
+     would arrive on a home page with no rules at all. */
+  table {
+    @apply hx:my-0 hx:table hx:w-full hx:border-collapse hx:text-sm;
+  }
+
+  /* A single underline under the header carries the column structure, at
+     every width: the header row is never hidden and the cells are never
+     stacked, so the table stays a table and a narrow viewport scrolls the
+     wrapper instead.
+
+     The hairlines are the only structural cue left once the cell grid and the
+     header background are gone, so they are drawn at the same weight as the
+     default table's borders rather than lighter: `border-neutral-200` was
+     1.17:1 on the light body and `dark:border-neutral-800` 1.10:1 on the dark
+     one, which left a four-column reference reading as a block of text. The
+     `contrast-more` pair matches series.css, sidebar.css and blog.css. */
+  thead {
+    @apply hx:bg-transparent hx:text-start;
+    @apply hx:border-b hx:border-neutral-300 hx:dark:border-neutral-700;
+    @apply hx:contrast-more:border-neutral-400 hx:dark:contrast-more:border-neutral-400;
+  }
+
+  /* Column gutters are trailing padding, so the last column has none: the
+     description, which is the column that wants the room, runs to the edge. */
+  th {
+    @apply hx:border-0 hx:px-0 hx:py-1.5 hx:font-semibold;
+    @apply hx:ltr:pr-4 hx:rtl:pl-4;
+
+    &:last-child {
+      @apply hx:ltr:pr-0 hx:rtl:pl-0;
+    }
+  }
+
+  /* Hairlines between rows, none around cells: the eye follows the row, and
+     the code spans inside the cells supply their own boxes. */
+  tr {
+    @apply hx:border-0;
+  }
+
+  tbody tr {
+    @apply hx:border-b hx:border-neutral-300 hx:dark:border-neutral-700;
+    @apply hx:contrast-more:border-neutral-400 hx:dark:contrast-more:border-neutral-400;
+
+    &:last-child {
+      @apply hx:border-b-0;
+    }
+  }
+
+  td {
+    @apply hx:border-0 hx:px-0 hx:py-3 hx:align-top;
+    @apply hx:ltr:pr-4 hx:rtl:pl-4;
+
+    &:last-child {
+      @apply hx:ltr:pr-0 hx:rtl:pl-0;
+    }
+  }
+}

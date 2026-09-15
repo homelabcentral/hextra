@@ -32,17 +32,29 @@ Hextraは、`hugo.yaml`設定ファイル内でテーマを設定するための
 }
 ```
 
-### プライマリカラー
+### アクセントカラー
 
-テーマのプライマリカラーは、`--primary-hue`、`--primary-saturation`、`--primary-lightness`変数を設定することでカスタマイズできます:
+テーマは現在、`assets/css/custom.css`ファイルにアクセントカラー変数を追加することでカスタマイズできる単一のアクセントカラーをサポートしています：
 
 ```css {filename="assets/css/custom.css"}
 :root {
-  --primary-hue: 100deg;
-  --primary-saturation: 90%;
-  --primary-lightness: 50%;
+  --color-accent-color-50: oklch(0.977 0.013 236.62);
+  --color-accent-color-100: oklch(0.951 0.026 236.824);
+  --color-accent-color-200: oklch(0.901 0.058 230.902);
+  --color-accent-color-300: oklch(0.828 0.111 230.318);
+  --color-accent-color-400: oklch(0.746 0.16 232.661);
+  --color-accent-color-500: oklch(0.685 0.169 237.323);
+  --color-accent-color-600: oklch(0.588 0.158 241.966);
+  --color-accent-color-700: oklch(0.5 0.134 242.749);
+  --color-accent-color-800: oklch(0.443 0.11 240.79);
+  --color-accent-color-900: oklch(0.391 0.09 240.876);
+  --color-accent-color-950: oklch(0.293 0.066 243.157);
 }
 ```
+
+このアクセントカラーシステムは、11のシェード（50-950）を持つ完全なカラーパレットを提供し、リンク、ボタン、ハイライト、その他のアクセント要素にテーマ全体で使用されます。
+
+[UI Colors](https://uicolors.app)を使用して、無料でカスタムアクセントカラーパレットを生成できます - 希望する色を入力するだけで、テーマに必要なすべてのシェードが生成されます。
 
 ### コンポーネントレイアウト変数
 
@@ -262,6 +274,6 @@ layouts/_partials/custom/page-end.html
 
 ## さらなるカスタマイズ
 
-探しているものが見つかりませんでしたか？[ディスカッションを開く](https://github.com/imfing/hextra/discussions)か、テーマへの貢献をお願いします！
+探しているものが見つかりませんでしたか？[ディスカッションを開く](https://github.com/homelabcentral/hextra/discussions)か、テーマへの貢献をお願いします！
 
 [hugo-template-docs]: https://gohugo.io/templates/

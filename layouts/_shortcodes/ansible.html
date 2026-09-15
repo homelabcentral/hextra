@@ -1,0 +1,133 @@
+{{/* Render a card for an Ansible Galaxy role or collection, with its description
+  and download count.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração).
+
+  @param {string} role Role as "namespace.name", e.g. "geerlingguy.docker".
+  @param {string} collection Collection as "namespace.name", e.g. "community.general".
+  @param {string} icon Icon shown before the title. Default "ansible".
+
+  @example {{< ansible role="geerlingguy.docker" >}}
+@example
+{{< ansible collection="community.general" >}}
+*/}}
+{{- $role := .Get "role" -}}
+{{- $collection := .Get "collection" -}}
+{{- $icon := .Get "icon" | default "ansible" -}}
+
+{{- if and $role $collection -}}
+  {{- errorf "The %q shortcode takes either a 'role' or a 'collection', not both. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- $id := $role | default $collection -}}
+{{- if not $id -}}
+  {{- errorf "The %q shortcode requires a 'role' or 'collection' parameter. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- if not (findRE `^[A-Za-z0-9_]+\.[A-Za-z0-9_]+$` $id) -}}
+  {{- errorf "The %q shortcode expects \"namespace.name\", got %q. See %s" .Name $id .Position -}}
+{{- end -}}
+
+{{- $parts := split $id "." -}}
+{{- $namespace := index $parts 0 -}}
+{{- $name := index $parts 1 -}}
+{{- $isCollection := ne $collection "" -}}
+
+{{- $card := dict
+  "url" (cond $isCollection
+  (printf "https://galaxy.ansible.com/ui/repo/published/%s/%s/" $namespace $name)
+  (printf "https://galaxy.ansible.com/ui/standalone/roles/%s/%s/" $namespace $name))
+  "title" $id
+  "icon" $icon
+  "language" (cond $isCollection "collection" "role")
+-}}
+
+{{- $enabled := partial "utils/remote-fetch-enabled.html" . -}}
+
+{{- if $enabled -}}
+  {{/* Roles and collections live behind entirely different APIs: roles are still
+    on the v1 search endpoint, collections on the v3 content index.
+  */}}
+  {{- $api := cond $isCollection
+    (printf "https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/index/%s/%s/" $namespace $name)
+    (printf "https://galaxy.ansible.com/api/v1/roles/?owner__username=%s&name=%s" $namespace $name)
+  -}}
+
+  {{- with try (resources.GetRemote $api) -}}
+    {{- with .Err -}}
+      {{- warnf "ansible: unable to fetch %q, rendering a plain card: %s" $api . -}}
+    {{- else with .Value -}}
+      {{- with . | transform.Unmarshal -}}
+        {{- $data := . -}}
+
+        {{- /* The role endpoint is a search, so unwrap the first result. */ -}}
+        {{- if not $isCollection -}}
+          {{- $data = "" -}}
+          {{- with .results -}}
+            {{- $data = index . 0 -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{- with $data -}}
+          {{- /* Tested against nil: zero downloads is a fact, not a missing value. */ -}}
+          {{- $metrics := slice -}}
+          {{- $downloads := .download_count -}}
+          {{- if ne $downloads nil -}}
+            {{- $metrics = $metrics | append (dict "icon" "download" "label" ((T "downloads") | default "downloads") "value" $downloads) -}}
+          {{- end -}}
+
+          {{- $description := .description -}}
+
+          {{- /* Collections report their newest version; roles do not. */ -}}
+          {{- $version := "" -}}
+          {{- with .highest_version -}}
+            {{- with .version -}}
+              {{- $version = . -}}
+            {{- end -}}
+          {{- end -}}
+
+          {{- with $version -}}
+            {{- $card = merge $card (dict "language" (printf "v%s" .)) -}}{{/* A role's description comes back with the v1 search result, but
+              the v3 collections index returns only name, namespace, download
+              count and the newest version - no description at all, which left
+              every collection card blank. It lives on that version's own
+              endpoint, under metadata.
+            */}}
+            {{- if not $description -}}
+              {{- $detail := printf "https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/index/%s/%s/versions/%s/" $namespace $name . -}}
+              {{- with try (resources.GetRemote $detail) -}}
+                {{- with .Err -}}
+                  {{- warnf "ansible: unable to fetch %q: %s" $detail . -}}
+                {{- else with .Value -}}
+                  {{- with . | transform.Unmarshal -}}
+                    {{- with .metadata -}}
+                      {{- $description = .description -}}
+                    {{- end -}}
+                  {{- end -}}
+                {{- else -}}
+                  {{- warnf "ansible: %q was not found, rendering a card without a description" $detail -}}
+                {{- end -}}
+              {{- end -}}
+            {{- end -}}
+          {{- end -}}
+
+          {{- with $description -}}
+            {{- $card = merge $card (dict "description" .) -}}
+          {{- end -}}
+
+          {{- $card = merge $card (dict "metrics" $metrics) -}}
+        {{- else -}}
+          {{- warnf "ansible: %q was not found on Galaxy, rendering a plain card" $id -}}
+        {{- end -}}
+      {{- end -}}
+    {{- else -}}
+      {{/* resources.GetRemote reports an HTTP 404 as a nil resource and no error.
+        The warning above sits inside the unmarshal block and so only covers an
+        empty result set, not a response that never arrived.
+      */}}
+      {{- warnf "ansible: %q was not found, rendering a plain card" $api -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- partial "components/repo-card.html" $card -}}

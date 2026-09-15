@@ -1,0 +1,230 @@
+{{/* Import a code file from an external source and render it as a code block.
+
+  The file is fetched at build time. A failed fetch is a warning, not an error,
+  so a build without network access still succeeds - the block is simply
+  omitted.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração), rendered through Hextra's
+  own codeblock partial so it gets the copy button, filename header and
+  syntax highlighting of a normal fenced block.
+
+  With `live=true` the build-time render still ships - so crawlers, readers
+  without JavaScript and the printed page all see the code - and the browser
+  re-fetches the file on view, replacing the block only when the source has
+  actually changed. That also covers the case this shortcode otherwise handles
+  badly: when the build-time fetch fails the page ships an empty block that
+  fills in client-side, rather than silently omitting the content.
+
+  The trade is that the reader's browser contacts the host, and that the host
+  must send an Access-Control-Allow-Origin header for the fetch to be readable.
+  raw.githubusercontent.com and the major package CDNs do; an arbitrary web
+  server generally does not, and the refresh then quietly does nothing.
+
+  @param {string} url Required. URL of the file. Must be http or https.
+  @param {string} type Language for syntax highlighting. Defaults to the file extension.
+  @deprecated lang Earlier name for `type`; still accepted.
+  @param {int} startLine First line to include, 1-based and inclusive.
+  @param {int} endLine Last line to include, inclusive.
+  @param {string} filename Optional filename header. Pass "auto" to use the URL's last segment.
+  @param {string} hl_lines Lines to highlight, e.g. "34-38 43". Numbers the imported excerpt.
+  @param {bool} lineNos Show line numbers. Default false.
+  @param {int} lineNoStart First line number. Default 1.
+  @param {bool} live Re-fetch in the reader's browser and refresh if changed. Default false.
+
+  @example {{< codeimporter url="https://example.com/main.go" type="go" >}}
+@example
+{{< codeimporter url="https://example.com/main.go" startLine="10" endLine="20" >}}
+@example
+{{< codeimporter url="https://example.com/main.go" lineNos=true hl_lines="3-5" >}}
+@example
+{{< codeimporter url="https://example.com/main.go" live=true >}}
+*/}}
+{{- $url := .Get "url" -}}
+
+{{- if not $url -}}
+  {{- errorf "The %q shortcode requires a 'url' parameter. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- $scheme := (urls.Parse $url).Scheme -}}
+{{- if not (in (slice "http" "https") $scheme) -}}
+  {{- errorf "The %q shortcode only fetches http and https URLs, got %q. See %s" .Name $url .Position -}}
+{{- end -}}
+
+{{- $filename := .Get "filename" -}}
+{{- if eq $filename "auto" -}}
+  {{- $filename = path.Base (urls.Parse $url).Path -}}
+{{- end -}}
+
+{{- $lang := .Get "type" | default (.Get "lang") -}}
+{{- if not $lang -}}
+  {{- $lang = strings.TrimPrefix "." (path.Ext (urls.Parse $url).Path) -}}
+{{- end -}}
+
+{{- $remoteFetch := partial "utils/remote-fetch-enabled.html" . -}}
+
+{{- $content := "" -}}
+{{- if $remoteFetch -}}
+  {{- with try (resources.GetRemote $url) -}}
+    {{- with .Err -}}
+      {{- warnf "codeimporter: unable to fetch %q: %s" $url . -}}
+    {{- else with .Value -}}
+      {{/* The byte-order mark is stripped here because the browser's res.text()
+        strips it too. Keeping it would put it inside the hash on this side
+        only, so a Windows-authored file could never match itself and every
+        reader would re-fetch and re-highlight the block on every page view.
+      */}}
+      {{- $content = strings.TrimPrefix "\ufeff" .Content -}}
+    {{- else -}}
+      {{- warnf "codeimporter: %q returned no content" $url -}}
+    {{- end -}}
+  {{- end -}}
+{{- else -}}
+  {{- /* The block has no offline fallback, so say why it is missing. */ -}}
+  {{- warnf "codeimporter: remote fetching is disabled, skipping %q. See %s" $url .Position -}}
+{{- end -}}{{/* Booleans are compared through printf so an explicit `false` is honoured:
+  `default` treats false as empty and would restore the default instead.
+*/}}
+{{- $live := eq (printf "%v" (.Get "live")) "true" -}}{{/* A build that must not reach the network must not hand the job to the
+  reader's browser either, so the same switch turns the live refresh off.
+*/}}
+{{- if and $live (not $remoteFetch) -}}
+  {{- $live = false -}}
+{{- end -}}{{/* Line numbers are validated as plain decimal digits and parsed base 10, to
+  match the `parseInt(x, 10)` the client does in scripts/live-code.html.
+  Hugo's `int` parses base 0: it reads "010" as octal 8 and "0x10" as 16,
+  where the browser reads 10 and 0. A zero-padded startLine would then slice
+  a different excerpt in the browser than at build time, so the hashes could
+  never match and the block would re-render on every page view - and "08",
+  which is not valid octal, failed the whole build rather than warning like
+  every other bad input here.
+*/}}
+{{- $startLine := .Get "startLine" -}}
+{{- $endLine := .Get "endLine" -}}
+{{- with $startLine -}}
+  {{- if not (findRE `^[0-9]+$` (printf "%v" .)) -}}
+    {{- warnf "codeimporter: startLine %q is not a whole number for %q, ignoring it. See %s" . $url $.Position -}}
+    {{- $startLine = "" -}}
+  {{- end -}}
+{{- end -}}
+{{- with $endLine -}}
+  {{- if not (findRE `^[0-9]+$` (printf "%v" .)) -}}
+    {{- warnf "codeimporter: endLine %q is not a whole number for %q, ignoring it. See %s" . $url $.Position -}}
+    {{- $endLine = "" -}}
+  {{- end -}}
+{{- end -}}{{/* Chroma options, assembled the same way gist.html does. Without this the
+  partial receives an empty dict and hl_lines/lineNos are silently ignored -
+  the block renders, just with no highlighted lines and no line numbers.
+
+  Note these number the *imported* excerpt, not the original file: after a
+  startLine/endLine slice, line 1 is the first line kept. Use lineNoStart to
+  restore the original numbering.
+*/}}
+{{- $options := dict -}}
+{{- with .Get "hl_lines" -}}
+  {{- $options = merge $options (dict "hl_lines" .) -}}
+{{- end -}}
+{{- if eq (printf "%v" (.Get "lineNos")) "true" -}}
+  {{- $options = merge $options (dict "lineNos" true) -}}
+{{- end -}}
+{{- with .Get "lineNoStart" -}}
+  {{- $options = merge $options (dict "lineNoStart" (int .)) -}}
+{{- end -}}{{/* The slice runs outside the content guard so `live` can still emit the block
+  when the build-time fetch failed. With an empty body it is a no-op.
+
+  The client repeats this arithmetic verbatim in scripts/live-code.html. Any
+  change here has to be mirrored there, or a refreshed block would slice
+  differently from the one it replaces.
+*/}}
+{{- $body := $content -}}
+{{- if and $body (or $startLine $endLine) -}}
+  {{- $lines := split (strings.TrimSuffix "\n" $body) "\n" -}}
+  {{- $count := len $lines -}}
+
+  {{- /* Leading zeros are stripped before `int` so the value is read base 10. */ -}}
+  {{- $start := 1 -}}
+  {{- $end := $count -}}
+  {{- with $startLine -}}
+    {{- $start = int (default "0" (strings.TrimLeft "0" (printf "%v" .))) -}}
+  {{- end -}}
+  {{- with $endLine -}}
+    {{- $end = int (default "0" (strings.TrimLeft "0" (printf "%v" .))) -}}
+  {{- end -}}
+
+  {{- if lt $start 1 -}}{{- $start = 1 -}}{{- end -}}
+  {{- if gt $end $count -}}{{- $end = $count -}}{{- end -}}
+
+  {{- if gt $start $end -}}
+    {{- warnf "codeimporter: startLine %d is after endLine %d for %q, ignoring the range" $start $end $url -}}
+  {{- else -}}
+    {{- $body = delimit (first (add (sub $end $start) 1) (after (sub $start 1) $lines)) "\n" -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if $live -}}
+  {{- .Page.Store.Set "hasLiveCode" true -}}
+{{- end -}}
+
+{{- if or $body $live -}}
+  {{/* The live attributes are assembled into a single string rather than written
+    inline in the tag. Two reasons: a non-live block's markup stays
+    byte-identical to what this shortcode emitted before `live` existed, and
+    the tag stays balanced - splitting `<div ...>` across an if/else defeats
+    prettier-plugin-go-template, which parses the HTML tree.
+
+    hash.FNV32a is cheap and, unlike SHA-256 through crypto.subtle, needs no
+    secure context, so the comparison still works on a site served over plain
+    http.
+
+    Every value goes through htmlEscape. The string is marked safeHTMLAttr,
+    which switches off Hugo's own escaping, so nothing else would escape it:
+    Go's %q quoting is not HTML quoting, and a `"` in an author-supplied value
+    would otherwise close the attribute and let the rest of it be parsed as
+    markup.
+  */}}
+  {{- $liveAttrs := "" -}}
+  {{- if $live -}}
+    {{- $liveAttrs = printf ` data-live-url="%s" data-live-lang="%s" data-live-hash="%s"` (htmlEscape $url) (htmlEscape $lang) (string (hash.FNV32a $body)) -}}
+    {{- with $startLine -}}
+      {{- $liveAttrs = printf `%s data-live-start="%s"` $liveAttrs (htmlEscape (string .)) -}}
+    {{- end -}}
+    {{- with $endLine -}}
+      {{- $liveAttrs = printf `%s data-live-end="%s"` $liveAttrs (htmlEscape (string .)) -}}
+    {{- end -}}{{/* With no body there is no Chroma output for the client to read the block's
+      shape back from, so the options are recorded here instead. Without them a
+      block recovered from a failed build-time fetch came back with nothing
+      highlighted and numbered from 1, unlike the same page built online.
+
+      Only emitted in that case: when the block did render, its own markup is
+      the better answer, since Chroma has already resolved how the options
+      interact.
+    */}}
+    {{- if not $body -}}
+      {{- if $options.lineNos -}}
+        {{/* Chroma's default layout; the inline one is a site-wide setting
+          the client cannot see, and it re-reads the real shape as soon as
+          a build renders the block.
+        */}}
+        {{- $liveAttrs = printf `%s data-live-linenos="table"` $liveAttrs -}}
+      {{- end -}}
+      {{- with $options.lineNoStart -}}
+        {{- $liveAttrs = printf `%s data-live-lineno-start="%s"` $liveAttrs (htmlEscape (string .)) -}}
+      {{- end -}}
+      {{- with $options.hl_lines -}}
+        {{- $liveAttrs = printf `%s data-live-hl="%s"` $liveAttrs (htmlEscape (string .)) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  <div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code" {{ $liveAttrs | safeHTMLAttr }}>
+    {{- partial "components/codeblock" (dict
+      "filename" $filename
+      "base_url" ""
+      "lang" $lang
+      "content" $body
+      "options" $options
+      )
+    -}}
+    {{- if or (eq site.Params.highlight.copy.enable nil) site.Params.highlight.copy.enable -}}
+      {{- partial "components/codeblock-copy-button" (dict "filename" $filename) -}}
+    {{- end -}}
+  </div>
+{{- end -}}

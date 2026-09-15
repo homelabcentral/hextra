@@ -1,0 +1,348 @@
+/*
+  Blog layout: left identity rail, post cards, right widget rail.
+
+  Utilities are applied here rather than inline in the templates so that the
+  stylesheet compiles regardless of what the docs site happens to render into
+  docs/hugo_stats.json.
+*/
+
+/* ------------------------------------------------------------------ rail */
+
+.hextra-blog-rail {
+  @apply hx:hidden hx:md:flex hx:flex-col hx:w-64 hx:shrink-0 hx:self-start hx:sticky;
+  top: var(--hextra-navbar-height);
+  /* Fixed height (not max-height) so the switch panel pins to the bottom of
+     the viewport like the docs sidebar, whatever the rail content height */
+  height: calc(100vh - var(--hextra-navbar-height));
+}
+
+.hextra-blog-rail-inner {
+  @apply hx:flex hx:flex-col hx:grow hx:gap-6 hx:overflow-y-auto hx:overflow-x-hidden hx:px-4 hx:pt-6 hx:pb-8;
+}
+
+/* Language/theme switches: mirrors the docs sidebar's sticky bottom panel
+   (sidebar.html) so both surfaces behave and look the same */
+.hextra-blog-rail-switches {
+  @apply hx:sticky hx:bottom-0 hx:mx-4 hx:flex hx:items-center hx:gap-2 hx:py-4 hx:border-t hx:border-neutral-200 hx:bg-hextra-bg hx:shadow-[0_-12px_16px_var(--hextra-bg)] hx:dark:border-neutral-800 hx:contrast-more:border-neutral-400 hx:contrast-more:shadow-none hx:contrast-more:dark:shadow-none;
+}
+
+.hextra-blog-profile {
+  @apply hx:flex hx:flex-col hx:grow hx:gap-6;
+}
+
+.hextra-blog-profile-head {
+  @apply hx:flex hx:flex-col hx:gap-3;
+}
+
+.hextra-blog-profile-text > p {
+  @apply hx:m-0;
+}
+
+.hextra-blog-avatar {
+  @apply hx:h-20 hx:w-20 hx:rounded-full hx:object-cover hx:select-none;
+}
+
+.hextra-blog-name {
+  @apply hx:m-0 hx:text-lg hx:font-bold hx:tracking-tight hx:text-neutral-900 hx:dark:text-neutral-100;
+}
+
+.hextra-blog-tagline {
+  @apply hx:mt-1 hx:text-sm hx:leading-relaxed hx:text-neutral-500 hx:dark:text-neutral-400;
+}
+
+.hextra-blog-nav {
+  @apply hx:flex hx:flex-col hx:gap-0.5 hx:m-0 hx:p-0 hx:list-none;
+}
+
+.hextra-blog-nav-link {
+  @apply hx:flex hx:items-center hx:gap-2 hx:-mx-2 hx:rounded-md hx:px-2 hx:py-1.5 hx:text-sm hx:font-medium hx:text-neutral-600 hx:transition-colors hx:hover:bg-neutral-100 hx:hover:text-neutral-900 hx:dark:text-neutral-300 hx:dark:hover:bg-neutral-800 hx:dark:hover:text-neutral-50 hx:hextra-focus-visible;
+}
+
+/* Active state lives in components/nav-active.css, shared with the sidebar. */
+
+.hextra-blog-nav-icon {
+  @apply hx:shrink-0 hx:opacity-70;
+}
+
+.hextra-blog-socials {
+  @apply hx:flex hx:flex-wrap hx:gap-1.5 hx:m-0 hx:p-0 hx:list-none;
+}
+
+.hextra-blog-social {
+  @apply hx:flex hx:h-9 hx:w-9 hx:items-center hx:justify-center hx:rounded-md hx:border hx:border-neutral-200 hx:text-neutral-500 hx:transition-colors hx:hover:border-hextra-accent-400 hx:hover:text-hextra-accent-600 hx:dark:border-neutral-800 hx:dark:text-neutral-400 hx:dark:hover:text-hextra-accent-400 hx:hextra-focus-visible;
+}
+
+.hextra-blog-sponsor {
+  @apply hx:mt-auto hx:rounded-lg hx:border hx:border-neutral-200 hx:bg-neutral-50 hx:p-3 hx:text-sm hx:leading-relaxed hx:text-neutral-500 hx:dark:border-neutral-800 hx:dark:bg-neutral-950 hx:dark:text-neutral-400;
+}
+
+.hextra-blog-sponsor > p {
+  @apply hx:m-0;
+}
+
+.hextra-blog-sponsor-title {
+  @apply hx:font-semibold hx:text-neutral-900 hx:dark:text-neutral-100;
+}
+
+.hextra-blog-sponsor-link {
+  @apply hx:mt-2 hx:inline-flex hx:items-center hx:gap-1 hx:font-semibold hx:text-hextra-accent-600 hx:hover:underline hx:dark:text-hextra-accent-400 hx:hextra-focus-visible;
+}
+
+/* -------------------------------------------------------- mobile banner */
+
+.hextra-blog-banner {
+  @apply hx:mb-8 hx:flex hx:flex-col hx:gap-4 hx:border-b hx:border-neutral-200 hx:pb-6 hx:md:hidden hx:dark:border-neutral-800;
+}
+
+.hextra-blog-banner .hextra-blog-profile-head {
+  @apply hx:flex-row hx:items-center hx:gap-3;
+}
+
+.hextra-blog-banner .hextra-blog-avatar {
+  @apply hx:h-12 hx:w-12;
+}
+
+.hextra-blog-banner .hextra-blog-tagline {
+  @apply hx:hidden;
+}
+
+.hextra-blog-chips {
+  @apply hx:flex hx:gap-2 hx:overflow-x-auto hx:m-0 hx:p-0 hx:pb-1 hx:list-none;
+}
+
+.hextra-blog-chip {
+  @apply hx:inline-flex hx:items-center hx:gap-1.5 hx:whitespace-nowrap hx:rounded-full hx:border hx:border-neutral-200 hx:px-3 hx:py-1 hx:text-sm hx:text-neutral-600 hx:dark:border-neutral-800 hx:dark:text-neutral-300 hx:hextra-focus-visible;
+}
+
+.hextra-blog-chip[aria-current="page"] {
+  @apply hx:border-hextra-accent-500 hx:font-semibold hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
+}
+
+/* --------------------------------------------------------------- widgets */
+
+.hextra-blog-widgets {
+  @apply hx:hidden hx:xl:block hx:w-64 hx:shrink-0 hx:px-4;
+}
+
+.hextra-blog-widgets-inner {
+  @apply hx:sticky hx:flex hx:flex-col hx:gap-3.5 hx:overflow-y-auto hx:pt-6 hx:pb-8 hx:text-sm;
+  top: var(--hextra-navbar-height);
+  max-height: calc(100vh - var(--hextra-navbar-height) - env(safe-area-inset-bottom));
+}
+
+.hextra-blog-widgets-inline {
+  @apply hx:mt-12 hx:grid hx:gap-8 hx:border-t hx:border-neutral-200 hx:pt-8 hx:text-sm hx:sm:grid-cols-2 hx:xl:hidden hx:dark:border-neutral-800;
+}
+
+/* Rail only: rule between adjacent widgets (recently updated | pinned |
+   trending tags). The inner flex gap provides the space above the rule and
+   the matching padding the space below it. */
+.hextra-blog-widgets-inner .hextra-blog-widget + .hextra-blog-widget {
+  @apply hx:border-t hx:border-neutral-200 hx:pt-3.5 hx:dark:border-neutral-800 hx:contrast-more:border-neutral-400;
+}
+
+.hextra-blog-widget-title {
+  @apply hx:mb-3 hx:flex hx:items-center hx:gap-1.5 hx:text-xs hx:font-semibold hx:tracking-wider hx:uppercase hx:text-neutral-500 hx:dark:text-neutral-400;
+}
+
+.hextra-blog-widget-icon {
+  @apply hx:shrink-0 hx:opacity-70;
+}
+
+.hextra-blog-widget-list {
+  @apply hx:flex hx:flex-col hx:gap-3 hx:m-0 hx:p-0 hx:list-none;
+}
+
+.hextra-blog-widget-link {
+  @apply hx:block hx:text-neutral-700 hx:transition-colors hx:hover:text-hextra-accent-600 hx:dark:text-neutral-300 hx:dark:hover:text-hextra-accent-400 hx:hextra-focus-visible;
+}
+
+.hextra-blog-widget-label {
+  @apply hx:block hx:font-medium hx:leading-snug;
+}
+
+.hextra-blog-widget-meta {
+  @apply hx:mt-0.5 hx:block hx:text-xs hx:tabular-nums hx:text-neutral-500 hx:dark:text-neutral-400;
+}
+
+/* Tag chips live in components/tags.css: the table of contents uses them too,
+   and that renders outside the blog. */
+
+/* ----------------------------------------------------------- post cards */
+
+.hextra-blog-list {
+  @apply hx:flex hx:flex-col hx:gap-6 hx:m-0 hx:p-0 hx:list-none;
+}
+
+.hextra-blog-card {
+  @apply hx:relative hx:overflow-hidden hx:rounded-lg hx:border hx:border-neutral-200 hx:bg-neutral-50 hx:transition-colors hx:hover:border-hextra-accent-400 hx:dark:border-neutral-800 hx:dark:bg-neutral-950;
+}
+
+/* Stretch the title link over the whole card so anywhere on it opens the post,
+   while keeping a single link with the title as its accessible name. */
+.hextra-blog-card-link::after {
+  @apply hx:absolute hx:inset-0;
+  content: "";
+}
+
+/* The Overlay level: `neutral-100` in light, `neutral-900` in dark - the same
+   pair as the theme selector's panel (`theme-toggle.html`), so a cover and the
+   light/dark menu read as the same surface. It is what shows through the
+   letterboxing of a contained cover image, so it has to be a real surface
+   rather than the page. */
+.hextra-blog-card-cover {
+  @apply hx:block hx:overflow-hidden hx:bg-neutral-100 hx:dark:bg-neutral-900;
+}
+
+/* Dynamic height: the image keeps its natural aspect ratio at full card
+   width, capped at 20rem — roughly the old fixed 2.4:1 box. Taller images
+   crop from the top edge down (not center), so UI screenshots keep their
+   header/start visible */
+.hextra-blog-card-image {
+  @apply hx:h-auto hx:max-h-80 hx:w-full hx:object-cover hx:object-top hx:select-none;
+  @apply hx:bg-cover hx:bg-top hx:bg-no-repeat;
+  background-image: var(--hextra-lqip, none);
+}
+
+.hextra-blog-card-body {
+  @apply hx:p-5 hx:sm:p-6;
+}
+
+.hextra-blog-card-title {
+  @apply hx:m-0 hx:text-xl hx:font-semibold hx:leading-snug hx:tracking-tight hx:text-neutral-900 hx:dark:text-neutral-100;
+}
+
+.hextra-blog-card-title a {
+  @apply hx:transition-colors hx:hextra-focus-visible;
+}
+
+.hextra-blog-card:hover .hextra-blog-card-title a {
+  @apply hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
+}
+
+.hextra-blog-card-excerpt {
+  @apply hx:mt-3 hx:mb-0 hx:leading-7 hx:text-neutral-600 hx:dark:text-neutral-300;
+}
+
+/* Horizontal card variant (tag pages): cover on the inline-start 40%, text
+   filling the remaining 60%. Every card is the same height from `sm` up so
+   the list reads as a grid; below `sm` the cover is hidden and the card
+   sizes to its text. Without a cover the body spans the full width. */
+.hextra-blog-card-h {
+  @apply hx:flex hx:items-stretch hx:sm:h-64;
+}
+
+.hextra-blog-card-h-cover {
+  @apply hx:w-2/5 hx:shrink-0 hx:overflow-hidden hx:bg-neutral-100 hx:max-sm:hidden hx:dark:bg-neutral-900;
+}
+
+/* Contained, not cropped: covers are often UI screenshots, which lose their
+   meaning when the edges are cut (same reasoning as `.hextra-blog-hero`
+   below). The image is centred in the column and the column's own background
+   shows through the letterboxing. */
+.hextra-blog-card-h .hextra-blog-card-image {
+  @apply hx:size-full hx:max-h-none hx:object-contain hx:object-center;
+  /* The placeholder is painted as this image's own background, so its sizing
+     has to track `object-fit` exactly — otherwise the stand-in sits in a
+     different rectangle than the photo that lands on top of it, and the
+     mismatch shows as a fringe. `contain`/`center` here mirrors the
+     `cover`/`top` on the base rule. */
+  @apply hx:bg-contain hx:bg-center;
+}
+
+/* A fixed card height means the text has to be bounded rather than clipped
+   mid-glyph, so the title and excerpt each end in an ellipsis. The excerpt
+   is the flexible element: if the meta row wraps onto a second line it gives
+   up space instead of pushing past the card. Clamping the title sets
+   `overflow: hidden` on the h2, which does not clip
+   `.hextra-blog-card-link::after` — the h2 is statically positioned, so the
+   card, not the title, is that pseudo-element's containing block. */
+.hextra-blog-card-h .hextra-blog-card-body {
+  @apply hx:flex hx:min-w-0 hx:flex-1 hx:flex-col hx:overflow-hidden;
+}
+
+.hextra-blog-card-h .hextra-blog-card-title {
+  @apply hx:line-clamp-2;
+}
+
+.hextra-blog-card-h .hextra-blog-card-excerpt {
+  @apply hx:min-h-0 hx:line-clamp-3;
+}
+
+.hextra-blog-meta {
+  @apply hx:mt-2 hx:flex hx:flex-wrap hx:items-center hx:gap-x-2 hx:gap-y-1 hx:text-sm hx:tabular-nums hx:text-neutral-500 hx:dark:text-neutral-400;
+}
+
+.hextra-blog-meta-sep {
+  @apply hx:opacity-50;
+}
+
+/* Raised above the card's stretched link so individual tags stay clickable. */
+.hextra-blog-meta-tags {
+  @apply hx:relative hx:z-1 hx:inline-flex hx:flex-wrap hx:gap-x-1;
+}
+
+/* ------------------------------------------------------------ post page */
+
+/* Sits between the breadcrumb and the title. No max-height/object-cover
+   crop: covers are often UI screenshots, which must render whole —
+   cropping clips their top and bottom edges */
+.hextra-blog-hero {
+  @apply hx:mt-4 hx:mb-4 hx:w-full hx:rounded-lg hx:border hx:border-neutral-200 hx:dark:border-neutral-800;
+  @apply hx:bg-cover hx:bg-center hx:bg-no-repeat;
+  background-image: var(--hextra-lqip, none);
+}
+
+/* Every post-footer section uses one rhythm: a top rule with equal padding
+   above and below its content. Each divider then sits midway between two
+   sections and the last section clears the pager's own rule. Padding rather
+   than margin, because margins between siblings collapse and the gaps stop
+   matching once a section is disabled. */
+.hextra-blog-share,
+.hextra-blog-related {
+  @apply hx:border-t hx:border-neutral-200 hx:pt-6 hx:pb-6 hx:sm:pt-8 hx:sm:pb-8 hx:dark:border-neutral-800;
+}
+
+/* mt-8 matches the last-updated line's mb-8, so the first rule keeps its
+   distance from the article body even when that line is hidden. */
+.hextra-blog-share {
+  @apply hx:mt-8 hx:flex hx:flex-wrap hx:items-center hx:gap-3 hx:print:hidden;
+}
+
+.hextra-blog-share-label {
+  @apply hx:text-sm hx:font-medium hx:text-neutral-500 hx:dark:text-neutral-400;
+}
+
+.hextra-blog-share-links {
+  @apply hx:flex hx:flex-wrap hx:gap-1.5 hx:m-0 hx:p-0 hx:list-none;
+}
+
+/* Shared by the share anchors and the copy-link button; the transparent
+   background and pointer cursor are what a <button> needs to match an <a>. */
+.hextra-blog-share-link {
+  @apply hx:flex hx:h-9 hx:w-9 hx:cursor-pointer hx:items-center hx:justify-center hx:rounded-md hx:border hx:border-neutral-200 hx:bg-transparent hx:text-neutral-500 hx:transition-colors hx:hover:border-hextra-accent-400 hx:hover:text-hextra-accent-600 hx:dark:border-neutral-800 hx:dark:text-neutral-400 hx:dark:hover:text-hextra-accent-400 hx:hextra-focus-visible;
+}
+
+.hextra-blog-share-copy.copied {
+  @apply hx:border-hextra-accent-400 hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
+}
+
+.hextra-blog-related-title {
+  @apply hx:mb-4 hx:text-xs hx:font-semibold hx:tracking-wider hx:uppercase hx:text-neutral-500 hx:dark:text-neutral-400;
+}
+
+.hextra-blog-related-list {
+  @apply hx:grid hx:gap-3 hx:m-0 hx:p-0 hx:list-none hx:sm:grid-cols-3;
+}
+
+.hextra-blog-related-link {
+  @apply hx:block hx:rounded-lg hx:border hx:border-neutral-200 hx:p-3 hx:transition-colors hx:hover:border-hextra-accent-400 hx:dark:border-neutral-800 hx:hextra-focus-visible;
+}
+
+.hextra-blog-related-label {
+  @apply hx:block hx:font-medium hx:leading-snug hx:text-neutral-800 hx:dark:text-neutral-200;
+}
+
+.hextra-blog-related-meta {
+  @apply hx:mt-1 hx:block hx:text-xs hx:tabular-nums hx:text-neutral-500 hx:dark:text-neutral-400;
+}

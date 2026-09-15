@@ -1,0 +1,17 @@
+{{- /*
+  Heading for a blog rail widget section.
+
+  @param {string} title The section title, already translated.
+  @param {string} [icon] Icon name from data/icons.yaml.
+
+  @example {{ partial "blog/widget-heading.html" (dict "title" $title "icon" "clock")
+}}
+*/ -}}
+<h2 class="hextra-blog-widget-title">
+  {{- with .icon -}}
+    {{- if partial "utils/icon-exists.html" (dict "name" .) -}}
+      {{- partial "utils/icon.html" (dict "name" . "attributes" `height="1em" class="hextra-blog-widget-icon"`) -}}
+    {{- end -}}
+  {{- end -}}
+  <span>{{ .title }}</span>
+</h2>

@@ -3,6 +3,7 @@
 👋 Thank you for being interested in contributing to Hextra! As an open source project, we welcome contributions of many forms including bug reports, feature requests, documentation improvements, and code contributions.
 
 <!-- omit in toc -->
+
 ## Table of Contents
 
 - [Guidelines](#guidelines)
@@ -15,7 +16,6 @@
   - [Project structure](#project-structure)
   - [Start the development server](#start-the-development-server)
   - [Compile the styles](#compile-the-styles)
-
 
 ## Guidelines
 
@@ -57,7 +57,7 @@ We recommend that you search existing [issues][issues] or discussions before ope
 
 ### Local development setup
 
-- [Hugo][hugo] >= v0.124.0 (extended version)
+- [Hugo][hugo] >= v0.146.0 (extended version)
 - [Node.js][nodejs]
 - [Go][go]
 
@@ -100,11 +100,11 @@ It will compile the Tailwind CSS styles and generate the `assets/css/compiled/ma
 
 [fork and pull]: https://docs.github.com/en/get-started/quickstart/contributing-to-projects
 [conventional commits]: https://www.conventionalcommits.org
-[issues]: https://github.com/imfing/hextra/issues
-[discussions]: https://github.com/imfing/hextra/discussions
+[issues]: https://github.com/homelabcentral/hextra/issues
+[discussions]: https://github.com/homelabcentral/hextra/discussions
 [nodejs]: https://nodejs.org/en/
 [hugo]: https://gohugo.io/
 [go]: https://golang.org/doc/install
 [devcontainer]: https://code.visualstudio.com/docs/devcontainers/containers
-[open in codespaces]: https://codespaces.new/imfing/hextra
+[open in codespaces]: https://codespaces.new/homelabcentral/hextra
 [netlify deploy preview]: https://docs.netlify.com/site-deploys/deploy-previews/

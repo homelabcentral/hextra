@@ -32,17 +32,29 @@ Hextra 在 `hugo.yaml` 配置文件中提供了一些默认的自定义选项来
 }
 ```
 
-### 主色调
+### 强调色
 
-可以通过设置 `--primary-hue`、`--primary-saturation` 和 `--primary-lightness` 变量来自定义主题的主色调：
+主题现在支持单一强调色，可以通过在 `assets/css/custom.css` 文件中添加强调色变量来自定义：
 
 ```css {filename="assets/css/custom.css"}
 :root {
-  --primary-hue: 100deg;
-  --primary-saturation: 90%;
-  --primary-lightness: 50%;
+  --color-accent-color-50: oklch(0.977 0.013 236.62);
+  --color-accent-color-100: oklch(0.951 0.026 236.824);
+  --color-accent-color-200: oklch(0.901 0.058 230.902);
+  --color-accent-color-300: oklch(0.828 0.111 230.318);
+  --color-accent-color-400: oklch(0.746 0.16 232.661);
+  --color-accent-color-500: oklch(0.685 0.169 237.323);
+  --color-accent-color-600: oklch(0.588 0.158 241.966);
+  --color-accent-color-700: oklch(0.5 0.134 242.749);
+  --color-accent-color-800: oklch(0.443 0.11 240.79);
+  --color-accent-color-900: oklch(0.391 0.09 240.876);
+  --color-accent-color-950: oklch(0.293 0.066 243.157);
 }
 ```
+
+这个强调色系统提供了具有11个色阶（50-950）的完整调色板，将在整个主题中用于链接、按钮、高亮显示和其他强调元素。
+
+您可以使用 [UI Colors](https://uicolors.app) 免费生成自定义强调色调色板 - 只需输入您想要的颜色，它就会为您的主题生成所有必要的色阶。
 
 ### 组件布局变量
 
@@ -262,6 +274,6 @@ layouts/_partials/custom/page-end.html
 
 ## 进一步自定义
 
-没有找到您需要的内容？欢迎 [发起讨论](https://github.com/imfing/hextra/discussions) 或为主题做出贡献！
+没有找到您需要的内容？欢迎 [发起讨论](https://github.com/homelabcentral/hextra/discussions) 或为主题做出贡献！
 
 [hugo-template-docs]: https://gohugo.io/templates/

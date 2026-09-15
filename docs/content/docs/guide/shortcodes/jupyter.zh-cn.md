@@ -19,14 +19,14 @@ sidebar:
 要使用 Jupyter Notebook 短代码，你需要在项目中放置一个 Jupyter Notebook 文件。与[添加图片](../../organize-files#add-images)到项目类似，你可以将 Jupyter Notebook 放入 `assets` 文件夹。
 
 {{< filetree/container >}}
-  {{< filetree/folder name="assets" >}}
-    {{< filetree/file name="notebook.ipynb" >}}
-  {{< /filetree/folder >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="assets" >}}
+{{< filetree/file name="notebook.ipynb" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 使用 `jupyter` 短代码将笔记本嵌入页面：
@@ -43,14 +43,14 @@ math: true
 或者，你可以利用 Hugo 的[页面包][page-bundles]功能，将 Jupyter Notebook 与 Markdown 文件组织在一起。
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/folder name="my-page" >}}
-            {{< filetree/file name="index.md" >}}
-            {{< filetree/file name="notebook.ipynb" >}}
-        {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/folder name="my-page" >}}
+{{< filetree/file name="index.md" >}}
+{{< filetree/file name="notebook.ipynb" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 ```markdown {filename="content/docs/my-page/index.md"}

@@ -1,0 +1,125 @@
+{{/* Every post in a series, in reading order.
+
+  Membership is resolved from the `series` taxonomy when the site declares one,
+  and from a scan of `site.RegularPages` when it does not. Both paths are
+  needed: Hugo gives `taxonomies` a merge strategy of "none" and honours a
+  strategy only from the project config, so the block this theme ships in
+  `hugo.toml` stays inert until a site opts in with `taxonomies: {_merge:
+  shallow}`. Without the taxonomy path the landing pages Hugo builds at
+  /series/<name>/ and the module rendered inside a post would answer the same
+  question differently; without the scan the module would render nothing at all
+  on a site that has not opted in.
+
+  The two paths differ in one visible way, and the taxonomy is the more
+  forgiving of them. Hugo folds term names case-insensitively, so a post
+  written `series: ["guides"]` joins `Guides`; the scan matches verbatim and
+  would leave that post in a series of its own. Renaming a series means editing
+  every member post either way - the name lives in front matter, not in one
+  place.
+
+  Either way the lookup is scoped to the current language: `site.Taxonomies` and
+  `site.RegularPages` both belong to the language being rendered, so a series
+  never mixes translations.
+
+  Order comes from three buckets, concatenated in this order: posts with an
+  explicit `seriesOrder` (ascending), then posts with a non-zero `weight`,
+  then everything else by date, oldest first. `series_order` is accepted as an
+  alias for `seriesOrder` so posts written for the Blowfish theme sort the
+  same way, mirroring how `utils/page-image` accepts `featured_image`
+  alongside `cover`. A `seriesOrder` that is not a number is warned about and
+  ordered by date rather than failing the build. Taxonomy `.Pages` arrives in
+  Hugo's own order, so it is re-sorted here rather than trusted.
+
+  `type` scopes the lookup to one content type, and callers should always pass
+  it. Only the blog layouts render the series module, so a docs page that
+  happens to carry a `series` key would otherwise be numbered into the blog
+  series and become a dead end: "next" walks the reader out of the blog into a
+  layout with no series navigation to get back with. The taxonomy spans every
+  content type, so it is filtered here too. Callers must include `type` in the
+  `partialCached` key.
+
+  @param {string} name The series name.
+  @param {string} type Optional content type to scope the lookup to.
+  @returns {slice} The pages in the series, in reading order.
+
+  @example {{ partialCached "utils/series-pages.html" (dict "name" $name "type" .Type) $name .Type site.Language.Lang
+}}
+*/}}
+{{- $name := .name -}}
+{{- $type := .type -}}
+{{- $candidates := slice -}}
+
+{{- with $name -}}
+  {{- $target := . -}}
+  {{- $term := index (index site.Taxonomies "series" | default dict) (urlize $target) -}}
+  {{- with $term -}}
+    {{- range .Pages -}}
+      {{- if or (not $type) (eq .Type $type) -}}
+        {{- $candidates = $candidates | append . -}}
+      {{- end -}}
+    {{- end -}}
+  {{- else -}}
+    {{- range site.RegularPages -}}
+      {{- if and $type (ne .Type $type) -}}
+        {{- continue -}}
+      {{- end -}}
+      {{- with .Params.series -}}
+        {{- $names := . -}}
+        {{- if not (reflect.IsSlice $names) -}}
+          {{- $names = slice $names -}}
+        {{- end -}}
+        {{- if in $names $target -}}
+          {{- $candidates = $candidates | append $ -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $ordered := slice -}}
+{{- $weighted := slice -}}
+{{- $dated := slice -}}
+
+{{- range $candidates -}}
+  {{- $page := . -}}
+  {{- $hasOrder := false -}}
+  {{- $raw := "" -}}
+  {{- if isset $page.Params "seriesorder" -}}
+    {{- $hasOrder = true -}}
+    {{- $raw = $page.Params.seriesOrder -}}
+  {{- else if isset $page.Params "series_order" -}}
+    {{- $hasOrder = true -}}
+    {{- $raw = index $page.Params "series_order" -}}
+  {{- end -}}
+  {{- if $hasOrder -}}
+    {{/* A hand-typed `seriesOrder: two` must not take the site down.
+      The cast is attempted, and a value that will not convert falls back to
+      the dated bucket with a warning naming the page that holds it - the
+      build error names whichever page happened to miss the cache first.
+    */}}
+    {{- $cast := try (int $raw) -}}
+    {{- with $cast.Err -}}
+      {{- warnf "series-pages: ignoring non-numeric seriesOrder %q on %s, ordering that post by date instead" $raw $page.RelPermalink -}}
+      {{- $dated = $dated | append (dict "page" $page "key" $page.Date.Unix) -}}
+    {{- else -}}
+      {{- $ordered = $ordered | append (dict "page" $page "key" $cast.Value) -}}
+    {{- end -}}
+  {{- else if $page.Weight -}}
+    {{- $weighted = $weighted | append (dict "page" $page "key" $page.Weight) -}}
+  {{- else -}}
+    {{- $dated = $dated | append (dict "page" $page "key" $page.Date.Unix) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $pages := slice -}}
+{{- with $ordered -}}
+  {{- range sort . "key" -}}{{- $pages = $pages | append .page -}}{{- end -}}
+{{- end -}}
+{{- with $weighted -}}
+  {{- range sort . "key" -}}{{- $pages = $pages | append .page -}}{{- end -}}
+{{- end -}}
+{{- with $dated -}}
+  {{- range sort . "key" -}}{{- $pages = $pages | append .page -}}{{- end -}}
+{{- end -}}
+
+{{- return $pages -}}

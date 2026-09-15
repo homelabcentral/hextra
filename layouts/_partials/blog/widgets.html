@@ -1,0 +1,54 @@
+{{/* Right rail for blog pages: recently updated, pinned, trending tags.
+
+  Rendered twice per page with different layouts — as a sticky rail from the
+  `xl` breakpoint up, and as a band below the post list on narrower screens.
+  Only one of the two is ever visible, so neither may contain an `id`.
+
+  @param {page} context The page being rendered.
+  @param {dict} config The dict returned by `blog/config.html`.
+  @param {string} layout "rail" (default) or "inline".
+  @param {string} [section] Section to draw pages from. Defaults to the
+  context page's own section; pages outside the blog (the tag pages) pass
+  "blog" explicitly.
+
+  @example {{ partial "blog/widgets.html" (dict "context" . "config" $cfg "layout" "rail")
+}}
+*/}}
+{{- $widgets := .config.widgets -}}
+{{- if $widgets.enable -}}
+  {{- $context := .context -}}
+  {{- $inline := eq (.layout | default "rail") "inline" -}}
+  {{- $blogWidgets := (T "blogWidgets") | default "More from the blog" -}}
+
+  {{- $section := .section | default $context.Section -}}
+  {{- $pages := where site.RegularPages "Section" $section -}}
+  {{- if eq $context.Kind "page" -}}
+    {{- $pages = where $pages "Permalink" "!=" $context.Permalink -}}
+  {{- end -}}
+
+  {{- $sections := slice -}}
+  {{- if and $widgets.recent.enable $pages -}}
+    {{- $sections = $sections | append (partial "blog/widgets/recent.html" (dict "pages" $pages "count" $widgets.recent.count)) -}}
+  {{- end -}}
+  {{- if and $widgets.pinned.enable $pages -}}
+    {{- $sections = $sections | append (partial "blog/widgets/pinned.html" (dict "pages" $pages "count" $widgets.pinned.count)) -}}
+  {{- end -}}
+  {{- if $widgets.tags.enable -}}
+    {{- $sections = $sections | append (partial "blog/widgets/tags.html" (dict "count" $widgets.tags.count)) -}}
+  {{- end -}}
+
+  {{- $content := delimit $sections "" -}}
+  {{- if trim $content " \n\t" -}}
+    {{- if $inline -}}
+      <aside class="hextra-blog-widgets-inline hx:print:hidden" aria-label="{{ $blogWidgets }}">
+        {{- $content | safeHTML -}}
+      </aside>
+    {{- else -}}
+      <aside class="hextra-blog-widgets hx:print:hidden" aria-label="{{ $blogWidgets }}">
+        <div class="hextra-scrollbar hextra-blog-widgets-inner">
+          {{- $content | safeHTML -}}
+        </div>
+      </aside>
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

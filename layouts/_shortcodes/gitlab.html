@@ -1,0 +1,95 @@
+{{/* Render a card for a GitLab project, with its description and current star and
+  fork counts.
+
+  Works with self-hosted instances too, as long as the /api/v4/projects endpoint
+  is reachable.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração), with support for a
+  namespace path in addition to the numeric project id.
+
+  @param {string} projectID Numeric project id, e.g. "278964".
+  @param {string} project Namespace path, e.g. "gitlab-org/gitlab".
+  @param {string} baseURL Instance URL. Default "https://gitlab.com".
+  @param {bool} showThumbnail Show the project's avatar. Default false.
+
+  @example {{< gitlab projectID="278964" >}}
+@example
+{{< gitlab project="gitlab-org/gitlab" >}}
+@example
+{{< gitlab project="group/thing" baseURL="https://gitlab.example.com" >}}
+*/}}{{/* default "" normalises the missing case. .Get returns nil, not an empty
+  string, for a key that is absent from named parameters, and `ne nil ""` is
+  true - so the fallback card below printf-ed a nil into its own URL and title
+  and rendered href="https://gitlab.com/%!s(<nil>)". A live API response
+  overwrote both, which is why it only showed on the fallback path this code
+  exists for: an offline build, a 404, a rate limit, or repoCards disabled.
+*/}}
+{{- $projectID := .Get "projectID" | default "" -}}
+{{- $project := .Get "project" | default (.Get 0) | default "" -}}
+{{- $baseURL := .Get "baseURL" | default "https://gitlab.com" -}}
+{{- $baseURL = strings.TrimSuffix "/" $baseURL -}}
+{{- $showThumbnail := eq (printf "%v" (.Get "showThumbnail")) "true" -}}
+
+{{- if and (not $projectID) (not $project) -}}
+  {{- errorf "The %q shortcode requires a 'projectID' or 'project' parameter. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- /* The API takes either a numeric id or the namespace path, URL-encoded. */ -}}
+{{- $ref := $projectID -}}
+{{- if not $ref -}}
+  {{- if not (findRE `^[A-Za-z0-9._/-]+$` $project) -}}
+    {{- errorf "The %q shortcode was given an invalid project %q. See %s" .Name $project .Position -}}
+  {{- end -}}
+  {{- $ref = replace $project "/" "%2F" -}}
+{{- else if not (findRE `^[0-9]+$` $ref) -}}
+  {{- errorf "The %q shortcode expects a numeric projectID, got %q. Use 'project' for a path. See %s" .Name $ref .Position -}}
+{{- end -}}
+
+{{- $card := dict
+  "url" (cond (ne $project "") (printf "%s/%s" $baseURL $project) $baseURL)
+  "title" (cond (ne $project "") $project (printf "project %s" $ref))
+  "icon" "gitlab"
+-}}
+
+{{- $enabled := partial "utils/remote-fetch-enabled.html" . -}}
+
+{{- if $enabled -}}
+  {{- $api := printf "%s/api/v4/projects/%s" $baseURL $ref -}}
+  {{- with try (resources.GetRemote $api) -}}
+    {{- with .Err -}}
+      {{- warnf "gitlab: unable to fetch %q, rendering a plain card: %s" $api . -}}
+    {{- else with .Value -}}
+      {{- with . | transform.Unmarshal -}}
+        {{- $card = merge $card (dict
+          "url" (.web_url | default $card.url)
+          "title" (.path_with_namespace | default .name_with_namespace | default $card.title)
+          "description" .description
+          "stars" .star_count
+          "forks" .forks_count
+          )
+        -}}{{/* Self-hosted rather than linked, so the card makes no third-party
+          request. The avatar is square, hence the contain fit.
+        */}}
+        {{- if and $showThumbnail .avatar_url -}}
+          {{- with try (resources.GetRemote .avatar_url) -}}
+            {{- with .Err -}}
+              {{- warnf "gitlab: unable to fetch the avatar for %q: %s" $ref . -}}
+            {{- else with .Value -}}
+              {{- with resources.Copy (printf "images/gitlab/%s.png" (replace $ref "%2F" "-")) . -}}
+                {{- $card = merge $card (dict "thumbnail" .RelPermalink "thumbnailFit" "contain") -}}
+              {{- end -}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- else -}}
+      {{/* resources.GetRemote reports an HTTP 404 as a nil resource and no error,
+        so without this branch a missing or private project degrades to a bare
+        card with nothing written to the build log.
+      */}}
+      {{- warnf "gitlab: %q was not found, rendering a plain card" $api -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- partial "components/repo-card.html" $card -}}

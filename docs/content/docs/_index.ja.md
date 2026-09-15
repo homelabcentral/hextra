@@ -24,8 +24,8 @@ Hextraは、[Tailwind CSS][tailwind-css]を使用して構築された、モダ�
 ## 質問やフィードバック
 
 {{< callout emoji="❓" >}}
-  Hextra は現在も活発に開発中です。
-  質問やフィードバックがありましたら、[issue を開いて](https://github.com/imfing/hextra/issues)ください！
+Hextra は現在も活発に開発中です。
+質問やフィードバックがありましたら、[issue を開いて](https://github.com/homelabcentral/hextra/issues)ください！
 {{< /callout >}}
 
 ## 次に
@@ -33,7 +33,7 @@ Hextraは、[Tailwind CSS][tailwind-css]を使用して構築された、モダ�
 以下のセクションから始めましょう：
 
 {{< cards >}}
-  {{< card link="getting-started" title="はじめに" icon="document-text" subtitle="Hextra を使ってウェブサイトを作成する方法を学ぶ" >}}
+{{< card link="getting-started" title="はじめに" icon="document-text" subtitle="Hextra を使ってウェブサイトを作成する方法を学ぶ" >}}
 {{< /cards >}}
 
 [hugo]: https://gohugo.io/

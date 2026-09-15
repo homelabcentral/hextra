@@ -27,6 +27,7 @@ your-site/
 ```
 
 In your markdown file:
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -43,6 +44,7 @@ your-site/
 ```
 
 In your markdown file:
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -59,6 +61,7 @@ your-site/
 ```
 
 In your markdown file:
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -79,6 +82,7 @@ You can also use cast files from any remote URL:
 ### How File Lookup Works
 
 The shortcode automatically finds your cast files by looking in this order:
+
 1. **Page bundle resources** (if using page bundles)
 2. **Global assets directory** (`assets/`)
 3. **Static directory** (`static/`)
@@ -91,7 +95,7 @@ If a file is not found, Hugo will show a helpful error message telling you where
 Here's a more advanced example showcasing all available parameters:
 
 ```markdown
-{{</* asciinema 
+{{</* asciinema
   file="demo.cast"
   theme="dracula"
   speed="2"
@@ -101,24 +105,22 @@ Here's a more advanced example showcasing all available parameters:
 */>}}
 ```
 
-{{< asciinema 
+{{< asciinema
   file="casts/demo.cast"
   theme="dracula"
   speed="2"
   autoplay="true"
   loop="true"
-  markers="1.5:Installation,3.2:Configuration,5.8:Testing"
->}}
+  markers="1.5:Installation,3.2:Configuration,5.8:Testing" >}}
 
 ## Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `file` | string | - | Path to the .cast file (required). Supports local files, absolute paths, and remote URLs |
-| `theme` | string | `"asciinema"` | Player theme |
-| `speed` | number | `1` | Playback speed multiplier |
-| `autoplay` | boolean | `false` | Start playing automatically |
-| `loop` | boolean | `false` | Loop the recording |
-| `poster` | string | `""` | Poster (a preview frame) to display until the playback is started. Supports NPT notation (e.g., "npt:1:23") |
-| `markers` | string | `""` | Comma-separated time markers. Format: "time:label" or just "time" (e.g., "1.5:Installation,3.2:Configuration,5.8") |
-
+| Parameter  | Type    | Default       | Description                                                                                                        |
+| ---------- | ------- | ------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `file`     | string  | -             | Path to the .cast file (required). Supports local files, absolute paths, and remote URLs                           |
+| `theme`    | string  | `"asciinema"` | Player theme                                                                                                       |
+| `speed`    | number  | `1`           | Playback speed multiplier                                                                                          |
+| `autoplay` | boolean | `false`       | Start playing automatically                                                                                        |
+| `loop`     | boolean | `false`       | Loop the recording                                                                                                 |
+| `poster`   | string  | `""`          | Poster (a preview frame) to display until the playback is started. Supports NPT notation (e.g., "npt:1:23")        |
+| `markers`  | string  | `""`          | Comma-separated time markers. Format: "time:label" or just "time" (e.g., "1.5:Installation,3.2:Configuration,5.8") |

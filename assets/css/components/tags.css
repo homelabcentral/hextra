@@ -1,0 +1,49 @@
+/* Tag chips.
+ *
+ * Shared by the blog rail's trending tags widget and the tag list at the
+ * bottom of the table of contents, which is why these are not namespaced
+ * under `hextra-blog-`. The count element is only used by the widget.
+ */
+
+.hextra-tag-cloud {
+  @apply hx:flex hx:flex-wrap hx:gap-1.5;
+}
+
+.hextra-tag-chip {
+  @apply hx:inline-flex hx:items-baseline hx:gap-1 hx:rounded-full hx:border hx:border-neutral-200 hx:px-2 hx:py-0.5 hx:text-neutral-700 hx:transition-colors hx:hover:border-hextra-accent-400 hx:hover:text-hextra-accent-600 hx:dark:border-neutral-800 hx:dark:text-neutral-300 hx:dark:hover:text-hextra-accent-400 hx:hextra-focus-visible;
+}
+
+.hextra-tag-count {
+  @apply hx:text-xs hx:tabular-nums hx:text-neutral-500 hx:dark:text-neutral-400;
+}
+
+/* The count sets its own colour, so it does not follow the chip's hover state
+   through currentColor the way the tag name does. */
+.hextra-tag-chip:hover .hextra-tag-count,
+.hextra-tag-chip:focus-visible .hextra-tag-count {
+  @apply hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
+}
+
+/* Full-page tag cloud on the taxonomy page (/tags/): same chips as the
+   trending tags widget, slightly larger for a whole-page context. */
+.hextra-tag-browse {
+  @apply hx:mt-2 hx:flex hx:flex-wrap hx:gap-2;
+}
+
+.hextra-tag-browse .hextra-tag-chip {
+  @apply hx:px-3 hx:py-1 hx:text-sm;
+}
+
+/* Heading line shared by /tags/ and the per-tag pages:
+   tag icon, term title, then a muted "· N" page count. */
+.hextra-tag-page-title {
+  @apply hx:mt-2 hx:mb-6 hx:flex hx:items-center hx:gap-2 hx:text-3xl hx:font-bold hx:tracking-tight hx:text-neutral-900 hx:dark:text-neutral-100;
+}
+
+.hextra-tag-page-icon {
+  @apply hx:shrink-0 hx:opacity-70;
+}
+
+.hextra-tag-page-count {
+  @apply hx:font-normal hx:tabular-nums hx:text-neutral-500 hx:dark:text-neutral-400;
+}

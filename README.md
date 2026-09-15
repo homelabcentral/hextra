@@ -4,6 +4,7 @@
   <p align="center">Modern, responsive, batteries-included Hugo theme for creating beautiful static websites.</p>
 
 Demo → [imfing.github.io/hextra](https://imfing.github.io/hextra/)
+
 </div>
 
 <picture>
@@ -12,7 +13,7 @@ Demo → [imfing.github.io/hextra](https://imfing.github.io/hextra/)
 </picture>
 
 <div align="right">
-<a href="https://github.com/imfing/hextra/actions/workflows/pages.yml"><img alt="GitHub Actions Status" src="https://github.com/imfing/hextra/actions/workflows/pages.yml/badge.svg"></a> <a href="https://app.netlify.com/sites/hugo-hextra/deploys"><img alt="Netlify Status" src="https://api.netlify.com/api/v1/badges/61d6e55a-2447-487e-b59f-c9537e5df175/deploy-status"></a>
+<a href="https://github.com/homelabcentral/hextra/actions/workflows/pages.yml"><img alt="GitHub Actions Status" src="https://github.com/homelabcentral/hextra/actions/workflows/pages.yml/badge.svg"></a>
 </div>
 
 ## Features
@@ -38,6 +39,21 @@ The template repository also includes a [GitHub Actions workflow](https://docs.g
 ### Usage
 
 Refer to the [documentation](https://imfing.github.io/hextra/docs) for more information.
+
+## For coding agents
+
+This theme ships an installable skill that teaches AI coding agents to author Hextra sites — shortcodes, front matter, `hugo.yaml`, the blog, theming, and Hugo's own built-in shortcodes.
+
+In Claude Code:
+
+```
+/plugin marketplace add homelabcentral/hextra
+/plugin install hextra@hextra
+```
+
+The agent then knows the theme's ~60 shortcodes with their real parameters, the 272 icon names, and which front matter keys apply to docs pages versus blog posts.
+
+For other agents, or to install it by hand, see [`skills/README.md`](skills/README.md).
 
 ## Contributing
 

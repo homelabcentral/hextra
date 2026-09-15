@@ -62,6 +62,7 @@
       {{- errorf "FlexSearch local loading requires params.search.flexsearch.js when using non-remote base %q" $flexSearchBase -}}
     {{- end -}}
 
+
     <script defer src="{{ $jsSearch.RelPermalink }}" integrity="{{ $jsSearch.Data.Integrity }}"></script>
     <script defer src="{{ $jsDialog.RelPermalink }}" integrity="{{ $jsDialog.Data.Integrity }}"></script>
   {{- else -}}

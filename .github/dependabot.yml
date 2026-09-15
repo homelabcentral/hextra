@@ -1,0 +1,84 @@
+# Dependabot version updates.
+#
+# This file covers ROUTINE version bumps. Security updates are a separate
+# mechanism that needs no config at all - they come from the repository setting
+# (Settings > Advanced Security > Dependabot security updates) and fire only on
+# a published advisory. Turn that on too; it is the one that would have caught
+# CVE-2026-67213 in nanoid.
+#
+# Dependabot does NOT build or test anything. It resolves a new version, edits
+# the manifest and opens a pull request - nothing more. The proof that a bump is
+# safe comes from CI running on that PR. Here that works: test-build.yml,
+# test-accessibility.yml and test-mobile-menu.yml all trigger on
+# `pull_request`, and none of them need a secret beyond GITHUB_TOKEN, which
+# matters because Dependabot PRs run with a read-only token and no access to
+# repository secrets. A bump that breaks the Hugo build, the Playwright suite or
+# WCAG AA shows up as a failing check on the PR rather than on main.
+#
+# Deliberately NOT configured:
+#
+#   gomod   - go.mod declares the module path and nothing else. There are zero
+#             requires, so there is nothing for Dependabot to update.
+#   docker  - docker-compose.yml pins mcr.microsoft.com/devcontainers/go:1 and
+#             pierrezemb/gostatic (untagged). Both float, so there is no version
+#             to bump; Dependabot would have nothing to say until they are
+#             pinned to a digest or an exact tag.
+#
+# Blind spot worth knowing: the vendored browser JavaScript is invisible here.
+# chart.js and highlight.js are pinned in a plain array in scripts/vendor-js.mjs
+# and committed as files under assets/js/vendor/, and the Iconify SVGs in
+# data/icons-vendored.yaml the same way. No manifest means no Dependabot. Those
+# are also the only dependencies that reach a visitor's browser - everything npm
+# tracks below is build-time only - so they need `npm run vendor:js` and
+# `npm run vendor:icons` run by hand when you decide to bump them.
+
+version: 2
+
+updates:
+  # Build toolchain: postcss, tailwind, playwright, prettier, axe-core, and
+  # their transitives. All devDependencies - none of this ships to the site.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # One PR per week for the routine noise, instead of five. Majors stay
+    # separate: tailwind and playwright both break things across a major, and
+    # those deserve to be reviewed and merged on their own.
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: chore
+      include: scope
+
+  # The 7 actions pinned across the 5 workflows (checkout@v4, setup-node@v4,
+  # setup-go@v5, configure-pages@v5, deploy-pages@v4, upload-artifact@v4,
+  # upload-pages-artifact@v3). Low noise, and a stale action is a real supply
+  # chain exposure since these run with repository credentials.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: ci
+      include: scope
+
+  # The 4 features in .devcontainer/devcontainer.json (hugo, node,
+  # docker-outside-of-docker, act). Affects the development environment only,
+  # never the built site - but a Hugo feature bump can change the rendered
+  # output, so let CI judge it like any other change.
+  - package-ecosystem: devcontainers
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: build
+      include: scope

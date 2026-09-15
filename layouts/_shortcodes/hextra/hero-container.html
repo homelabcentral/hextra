@@ -1,4 +1,4 @@
-{{- /*
+{{/*
 A simple hero container with an image on the left side.
 
 @param {string} class The class of the container.
@@ -14,7 +14,7 @@ A simple hero container with an image on the left side.
 @param {string} style The style of the container.
 
 @example {{< hextra/hero-container image="image.png" imageLink="https://example.com" imageTitle="Example Image" >}}
-*/ -}}
+*/}}
 
 {{- $class := .Get "class" -}}
 {{- $cols := .Get "cols" | default 2 -}}
@@ -47,7 +47,7 @@ A simple hero container with an image on the left side.
     <a
       {{ with $imageLink }}href="{{ $href }}" {{ with $imageLinkExternal }} target="_blank" rel="noreferrer"{{ end }}{{ end }}
       {{ with $imageStyle }}style="{{ . | safeCSS }}"{{ end }}
-      class="{{ $imageClass }} {{ if $imageCard }}hextra-feature-card not-prose hx:block hx:relative hx:p-6 hx:overflow-hidden hx:rounded-3xl hx:border hx:border-gray-200 hx:hover:border-gray-300 hx:dark:border-neutral-800 hx:dark:hover:border-neutral-700 hx:before:pointer-events-none hx:before:absolute hx:before:inset-0 hx:before:bg-glass-gradient{{ end }}"
+      class="{{ $imageClass }} {{ if $imageCard }}hextra-feature-card not-prose hx:block hx:relative hx:p-6 hx:overflow-hidden hx:rounded-3xl hx:border hx:border-neutral-200 hx:hover:border-neutral-300 hx:dark:border-neutral-800 hx:dark:hover:border-neutral-700 hx:before:pointer-events-none hx:before:absolute hx:before:inset-0 hx:before:bg-glass-gradient{{ end }}"
     >
       <img src="{{ $image }}" width="{{ $imageWidth }}" height="{{ $imageHeight }}" {{ with $imageTitle }}alt="{{ $imageTitle }}"{{ end }}/>
     </a>

@@ -3,86 +3,171 @@
 {{- $enable := cond (ne $enablePage nil) $enablePage $enableGlobal -}}
 {{- $customLinks := site.Params.page.contextMenu.links | default slice -}}
 
+{{/* Every dropdown row is a two-column grid: an icon aligned to the label line,
+  then a stacked label and description. The class strings are hoisted because the
+  three rows share them exactly, and the item colours live on the label and
+  description spans rather than on the row, so the description stays muted.
+
+  Each row carries an `aria-label` holding exactly its visible label, plus an
+  `aria-describedby` pointing at its description. Without the label, the name
+  computation walks the row's contents and returns label-and-description as one
+  run-on sentence; `aria-describedby` alone does not change that, because it
+  adds a description rather than removing anything from the name. With both, a
+  screen reader announces name-then-description.
+
+  The copy row and the split button share behaviour, not a name: the row is
+  `copyAsMarkdown`, the button is `copyPage`, because the button's accessible
+  name has to contain its visible label "Copy Page" (WCAG 2.5.3 Label in Name,
+  see the comment on the button itself). Clicking the row forwards to the
+  button, and the two are named for what each one looks like.
+
+  Hover tints the row with the accent colour, matching the theme switcher's
+  menu rather than the neutral grey this used to carry - the two dropdowns sit
+  in the same theme and should not highlight differently. The label and icon go
+  to `accent-700`, not the switcher's `accent-600`: against `accent-100` the
+  default sky accent gives 600 only 3.56:1, under the 4.5:1 AA floor, while 700
+  is 5.17:1. The description stays grey on hover (6.59:1 light, 5.47:1 dark on
+  the tinted row), because anything lighter than the label in the accent ramp
+  drops below AA - grey keeps the hierarchy and the contrast.
+
+  Every row carries `tabindex="-1"`, the roving-tabindex half of the WAI-ARIA
+  APG menu pattern and what layouts/_partials/theme-toggle.html already does
+  for its own menu. Without it Tab walked from item to item and out of the
+  menu into page content while the panel stayed open over it - the arrow keys
+  the menu handles are meant to be the only way between rows, and Tab is meant
+  to leave the widget entirely. assets/js/core/page-context-menu.js closes the
+  menu on Tab so it does not float over whatever Tab lands on next.
+
+  The rows deliberately do not set `whitespace-nowrap`: descriptions are prose,
+  and holding them on one line makes the dropdown as wide as the longest
+  translation. The panel itself carries the sizing instead - `w-max` so it still
+  shrinks to its content (an absolutely positioned box would otherwise be
+  squeezed to the narrow toggle it is anchored to), clamped by a max-width so it
+  can never outgrow the viewport.
+*/}}
+{{- $itemClass := "hx:group/pcmitem hx:flex hx:w-full hx:cursor-pointer hx:select-none hx:items-start hx:gap-2.5 hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-start hx:outline-none hx:transition-colors hx:hover:bg-hextra-accent-100 hx:dark:hover:bg-hextra-accent-950" -}}
+{{- $itemIconClass := "hx:mt-0.5 hx:size-4 hx:shrink-0 hx:text-neutral-500 hx:transition-colors hx:group-hover/pcmitem:text-hextra-accent-700 hx:dark:text-neutral-400 hx:dark:group-hover/pcmitem:text-hextra-accent-200" -}}
+{{- $itemLabelClass := "hx:text-sm hx:font-medium hx:text-neutral-900 hx:transition-colors hx:group-hover/pcmitem:text-hextra-accent-700 hx:dark:text-neutral-100 hx:dark:group-hover/pcmitem:text-hextra-accent-200" -}}
+{{- $itemDescClass := "hx:text-xs hx:text-neutral-600 hx:dark:text-neutral-400" -}}
+
+{{- $copyLabel := (T "copyAsMarkdown") | default "Copy as Markdown" -}}
+{{- $copyDesc := (T "copyAsMarkdownDescription") | default "Copy page as Markdown for LLMs" -}}
+{{- $viewLabel := (T "viewAsMarkdown") | default "View as Markdown" -}}
+{{- $viewDesc := (T "viewAsMarkdownDescription") | default "Open the raw Markdown source" -}}
+{{- $copyPageLabel := (T "copyPage") | default "Copy Page" -}}
+
 {{- if $enable -}}
   {{- with .OutputFormats.Get "markdown" -}}
-    {{- $markdownURL := .Permalink -}}
+    {{/* Relative, so the copy/view fetch is same-origin wherever the build
+      is served — an absolute permalink breaks both when baseURL doesn't match
+      the serving host (e.g. a `make build` output on the preview container).
+      Custom links go to external services, so their `{markdown_url}` stays
+      absolute.
+    */}}
+    {{- $markdownURL := .RelPermalink -}}
+    {{- $markdownPermalink := .Permalink -}}
     {{- $pageURL := $.Permalink -}}
     {{- $pageTitle := $.Title -}}
     <div class="hextra-page-context-menu hx:relative hx:inline-flex hx:shrink-0">
-      <div class="hx:inline-flex hx:rounded-lg hx:border hx:border-gray-200 hx:transition-colors hx:hover:border-gray-300 hx:dark:border-neutral-800 hx:dark:hover:border-neutral-700">
-        <button
-          class="hextra-page-context-menu-copy hx:group/copybtn hx:inline-flex hx:cursor-pointer hx:items-center hx:gap-1.5 hx:bg-transparent hx:px-2.5 hx:py-1 hx:text-sm hx:font-medium hx:text-gray-700 hx:transition-colors hx:hover:bg-slate-50 hx:dark:text-gray-300 hx:dark:hover:bg-neutral-900 hx:ltr:rounded-l-lg hx:rtl:rounded-r-lg hx:hextra-focus-visible-inset"
-          data-url="{{ $markdownURL }}"
-          title="{{ i18n "copyAsMarkdown" }}"
-          aria-label="{{ i18n "copyAsMarkdown" }}"
-        >
+      <div class="hx:inline-flex hx:rounded-lg hx:border hx:border-neutral-200 hx:transition-colors hx:hover:border-neutral-300 hx:dark:border-neutral-800 hx:dark:hover:border-neutral-700">
+        <button class="hextra-page-context-menu-copy hx:group/copybtn hx:inline-flex hx:cursor-pointer hx:items-center hx:gap-1.5 hx:bg-transparent hx:px-2.5 hx:py-1 hx:text-sm hx:font-medium hx:text-neutral-700 hx:transition-colors hx:hover:bg-neutral-200 hx:dark:text-neutral-300 hx:dark:hover:bg-neutral-800 hx:ltr:rounded-l-lg hx:rtl:rounded-r-lg hx:hextra-focus-visible-inset" data-url="{{ $markdownURL }}" title="{{ $copyLabel }}">
           <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:size-4">
-            {{- partial "utils/icon.html" (dict "name" "copy" "attributes" "height=16 width=16") -}}
+            {{- partial "utils/icon.html" (dict "name" "copy" "attributes" `height="16" width="16" aria-hidden="true"`) -}}
           </div>
           <div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:size-4">
-            {{- partial "utils/icon.html" (dict "name" "check" "attributes" "height=16 width=16") -}}
+            {{- partial "utils/icon.html" (dict "name" "check" "attributes" `height="16" width="16" aria-hidden="true"`) -}}
           </div>
-          <span>{{ i18n "copyPage" }}</span>
+          {{/* No aria-label. This button's visible label is `copyPage`, and an
+            aria-label overrides the contents, so naming it `copyAsMarkdown` left
+            the accessible name without the visible label in it - WCAG 2.5.3
+            Label in Name, and a speech-input user saying "click Copy Page" got
+            no match. The name now comes from the span below; `title` keeps
+            "Copy as Markdown", which assistive tech reads as the description
+            rather than the name, so nothing is lost. The two icons are
+            aria-hidden, so they contribute nothing to the name.
+          */}}
+          <span>{{ $copyPageLabel }}</span>
         </button>
-        <button
-          class="hextra-page-context-menu-toggle hx:inline-flex hx:cursor-pointer hx:items-center hx:justify-center hx:bg-transparent hx:px-1.5 hx:py-1 hx:text-gray-500 hx:transition-colors hx:hover:bg-slate-50 hx:hover:text-gray-700 hx:dark:text-gray-400 hx:dark:hover:bg-neutral-900 hx:dark:hover:text-gray-300 hx:ltr:rounded-r-lg hx:rtl:rounded-l-lg hx:hextra-focus-visible-inset"
-          data-state="closed"
-          aria-label="{{ (T "togglePageContextMenu") | default "Toggle page context menu" }}"
-          aria-expanded="false"
-          aria-haspopup="menu"
-        >
+        <button class="hextra-page-context-menu-toggle hx:inline-flex hx:cursor-pointer hx:items-center hx:justify-center hx:bg-transparent hx:px-1.5 hx:py-1 hx:text-neutral-500 hx:transition-colors hx:hover:bg-neutral-200 hx:hover:text-neutral-700 hx:dark:text-neutral-400 hx:dark:hover:bg-neutral-800 hx:dark:hover:text-neutral-300 hx:ltr:rounded-r-lg hx:rtl:rounded-l-lg hx:hextra-focus-visible-inset" data-state="closed" aria-label="{{ (T "togglePageContextMenu") | default "Toggle page context menu" }}" aria-expanded="false" aria-haspopup="menu" aria-controls="hextra-pcm-menu">
           <div class="hx:size-4 hx:transition-transform hx:duration-200" data-chevron>
-            {{- partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "height=16 width=16") -}}
+            {{- partial "utils/icon.html" (dict "name" "chevron-down" "attributes" `height="16" width="16" aria-hidden="true"`) -}}
           </div>
         </button>
       </div>
-      <ul class="hextra-page-context-menu-dropdown not-prose hx:hidden hx:absolute hx:top-full hx:left-0 hx:sm:left-auto hx:sm:right-0 hx:mt-1 hx:z-20 hx:max-h-64 hx:overflow-auto hx:rounded-lg hx:border hx:border-gray-200 hx:bg-white hx:p-1 hx:text-sm hx:shadow-lg hx:dark:border-neutral-700 hx:dark:bg-neutral-900" role="menu">
+      <ul class="hextra-page-context-menu-dropdown not-prose hx:hidden hx:absolute hx:top-full hx:start-0 hx:sm:start-auto hx:sm:end-0 hx:mt-1 hx:z-20 hx:w-max hx:max-w-[calc(100vw-2rem)] hx:sm:max-w-80 hx:max-h-80 hx:overflow-auto hx:rounded-lg hx:border hx:border-neutral-200 hx:bg-neutral-100 hx:p-1 hx:text-sm hx:shadow-lg hx:dark:border-neutral-700 hx:dark:bg-neutral-900" role="menu" id="hextra-pcm-menu">
         <li role="none">
-          <button
-            data-action="copy"
-            role="menuitem"
-            class="hx:flex hx:w-full hx:cursor-pointer hx:select-none hx:items-center hx:gap-2 hx:whitespace-nowrap hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:text-gray-700 hx:outline-none hx:transition-colors hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-gray-300 hx:dark:hover:bg-neutral-800 hx:dark:hover:text-gray-100"
-          >
-            <div class="hx:size-4 hx:shrink-0 hx:text-gray-500 hx:dark:text-gray-400">
-              {{- partial "utils/icon.html" (dict "name" "copy" "attributes" "height=16 width=16") -}}
+          <button data-action="copy" role="menuitem" tabindex="-1" class="{{ $itemClass }}" aria-label="{{ $copyLabel }}" aria-describedby="hextra-pcm-desc-copy">
+            <div class="{{ $itemIconClass }}">
+              {{- partial "utils/icon.html" (dict "name" "copy" "attributes" `height="16" width="16" aria-hidden="true"`) -}}
             </div>
-            {{ i18n "copyAsMarkdown" }}
+            <span class="hx:flex hx:flex-col hx:gap-0.5">
+              <span class="{{ $itemLabelClass }}">{{ $copyLabel }}</span>
+              <span class="{{ $itemDescClass }}" id="hextra-pcm-desc-copy">{{ $copyDesc }}</span>
+            </span>
           </button>
         </li>
         <li role="none">
-          <button
-            data-action="view"
-            data-url="{{ $markdownURL }}"
-            role="menuitem"
-            class="hx:flex hx:w-full hx:cursor-pointer hx:select-none hx:items-center hx:gap-2 hx:whitespace-nowrap hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:text-gray-700 hx:outline-none hx:transition-colors hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-gray-300 hx:dark:hover:bg-neutral-800 hx:dark:hover:text-gray-100"
-          >
-            <div class="hx:size-4 hx:shrink-0 hx:text-gray-500 hx:dark:text-gray-400">
-              {{- partial "utils/icon.html" (dict "name" "markdown" "attributes" "height=16 width=16") -}}
+          <button data-action="view" data-url="{{ $markdownURL }}" role="menuitem" tabindex="-1" class="{{ $itemClass }}" aria-label="{{ $viewLabel }}" aria-describedby="hextra-pcm-desc-view">
+            <div class="{{ $itemIconClass }}">
+              {{- partial "utils/icon.html" (dict "name" "markdown" "attributes" `height="16" width="16" aria-hidden="true"`) -}}
             </div>
-            {{ i18n "viewAsMarkdown" }}
+            <span class="hx:flex hx:flex-col hx:gap-0.5">
+              <span class="{{ $itemLabelClass }}">{{ $viewLabel }}</span>
+              <span class="{{ $itemDescClass }}" id="hextra-pcm-desc-view">{{ $viewDesc }}</span>
+            </span>
           </button>
         </li>
         {{- if $customLinks -}}
-        <li class="hx:my-1 hx:h-px hx:bg-gray-200 hx:dark:bg-neutral-700" role="separator"></li>
-        {{- range $customLinks -}}
-          {{- $linkURL := partial "utils/template-url.html" (dict "template" .url "values" (dict "url" $pageURL "title" $pageTitle "markdown_url" $markdownURL)) -}}
-          <li role="none">
-            <a
-              href="{{ $linkURL }}"
-              target="_blank"
-              rel="noopener noreferrer"
-              role="menuitem"
-              class="hx:flex hx:w-full hx:cursor-pointer hx:select-none hx:items-center hx:gap-2 hx:whitespace-nowrap hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:text-gray-700 hx:outline-none hx:transition-colors hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-gray-300 hx:dark:hover:bg-neutral-800 hx:dark:hover:text-gray-100"
-            >
-              {{- with .icon -}}
-              <div class="hx:size-4 hx:shrink-0 hx:text-gray-500 hx:dark:text-gray-400">
-                {{- partial "utils/icon.html" (dict "name" . "attributes" "height=16 width=16") -}}
-              </div>
-              {{- end -}}
-              {{ .name }}
-            </a>
-          </li>
-        {{- end -}}
+          <li class="hx:my-1 hx:h-px hx:bg-neutral-200 hx:dark:bg-neutral-700" role="separator"></li>
+          {{- range $linkIndex, $link := $customLinks -}}
+            {{- $linkURL := partial "utils/template-url.html" (dict "template" $link.url "values" (dict "url" $pageURL "title" $pageTitle "markdown_url" $markdownPermalink)) -}}
+            {{- $descID := printf "hextra-pcm-desc-link-%d" $linkIndex -}}
+            {{/* Both gates come from layouts/_markup/render-link.html, and both
+              hang off `$isExternal`. `target="_blank"` because a link that
+              stays on the site has no reason to steal a tab, and the arrow
+              because it is an opt-in site decoration that only means anything
+              on a link which actually leaves the site - `externalLinkDecoration`
+              has no default, so an unconditional arrow would appear on sites
+              that never asked for one anywhere else.
+
+              The two must stay tied to the same condition. Gating only the
+              arrow leaves a same-site link opening in a new tab with nothing
+              saying so, which is the WCAG 3.2.5 On Request failure the arrow
+              exists to prevent.
+            */}}
+            {{- $isExternal := strings.HasPrefix $linkURL "http" -}}
+            {{- $decorate := and site.Params.externalLinkDecoration $isExternal -}}
+            <li role="none">
+              <a href="{{ $linkURL }}" role="menuitem" tabindex="-1" class="{{ $itemClass }}" aria-label="{{ $link.name }}" {{ with $link.description }}aria-describedby="{{ $descID }}"{{ end }} {{ if $isExternal }}target="_blank" rel="noopener noreferrer"{{ end }}>
+                {{/* The icon box is rendered even when the link has no icon, which
+                  `icon` being optional makes routine. Omitting it would make the
+                  text block the row's first flex item, hanging the whole
+                  two-line block 26px left of every other row's text column.
+                */}}
+                <div class="{{ $itemIconClass }}">
+                  {{- with $link.icon -}}
+                    {{- partial "utils/icon.html" (dict "name" . "attributes" `height="16" width="16" aria-hidden="true"`) -}}
+                  {{- end -}}
+                </div>
+                <span class="hx:flex hx:flex-col hx:gap-0.5">
+                  <span class="{{ $itemLabelClass }}">
+                    {{- $link.name -}}
+                    {{- if $decorate -}}
+                      {{- partial "utils/icon.html" (dict "name" "arrow-up-right" "attributes" `class="hx:ms-0.5 hx:inline hx:rtl:rotate-270 hx:align-baseline" height="1em" aria-hidden="true"`) -}}
+                    {{- end -}}
+                  </span>
+                  {{/* No leading trim: it would delete the newline between the
+                    label and the description, fusing the two into one run of
+                    text. The built-in rows above keep that whitespace, and the
+                    two branches have to agree.
+                  */}}
+                  {{ with $link.description }}
+                    <span class="{{ $itemDescClass }}" id="{{ $descID }}">{{ . }}</span>
+                  {{ end -}}
+                </span>
+              </a>
+            </li>
+          {{- end -}}
         {{- end -}}
       </ul>
     </div>

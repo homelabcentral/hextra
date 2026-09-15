@@ -1,20 +1,20 @@
-{{- /*
-Highlight a glossary term
+{{/* Highlight a glossary term
 
-@param {string} entry Either the glossary abbreviation or the term.
+  @param {string} entry Either the glossary abbreviation or the term.
 
-or
+  or
 
-@param {string} 0 Either the glossary abbreviation or the term.
+  @param {string} 0 Either the glossary abbreviation or the term.
 
-@example {{< term entry="MAC" >}}
-@example {{< term "MAC" >}}
-*/ -}}
-
+  @example {{< term entry="MAC" >}}
+@example
+{{< term "MAC" >}}
+*/}}
 {{- $entry := .Get "entry" | default (.Get 0) -}}
 {{- $entryLower := lower $entry -}}
 {{- $match := dict -}}
 {{- $siteData := partial "utils/hugo-compat/site-data.html" . -}}
+
 
 <!-- Go over the term data file - data/<lang>/termbase.yaml -->
 {{- range (index $siteData .Site.Language.Lang "termbase") -}}

@@ -19,14 +19,14 @@ sidebar:
 Jupyter Notebook ショートコードを使用するには、プロジェクト内に Jupyter Notebook ファイルが必要です。[画像を追加する](../../organize-files#add-images)方法と同様に、Jupyter Notebook を `assets` フォルダに追加できます。
 
 {{< filetree/container >}}
-  {{< filetree/folder name="assets" >}}
-    {{< filetree/file name="notebook.ipynb" >}}
-  {{< /filetree/folder >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="assets" >}}
+{{< filetree/file name="notebook.ipynb" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 `jupyter` ショートコードを使用してページに Jupyter Notebook を組み込みます:
@@ -43,14 +43,14 @@ math: true
 あるいは、Hugo の [ページバンドル][page-bundles] 機能を利用して、Jupyter Notebook を Markdown ファイルと一緒に整理することもできます。
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/folder name="my-page" >}}
-            {{< filetree/file name="index.md" >}}
-            {{< filetree/file name="notebook.ipynb" >}}
-        {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/folder name="my-page" >}}
+{{< filetree/file name="index.md" >}}
+{{< filetree/file name="notebook.ipynb" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 ```markdown {filename="content/docs/my-page/index.md"}

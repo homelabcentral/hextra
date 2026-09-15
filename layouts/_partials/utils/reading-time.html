@@ -1,0 +1,10 @@
+{{/* Localized reading time for a page.
+
+  @param {page} . The page to measure.
+  @returns {string} e.g. "7 min read"
+
+  @example {{ partial "utils/reading-time.html" .
+}}
+*/}}
+{{- $format := (T "readingTime") | default "%d min read" -}}
+{{- return (printf $format .ReadingTime) -}}

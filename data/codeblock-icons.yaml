@@ -1,0 +1,97 @@
+# Maps code block filenames and languages to icons shown in the filename bar.
+#
+# Resolution order: explicit `icon` attribute on the code fence, then the
+# filename extension (`extensions`), then the fence language (`languages`).
+# Values are icon names resolved by the `utils/icon` partial, so they can
+# reference icons bundled in `data/icons.yaml` or any remote provider
+# (e.g. `iconify:<set>/<icon>` for any set on https://icon-sets.iconify.design).
+#
+# The defaults use monochrome icons (Simple Icons, with Material Design Icons
+# filling non-brand gaps) that inherit the bar text color via currentColor,
+# adapting to light/dark mode automatically.
+#
+# Sites can extend or override these maps by creating their own
+# `data/codeblock-icons.yaml`.
+
+extensions:
+  js: iconify:simple-icons/javascript
+  mjs: iconify:simple-icons/javascript
+  cjs: iconify:simple-icons/javascript
+  ts: iconify:simple-icons/typescript
+  jsx: iconify:simple-icons/react
+  tsx: iconify:simple-icons/react
+  py: iconify:simple-icons/python
+  go: iconify:simple-icons/go
+  rs: iconify:simple-icons/rust
+  swift: iconify:simple-icons/swift
+  java: iconify:simple-icons/openjdk
+  kt: iconify:simple-icons/kotlin
+  c: iconify:simple-icons/c
+  h: iconify:simple-icons/c
+  cpp: iconify:simple-icons/cplusplus
+  hpp: iconify:simple-icons/cplusplus
+  cs: iconify:simple-icons/csharp
+  php: iconify:simple-icons/php
+  rb: iconify:simple-icons/ruby
+  sh: iconify:simple-icons/gnubash
+  bash: iconify:simple-icons/gnubash
+  zsh: iconify:simple-icons/gnubash
+  html: iconify:simple-icons/html5
+  css: iconify:simple-icons/css
+  scss: iconify:simple-icons/sass
+  json: iconify:simple-icons/json
+  yaml: iconify:simple-icons/yaml
+  yml: iconify:simple-icons/yaml
+  toml: iconify:simple-icons/toml
+  xml: iconify:simple-icons/xml
+  md: iconify:simple-icons/markdown
+  mdx: iconify:simple-icons/mdx
+  sql: iconify:mdi/database-outline
+  graphql: iconify:simple-icons/graphql
+  vue: iconify:simple-icons/vuedotjs
+  svelte: iconify:simple-icons/svelte
+  dockerfile: iconify:simple-icons/docker
+  tf: iconify:simple-icons/terraform
+  txt: iconify:mdi/file-document-outline
+
+languages:
+  javascript: iconify:simple-icons/javascript
+  js: iconify:simple-icons/javascript
+  typescript: iconify:simple-icons/typescript
+  ts: iconify:simple-icons/typescript
+  jsx: iconify:simple-icons/react
+  tsx: iconify:simple-icons/react
+  python: iconify:simple-icons/python
+  py: iconify:simple-icons/python
+  go: iconify:simple-icons/go
+  rust: iconify:simple-icons/rust
+  swift: iconify:simple-icons/swift
+  java: iconify:simple-icons/openjdk
+  kotlin: iconify:simple-icons/kotlin
+  c: iconify:simple-icons/c
+  cpp: iconify:simple-icons/cplusplus
+  csharp: iconify:simple-icons/csharp
+  php: iconify:simple-icons/php
+  ruby: iconify:simple-icons/ruby
+  bash: iconify:simple-icons/gnubash
+  sh: iconify:simple-icons/gnubash
+  shell: iconify:simple-icons/gnubash
+  zsh: iconify:simple-icons/gnubash
+  html: iconify:simple-icons/html5
+  css: iconify:simple-icons/css
+  scss: iconify:simple-icons/sass
+  json: iconify:simple-icons/json
+  yaml: iconify:simple-icons/yaml
+  yml: iconify:simple-icons/yaml
+  toml: iconify:simple-icons/toml
+  xml: iconify:simple-icons/xml
+  markdown: iconify:simple-icons/markdown
+  md: iconify:simple-icons/markdown
+  mdx: iconify:simple-icons/mdx
+  sql: iconify:mdi/database-outline
+  graphql: iconify:simple-icons/graphql
+  vue: iconify:simple-icons/vuedotjs
+  svelte: iconify:simple-icons/svelte
+  docker: iconify:simple-icons/docker
+  dockerfile: iconify:simple-icons/docker
+  terraform: iconify:simple-icons/terraform

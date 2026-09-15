@@ -12,21 +12,21 @@ prev: /docs/guide
 <!--more-->
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/file name="_index.md" >}}
-    {{< filetree/folder name="docs" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="getting-started.md" >}}
-      {{< filetree/folder name="guide" state="open" >}}
-        {{< filetree/file name="_index.md" >}}
-        {{< filetree/file name="organize-files.md" >}}
-      {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="blog" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="post-1.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="docs" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="getting-started.md" >}}
+{{< filetree/folder name="guide" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="organize-files.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="blog" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="post-1.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 هر یک از فایل‌های `_index.md` صفحه اصلی مربوط به بخش خود هستند. سایر فایل‌های Markdown صفحات معمولی هستند.
@@ -49,11 +49,11 @@ content
 
 Hextra سه طرح‌بندی برای انواع مختلف محتوا ارائه می‌دهد:
 
-| طرح‌بندی   | دایرکتوری          | ویژگی‌ها                                                      |
-| :-------- | :----------------- | :----------------------------------------------------------- |
-| `docs`    | `content/docs/`    | مناسب برای مستندات ساختاریافته، مشابه این بخش.               |
-| `blog`    | `content/blog/`    | برای پست‌های وبلاگ، با نمایش لیست و مقاله‌های تفصیلی.         |
-| `default` | سایر دایرکتوری‌ها  | نمایش تک‌صفحه‌ای مقاله بدون نوار کناری.                      |
+| طرح‌بندی  | دایرکتوری         | ویژگی‌ها                                              |
+| :-------- | :---------------- | :---------------------------------------------------- |
+| `docs`    | `content/docs/`   | مناسب برای مستندات ساختاریافته، مشابه این بخش.        |
+| `blog`    | `content/blog/`   | برای پست‌های وبلاگ، با نمایش لیست و مقاله‌های تفصیلی. |
+| `default` | سایر دایرکتوری‌ها | نمایش تک‌صفحه‌ای مقاله بدون نوار کناری.               |
 
 برای سفارشی‌سازی یک بخش به منظور تقلید رفتار یک طرح‌بندی داخلی، نوع مورد نظر را در front matter فایل `_index.md` بخش مشخص کنید.
 
@@ -79,7 +79,7 @@ weight: 2
 ```
 
 {{< callout type="info" >}}
-  توصیه می‌شود نوار کناری را خیلی عمیق نگه ندارید. اگر محتوای زیادی دارید، **آن‌ها را به چند بخش تقسیم کنید**.
+توصیه می‌شود نوار کناری را خیلی عمیق نگه ندارید. اگر محتوای زیادی دارید، **آن‌ها را به چند بخش تقسیم کنید**.
 {{< /callout >}}
 
 ## ناوبری بخش
@@ -95,24 +95,24 @@ weight: 2
 با توجه به ساختار دایرکتوری زیر:
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/file name="_index.md" >}}
-    {{< filetree/folder name="blog" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/folder name="my-blog-series" state="open" >}}
-        {{< filetree/file name="_index.md" >}}
-        {{< filetree/folder name="post-a" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-        {{< filetree/folder name="post-b" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-        {{< filetree/folder name="post-c" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-      {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="blog" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="my-blog-series" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="post-a" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="post-b" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="post-c" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 و front matter زیر در پست‌ها:
@@ -123,12 +123,14 @@ title: پست A
 weight: 1
 ---
 ```
+
 ```yaml {filename="content/blog/my-blog-series/post-b/index.md"}
 ---
 title: پست B
 weight: 2
 ---
 ```
+
 ```yaml {filename="content/blog/my-blog-series/post-c/index.md"}
 ---
 title: پست C
@@ -175,6 +177,7 @@ title: سازماندهی فایل‌ها
 ```
 
 این اکنون مسیرهای راهنمای زیر را ایجاد می‌کند:
+
 ```
 مستندات > راهنما > Foo Bar
 ```
@@ -201,12 +204,12 @@ title: سازماندهی فایل‌ها
 به عنوان مثال، یک فایل تصویر `image.png` را در کنار فایل `my-page.md` اضافه کنید:
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-        {{< filetree/file name="image.png" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 سپس می‌توانیم از سینتکس Markdown زیر برای اضافه کردن تصویر به محتوا استفاده کنیم:
@@ -218,14 +221,14 @@ title: سازماندهی فایل‌ها
 همچنین می‌توانیم از ویژگی [page bundles][page-bundles] Hugo استفاده کنیم تا فایل‌های تصویر را همراه با فایل Markdown سازماندهی کنیم. برای این کار، فایل `my-page.md` را به یک دایرکتوری `my-page` تبدیل کنید و محتوا را در یک فایل به نام `index.md` قرار دهید و فایل‌های تصویر را داخل دایرکتوری `my-page` قرار دهید:
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/folder name="my-page" >}}
-            {{< filetree/file name="index.md" >}}
-            {{< filetree/file name="image.png" >}}
-        {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/folder name="my-page" >}}
+{{< filetree/file name="index.md" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 ```markdown {filename="content/docs/my-page/index.md"}
@@ -235,16 +238,16 @@ title: سازماندهی فایل‌ها
 به‌عنوان جایگزین، می‌توانیم فایل‌های تصویر را در دایرکتوری `static` قرار دهیم، که تصاویر را برای تمام صفحات قابل دسترس می‌کند:
 
 {{< filetree/container >}}
-  {{< filetree/folder name="static" >}}
-    {{< filetree/folder name="images" >}}
-        {{< filetree/file name="image.png" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="static" >}}
+{{< filetree/folder name="images" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 توجه کنید که مسیر تصویر با یک اسلش `/` شروع می‌شود و نسبت به دایرکتوری static است:

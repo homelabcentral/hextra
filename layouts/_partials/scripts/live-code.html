@@ -1,0 +1,447 @@
+{{/* Refresh `live=true` code blocks from their source URL.
+
+  Loaded only on pages that use the parameter, gated on the "hasLiveCode" store
+  flag in scripts.html - the same pattern as chart, typeit and youtube-lite.
+  Shared by the codeimporter and gist shortcodes; either emits one
+  .hextra-code-block[data-live-url] per file and this drives all of them.
+
+  The build-time render is what ships and what a crawler sees. This only
+  replaces it when the remote file has actually changed, which the FNV-1a hash
+  emitted by the shortcode makes cheap to decide: on the common path the fetch
+  completes, the hashes match, and nothing touches the DOM.
+*/}}
+
+{{- $asset := site.Params.liveCode.js | default "js/vendor/highlight.min.js" -}}
+{{- with resources.Get $asset -}}
+  {{- $js := . | fingerprint -}}
+  <script defer src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
+{{- else -}}
+  {{- errorf "highlight.js asset not found at %q. Run `npm run vendor:js` or set params.liveCode.js." $asset -}}
+{{- end -}}
+
+<script>
+  (() => {
+    const TIMEOUT_MS = 10000;
+    const UPDATED_TEXT = {{ (T "liveCodeUpdated") | default "Code block updated" | jsonify }};
+
+    /*
+      A refresh swaps out code the reader may already have read, so it is
+      announced rather than changed in silence. One region for the page, added
+      on first use: a live region has to be in the DOM before its text changes
+      for the change to be announced at all.
+    */
+    let statusEl = null;
+    const announce = (label) => {
+      if (!statusEl) {
+        statusEl = document.createElement("div");
+        statusEl.setAttribute("role", "status");
+        statusEl.setAttribute("aria-live", "polite");
+        statusEl.className = "hx:sr-only";
+        document.body.appendChild(statusEl);
+      }
+      const text = label ? `${UPDATED_TEXT}: ${label}` : UPDATED_TEXT;
+      // Cleared first so two refreshes of the same block are both announced.
+      statusEl.textContent = "";
+      requestAnimationFrame(() => {
+        statusEl.textContent = text;
+      });
+    };
+
+    // Chroma lexer names do not all exist in highlight.js. Only the ones a
+    // code import is likely to hit are mapped; anything unknown is rendered as
+    // plain text rather than guessed at.
+    const LANG_ALIASES = {
+      "go-html-template": "xml",
+      gotmpl: "xml",
+      gohtml: "xml",
+      html: "xml",
+      yml: "yaml",
+      sh: "bash",
+      zsh: "bash",
+      console: "shell",
+      jsonc: "json",
+      json5: "json",
+      jsx: "javascript",
+      tsx: "typescript",
+      "c++": "cpp",
+      "c#": "csharp",
+      "objective-c": "objectivec",
+      md: "markdown",
+      text: "plaintext",
+      "": "plaintext"
+    };
+
+    // Must match Hugo's hash.FNV32a, which hashes UTF-8 bytes - hence
+    // TextEncoder rather than iterating UTF-16 code units.
+    const fnv1a = (str) => {
+      const bytes = new TextEncoder().encode(str);
+      let h = 2166136261;
+      for (let i = 0; i < bytes.length; i++) {
+        h ^= bytes[i];
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    };
+
+    // Only plain decimal digits count as a line number, which is also what the
+    // shortcode accepts; anything else is ignored on both sides rather than
+    // being read as octal by Hugo and as decimal here.
+    const lineNumber = (attr) => (/^[0-9]+$/.test(attr ?? "") ? parseInt(attr, 10) : null);
+
+    // The same arithmetic as the shortcodes. Kept in step deliberately: if the
+    // two ever diverge, an unchanged file would hash differently and the block
+    // would churn on every load.
+    const slice = (text, startAttr, endAttr) => {
+      const startNo = lineNumber(startAttr);
+      const endNo = lineNumber(endAttr);
+      if (startNo === null && endNo === null) return text;
+
+      const lines = text.replace(/\n$/, "").split("\n");
+      const count = lines.length;
+
+      let start = startNo === null ? 1 : startNo;
+      let end = endNo === null ? count : endNo;
+
+      if (start < 1) start = 1;
+      if (end > count) end = count;
+      if (start > end) return text; // matches the shortcode's warnf-and-ignore
+
+      return lines.slice(start - 1, end).join("\n");
+    };
+
+    /*
+      highlight.js returns one flat token stream, but Chroma marks up every line
+      separately - which is what the `.line`, `.hl` and line-number styles hang
+      off. So the stream has to be cut into lines, and a span that crosses a
+      newline (a block comment, a raw string) has to be closed at the end of one
+      line and reopened at the start of the next, or the markup falls apart.
+    */
+    const splitLines = (html) => {
+      const lines = [];
+      const stack = [];
+      let cur = "";
+      const reopen = () => stack.join("");
+      const close = () => "</span>".repeat(stack.length);
+
+      const re = /<\/span>|<span[^>]*>|<[^>]+>|[^<]+/g;
+      let m;
+      while ((m = re.exec(html)) !== null) {
+        const tok = m[0];
+        if (tok === "</span>") {
+          stack.pop();
+          cur += tok;
+        } else if (tok.startsWith("<span")) {
+          stack.push(tok);
+          cur += tok;
+        } else if (tok[0] === "<") {
+          cur += tok;
+        } else {
+          const parts = tok.split("\n");
+          for (let i = 0; i < parts.length; i++) {
+            if (i > 0) {
+              lines.push(cur + close());
+              cur = reopen();
+            }
+            cur += parts[i];
+          }
+        }
+      }
+      lines.push(cur + close());
+
+      // A file ending in a newline yields a trailing empty line that Chroma
+      // does not emit either.
+      if (lines.length > 1 && !lines[lines.length - 1].replace(/<[^>]*>/g, "")) {
+        lines.pop();
+      }
+      return lines;
+    };
+
+    const highlightToLines = (text, lang) => {
+      if (typeof hljs !== "undefined") {
+        const name = LANG_ALIASES[lang] ?? lang;
+        try {
+          /*
+            The vendored bundle registers highlight.js's `common` set, which is
+            36 languages against Chroma's 200-odd. An unregistered language -
+            dockerfile, powershell, terraform, elixir - used to go to
+            highlightAuto, which guesses: Dockerfile content came back coloured
+            as SQL while the block still called itself a Dockerfile. Plain text
+            is wrong in a way the reader can see through, rather than one that
+            looks like a different language.
+          */
+          const out = hljs.getLanguage(name)
+            ? hljs.highlight(text, { language: name, ignoreIllegals: true })
+            : hljs.highlight(text, { language: "plaintext", ignoreIllegals: true });
+          return splitLines(out.value);
+        } catch (err) {
+          console.debug("live-code: highlighting failed, falling back to plain text", err);
+        }
+      }
+      const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return text.replace(/\n$/, "").split("\n").map(esc);
+    };
+
+    /*
+      Read the shape of the block Chroma produced, rather than re-deriving it
+      from hl_lines. Chroma has already resolved which lines are highlighted -
+      including how hl_lines interacts with lineNoStart - so reusing its answer
+      keeps the refreshed block identical in every case, with no second
+      interpretation of the option to drift out of step.
+    */
+    // "34-38 43" -> the 0-based line indexes it names. Chroma numbers hl_lines
+    // from the first line of the excerpt, independently of lineNoStart.
+    const parseHlLines = (spec) => {
+      const out = [];
+      for (const part of spec.split(/[\s,]+/)) {
+        const m = part.match(/^([0-9]+)(?:-([0-9]+))?$/);
+        if (!m) continue;
+        const from = parseInt(m[1], 10);
+        const to = m[2] ? parseInt(m[2], 10) : from;
+        for (let n = from; n <= to && n - from < 10000; n++) out.push(n - 1);
+      }
+      return out;
+    };
+
+    const readShape = (container, block) => {
+      const codes = container.querySelectorAll("code");
+      const codeEl = codes[codes.length - 1];
+
+      /*
+        Chroma has two line-number layouts, and which one is in use is a site
+        setting: a table by default, and numbers inline in each line when
+        markup.highlight.lineNumbersInTable is false. Probing only for the
+        table used to leave an inline block looking unnumbered, so a refresh
+        rebuilt it with no gutter at all.
+      */
+      const mode = container.querySelector("table.lntable")
+        ? "table"
+        : container.querySelector(".ln")
+          ? "inline"
+          : "none";
+      const shape = { mode, hl: [], start: 1, anchors: false, anchorPrefix: "" };
+
+      const lineEls = codeEl ? codeEl.querySelectorAll(":scope > .line") : [];
+      if (!lineEls.length) {
+        /*
+          Nothing rendered at build time: the fetch failed and `live` shipped
+          an empty block for the browser to fill in. There is no Chroma output
+          to read the shape back from, so fall back to the options the
+          shortcode recorded on the block.
+        */
+        const data = block?.dataset ?? {};
+        if (data.liveLinenos) shape.mode = data.liveLinenos;
+        const start = lineNumber(data.liveLinenoStart);
+        if (start !== null) shape.start = start;
+        if (data.liveHl) shape.hl = parseHlLines(data.liveHl);
+        return shape;
+      }
+
+      lineEls.forEach((el, i) => {
+        if (el.classList.contains("hl")) shape.hl.push(i);
+      });
+
+      const firstNo = container.querySelector(".lnt, .ln");
+      if (firstNo) {
+        const n = parseInt(firstNo.textContent.trim(), 10);
+        if (Number.isFinite(n)) shape.start = n;
+      }
+
+      // With markup.highlight.anchorLineNos on, every number is an id and a
+      // link into the block. Rebuilding bare spans broke every existing #N
+      // link on the page, so the anchors are carried over - including the
+      // prefix a `lineAnchors` setting puts in front of the number.
+      const anchored = container.querySelector(".lnt[id], .ln[id]");
+      if (anchored) {
+        shape.anchors = true;
+        shape.anchorPrefix = anchored.id.replace(/[0-9]+$/, "").replace(/[^\w-]/g, "");
+      }
+      return shape;
+    };
+
+    const render = (text, lang, shape) => {
+      // `+` and `#` are kept: Chroma can highlight c++ and c#, so the build
+      // really does emit `language-c++`, and stripping them renamed the block
+      // to a different language on refresh.
+      const safeLang = lang.replace(/[^\w.+#-]/g, "");
+      const lines = highlightToLines(text, lang);
+      const hl = new Set(shape.hl);
+
+      // One number, marked up the way Chroma marked up the block being
+      // replaced: id and link when anchorLineNos is on, bare text otherwise.
+      /*
+        Chroma right-aligns the gutter by padding every number with spaces to
+        the width of the widest one, and `.lnt` is an inline span, so those
+        spaces are the only thing aligning the column. Without them lines 1-9
+        jumped a glyph left the first time a block refreshed and the whole code
+        column shifted with them.
+      */
+      const width = String(shape.start + lines.length - 1).length;
+
+      const number = (i, cls, tail = "") => {
+        const n = shape.start + i;
+        const anchor = `${shape.anchorPrefix}${n}`;
+        const label = String(n).padStart(width, " ");
+        const body = shape.anchors ? `<a class="lnlinks" href="#${anchor}">${label}</a>` : label;
+        const id = shape.anchors ? ` id="${anchor}"` : "";
+        return `<span class="${cls}"${id}>${body}${tail}</span>`;
+      };
+
+      // In inline mode the number is part of the line rather than a column of
+      // its own, which is the markup Chroma emits with lineNumbersInTable off.
+      const inlineNo = (i) => (shape.mode === "inline" ? number(i, "ln") : "");
+
+      // Chroma ends every line with a newline except the last, which is why a
+      // Chroma block copies without a trailing blank line. Appending one to
+      // every line meant a refreshed block copied with an extra newline that
+      // the block it replaced did not have.
+      const nl = (i) => (i < lines.length - 1 ? "\n" : "");
+
+      const codeBody = lines
+        .map(
+          (l, i) =>
+            `<span class="line${hl.has(i) ? " hl" : ""}">${inlineNo(i)}<span class="cl">${l}${nl(i)}</span></span>`
+        )
+        .join("");
+
+      // data-lang is set deliberately: the markup now matches Chroma's, so
+      // code-copy.js must apply the same "\n\n" collapse it applies there.
+      const codeOpen = `<code class="language-${safeLang} hljs" data-lang="${safeLang}">`;
+
+      const wrap = document.createElement("div");
+      wrap.className = "highlight";
+
+      if (shape.mode !== "table") {
+        wrap.innerHTML = `<pre class="chroma">${codeOpen}${codeBody}</code></pre>`;
+        return wrap;
+      }
+
+      const nums = lines
+        .map((_, i) => {
+          const cell = number(i, "lnt", nl(i));
+          return hl.has(i) ? `<span class="hl">${cell}</span>` : cell;
+        })
+        .join("");
+
+      wrap.innerHTML =
+        `<div class="chroma"><table class="lntable"><tr>` +
+        `<td class="lntd"><pre class="chroma"><code>${nums}</code></pre></td>` +
+        `<td class="lntd"><pre class="chroma">${codeOpen}${codeBody}</code></pre></td>` +
+        `</tr></table></div>`;
+      return wrap;
+    };
+
+    // The div holding the code, i.e. neither the filename bar nor the copy
+    // button. Its identity must be preserved: code-copy.js resolves its target
+    // at click time via button.parentElement.previousElementSibling, so
+    // replacing the div itself would break copying.
+    const codeContainer = (block) =>
+      [...block.children].find(
+        (el) =>
+          el.tagName === "DIV" &&
+          !el.classList.contains("hextra-code-filename") &&
+          !el.classList.contains("hextra-code-copy-btn-container")
+      );
+
+    const refresh = async (block) => {
+      const url = block.dataset.liveUrl;
+      if (!url) return;
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+      let text;
+      try {
+        // Both hosts this is aimed at send `cache-control: max-age=300`, so
+        // without this the refresh was served from the HTTP cache and could be
+        // five minutes stale - which is the one thing the block promises not
+        // to be. `no-cache` still revalidates rather than re-downloading, so
+        // the unchanged case stays a conditional request.
+        const res = await fetch(url, { credentials: "omit", cache: "no-cache", signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        // res.text() drops a UTF-8 BOM already; the shortcodes strip theirs to
+        // match, and this keeps the two in step if that ever changes.
+        text = (await res.text()).replace(/^\uFEFF/, "");
+      } catch (err) {
+        // A refresh that cannot happen is not an error: the build-time render
+        // is still on screen and still correct as of the last build.
+        console.debug(`live-code: could not refresh ${url}`, err);
+        return;
+      } finally {
+        clearTimeout(timer);
+      }
+
+      const body = slice(text, block.dataset.liveStart, block.dataset.liveEnd);
+      if (String(fnv1a(body)) === block.dataset.liveHash) return;
+
+      const container = codeContainer(block);
+      if (!container) return;
+
+      const shape = readShape(container, block);
+
+      // replaceChildren destroys whatever the reader was focused on. A
+      // scrollable <pre> carries tabindex="0", so a keyboard user reading this
+      // block would otherwise be dropped back to <body> and have to tab from
+      // the top of the page again.
+      const hadFocus = container.contains(document.activeElement);
+
+      container.replaceChildren(render(body, block.dataset.liveLang || "", shape));
+      window.hextraCodeBlocks?.refreshScrollable?.();
+
+      if (hadFocus) {
+        // The rescan that adds tabindex runs on the next frame, so pick the
+        // scroll container directly: the table when the block has line
+        // numbers, the <pre> otherwise.
+        const target = container.querySelector(".lntable") || container.querySelector("pre");
+        if (target) {
+          if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+          target.focus({ preventScroll: true });
+        }
+      }
+
+      announce(block.querySelector(".hextra-code-filename")?.textContent.trim());
+    };
+
+    // The try/catch inside refresh() covers the fetch only, so anything thrown
+    // while reading the shape or rebuilding the markup escaped as an unhandled
+    // rejection instead of degrading quietly to the build-time render, which is
+    // what the rest of this file is careful to do.
+    const start = (block) =>
+      refresh(block).catch((err) => {
+        console.debug("live-code: refresh failed", err);
+      });
+
+    const init = () => {
+      const blocks = document.querySelectorAll(".hextra-code-block[data-live-url]");
+      if (!blocks.length) return;
+
+      // Probe on approach rather than on load: a long page should not contact
+      // every host it mentions before the reader has scrolled to any of them.
+      const observer =
+        "IntersectionObserver" in window
+          ? new IntersectionObserver(
+              (entries, obs) => {
+                for (const entry of entries) {
+                  if (!entry.isIntersecting) continue;
+                  obs.unobserve(entry.target);
+                  start(entry.target);
+                }
+              },
+              { rootMargin: "200px" }
+            )
+          : null;
+
+      blocks.forEach((block) => {
+        if (block.dataset.liveInited === "1") return;
+        block.dataset.liveInited = "1";
+        if (observer) observer.observe(block);
+        else start(block);
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+</script>

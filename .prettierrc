@@ -14,7 +14,16 @@
         "*.html"
       ],
       "options": {
-        "parser": "go-template"
+        "parser": "go-template",
+        "printWidth": 100000
+      }
+    },
+    {
+      "files": [
+        "*.md"
+      ],
+      "options": {
+        "embeddedLanguageFormatting": "off"
       }
     }
   ]

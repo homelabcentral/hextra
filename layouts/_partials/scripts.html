@@ -19,7 +19,32 @@
   {{- partial "scripts/gallery.html" . -}}
 {{- end -}}
 
+{{/* TypeIt */}}
+{{- if (.Store.Get "hasTypeIt") -}}
+  {{- partial "scripts/typeit.html" . -}}
+{{- end -}}
+
+{{/* Chart.js */}}
+{{- if (.Store.Get "hasChart") -}}
+  {{- partial "scripts/chart.html" . -}}
+{{- end -}}
+
+{{/* YouTube Lite */}}
+{{- if (.Store.Get "hasYoutubeLite") -}}
+  {{- partial "scripts/youtube-lite.html" . -}}
+{{- end -}}
+
+{{/* Live code (codeimporter live=true) */}}
+{{- if (.Store.Get "hasLiveCode") -}}
+  {{- partial "scripts/live-code.html" . -}}
+{{- end -}}
+
 {{/* Medium Zoom */}}
 {{- if (.Store.Get "hasImageZoom") -}}
   {{- partial "scripts/medium-zoom.html" . -}}
+{{- end -}}
+
+{{/* Ad network loaders */}}
+{{- if (.Store.Get "hasAds") -}}
+  {{- partial "scripts/ads.html" . -}}
 {{- end -}}

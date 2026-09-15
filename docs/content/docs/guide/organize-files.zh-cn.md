@@ -12,21 +12,21 @@ prev: /docs/guide
 <!--more-->
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/file name="_index.md" >}}
-    {{< filetree/folder name="docs" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="getting-started.md" >}}
-      {{< filetree/folder name="guide" state="open" >}}
-        {{< filetree/file name="_index.md" >}}
-        {{< filetree/file name="organize-files.md" >}}
-      {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="blog" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="post-1.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="docs" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="getting-started.md" >}}
+{{< filetree/folder name="guide" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="organize-files.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="blog" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="post-1.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 每个 `_index.md` 文件都是对应部分的索引页。其他 Markdown 文件则是常规页面。
@@ -49,11 +49,11 @@ content
 
 Hextra 为不同类型的内容提供了三种布局：
 
-| 布局      | 目录               | 特点                                                           |
-| :-------- | :----------------- | :------------------------------------------------------------- |
-| `docs`    | `content/docs/`    | 适合结构化文档，与本部分相同。                                 |
-| `blog`    | `content/blog/`    | 用于博客文章，包含列表和详细文章视图。                         |
-| `default` | 其他所有目录       | 单页文章视图，无侧边栏。                                       |
+| 布局      | 目录            | 特点                                   |
+| :-------- | :-------------- | :------------------------------------- |
+| `docs`    | `content/docs/` | 适合结构化文档，与本部分相同。         |
+| `blog`    | `content/blog/` | 用于博客文章，包含列表和详细文章视图。 |
+| `default` | 其他所有目录    | 单页文章视图，无侧边栏。               |
 
 要自定义一个部分以模仿内置布局的行为，可以在该部分的 `_index.md` 的 front matter 中指定所需的类型。
 
@@ -79,7 +79,7 @@ weight: 2
 ```
 
 {{< callout type="info" >}}
-  建议不要让侧边栏过深。如果有大量内容，可以考虑**将其拆分为多个部分**。
+建议不要让侧边栏过深。如果有大量内容，可以考虑**将其拆分为多个部分**。
 {{< /callout >}}
 
 ## 部分导航
@@ -95,24 +95,24 @@ weight: 2
 给定以下目录结构：
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/file name="_index.md" >}}
-    {{< filetree/folder name="blog" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/folder name="my-blog-series" state="open" >}}
-        {{< filetree/file name="_index.md" >}}
-        {{< filetree/folder name="post-a" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-        {{< filetree/folder name="post-b" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-        {{< filetree/folder name="post-c" state="open" >}}
-          {{< filetree/file name="index.md" >}}
-        {{< /filetree/folder >}}
-      {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="blog" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="my-blog-series" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/folder name="post-a" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="post-b" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="post-c" state="open" >}}
+{{< filetree/file name="index.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 并在文章的 front matter 中设置：
@@ -123,12 +123,14 @@ title: 文章 A
 weight: 1
 ---
 ```
+
 ```yaml {filename="content/blog/my-blog-series/post-b/index.md"}
 ---
 title: 文章 B
 weight: 2
 ---
 ```
+
 ```yaml {filename="content/blog/my-blog-series/post-c/index.md"}
 ---
 title: 文章 C
@@ -175,6 +177,7 @@ title: 组织文件
 ```
 
 现在会生成以下面包屑：
+
 ```
 文档 > 指南 > Foo Bar
 ```
@@ -201,12 +204,12 @@ title: 组织文件
 例如，将图片文件 `image.png` 与 `my-page.md` 文件放在一起：
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-        {{< filetree/file name="image.png" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 然后，可以使用以下 Markdown 语法将图片添加到内容中：
@@ -218,14 +221,14 @@ title: 组织文件
 我们还可以利用 Hugo 的[页面包][page-bundles]功能将图片文件与 Markdown 文件组织在一起。为此，将 `my-page.md` 文件转换为目录 `my-page`，并将内容放入名为 `index.md` 的文件中，然后将图片文件放入 `my-page` 目录中：
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/folder name="my-page" >}}
-            {{< filetree/file name="index.md" >}}
-            {{< filetree/file name="image.png" >}}
-        {{< /filetree/folder >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/folder name="my-page" >}}
+{{< filetree/file name="index.md" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 ```markdown {filename="content/docs/my-page/index.md"}
@@ -235,16 +238,16 @@ title: 组织文件
 或者，我们也可以将图片文件放在 `static` 目录中，这样所有页面都可以访问这些图片：
 
 {{< filetree/container >}}
-  {{< filetree/folder name="static" >}}
-    {{< filetree/folder name="images" >}}
-        {{< filetree/file name="image.png" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" >}}
-        {{< filetree/file name="my-page.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="static" >}}
+{{< filetree/folder name="images" >}}
+{{< filetree/file name="image.png" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" >}}
+{{< filetree/file name="my-page.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 注意，图片路径以斜杠 `/` 开头，并且相对于 static 目录：

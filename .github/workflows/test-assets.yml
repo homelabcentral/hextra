@@ -1,0 +1,81 @@
+name: Generated Assets
+
+# Two tracked files are build output: docs/hugo_stats.json, which Hugo writes
+# from the rendered site, and assets/css/compiled/main.css, which Tailwind
+# tree-shakes from those stats. Nothing verified they matched their inputs.
+#
+# The failure this catches is silent in every other check. Deleting content
+# leaves classes in the stats that no page uses any more; adding a utility class
+# without regenerating leaves it out of the CSS entirely, so the style is simply
+# missing from the built site while every test still passes.
+#
+# `make css` regenerates both, in the order the Makefile enforces (stats, then
+# compile). If the result differs from what was committed, the tree was built
+# from stale inputs.
+#
+# Its own workflow rather than a step in another: the other test workflows use
+# `npm run build`, which renders the site but does NOT recompile the CSS, so
+# there is nothing to compare there.
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+# The event is part of the group on purpose: push and pull_request both fire
+# for a same-repo push with an open PR, and without it they share a group and
+# cancel each other - leaving the push run cancelled and the pull_request run
+# skipped by the guard below, so nothing runs at all.
+concurrency:
+  group: assets-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  assets:
+    runs-on: ubuntu-latest
+    # Push covers every branch in this repository; pull_request is kept only for
+    # PRs opened from a fork, whose pushes land in the fork and never fire here.
+    # Without this guard both events fire for a same-repo push with an open PR,
+    # running the check twice.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    env:
+      HUGO_VERSION: 0.166.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Setup Hugo
+        run: |
+          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
+          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+
+      # `touch` matters: the Makefile's `deps` is a file rule on node_modules and
+      # would re-run `npm install` if the directory looked older than
+      # package-lock.json - an install that can rewrite the lockfile, which the
+      # diff below would then report as drift.
+      - name: Install dependencies
+        run: |
+          npm ci
+          touch node_modules
+
+      - name: Regenerate stats and CSS
+        run: make css
+
+      - name: Check the committed output matches
+        run: |
+          if ! git diff --exit-code -- docs/hugo_stats.json assets/css/compiled/main.css; then
+            echo "::error::Generated assets are stale. Run 'make css' and commit the result."
+            exit 1
+          fi

@@ -32,8 +32,22 @@
       <description>
         {{ $img := (.Resources.ByType "image").GetMatch "*featured*" }}
         {{ with $img }}
+        {{/* Hugo counts image/svg+xml as resource type "image", so ByType picks
+          up a featured.svg and hands it to .Resize, which is raster-only and
+          fails the build. Every other place the theme processes an image guards
+          this - card.html, render-image.html, page-image.html, gallery-item.html
+          and identity.html - and this was the one that did not.
+
+          An SVG is passed through at its own size, which is what those other
+          guards do. No width or height: .Width on a non-raster resource is not
+          meaningful, and a feed reader that cannot render SVG ignores the
+          element either way. */}}
+        {{ if eq .MediaType.SubType "svg" }}
+        {{ printf "<![CDATA[<img src=\"%s\"/>]]>" .Permalink | safeHTML }}
+        {{ else }}
         {{ $img := .Resize "640x" }}
         {{ printf "<![CDATA[<img src=\"%s\" width=\"%d\" height=\"%d\"/>]]>" $img.Permalink $img.Width $img.Height | safeHTML }}
+        {{ end }}
         {{ end }}
         {{ .Content | html }}
       </description>

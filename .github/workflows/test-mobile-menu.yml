@@ -1,11 +1,16 @@
 name: Mobile Menu Tests
 
 on:
+  push:
   pull_request:
     branches: [main]
 
+# The event is part of the group on purpose: push and pull_request both fire
+# for a same-repo push with an open PR, and without it they share a group and
+# cancel each other - leaving the push run cancelled and the pull_request run
+# skipped by the guard below, so nothing runs at all.
 concurrency:
-  group: mobile-menu-${{ github.head_ref || github.ref_name }}
+  group: mobile-menu-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 defaults:
@@ -15,8 +20,13 @@ defaults:
 jobs:
   mobile-menu:
     runs-on: ubuntu-latest
+    # Push covers every branch in this repository; pull_request is kept only for
+    # PRs opened from a fork, whose pushes land in the fork and never fire here.
+    # Without this guard both events fire for a same-repo push with an open PR,
+    # running the suite twice.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     env:
-      HUGO_VERSION: 0.161.1
+      HUGO_VERSION: 0.166.0
     steps:
       - name: Checkout
         uses: actions/checkout@v4

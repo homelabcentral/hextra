@@ -57,7 +57,7 @@ cd my-site
 hugo mod init github.com/username/my-site
 
 # add Hextra theme
-hugo mod get github.com/imfing/hextra
+hugo mod get github.com/homelabcentral/hextra
 ```
 
 Configure `hugo.yaml` to use Hextra theme by adding the following:
@@ -65,7 +65,7 @@ Configure `hugo.yaml` to use Hextra theme by adding the following:
 ```yaml
 module:
   imports:
-    - path: github.com/imfing/hextra
+    - path: github.com/homelabcentral/hextra
 ```
 
 ### Create your first content pages
@@ -87,7 +87,6 @@ Voila, your new site preview is available at `http://localhost:1313/`.
 
 {{% /steps %}}
 
-
 {{% details title="How to update theme?" %}}
 
 To update all Hugo modules in your project to their latest versions, run the following command:
@@ -96,22 +95,21 @@ To update all Hugo modules in your project to their latest versions, run the fol
 hugo mod get -u
 ```
 
-To update Hextra to the [latest released version](https://github.com/imfing/hextra/releases), run the following command:
+To update Hextra to the [latest released version](https://github.com/homelabcentral/hextra/releases), run the following command:
 
 ```shell
-hugo mod get -u github.com/imfing/hextra
+hugo mod get -u github.com/homelabcentral/hextra
 ```
 
 If you want to try the most recent changes before the next release, update the module to the development branch directly (⚠️ may contain unstable/breaking changes):
 
 ```shell
-hugo mod get -u github.com/imfing/hextra@main
+hugo mod get -u github.com/homelabcentral/hextra@main
 ```
 
 See [Hugo Modules](https://gohugo.io/hugo-modules/use-modules/#update-all-modules) for more details.
 
 {{% /details %}}
-
 
 ### Setup Hextra as Git submodule
 
@@ -144,7 +142,7 @@ git init
 Then, add Hextra theme as a Git submodule:
 
 ```shell
-git submodule add https://github.com/imfing/hextra.git themes/hextra
+git submodule add https://github.com/homelabcentral/hextra.git themes/hextra
 ```
 
 Configure `hugo.yaml` to use Hextra theme by adding the following:
@@ -172,7 +170,6 @@ Your new site preview is available at `http://localhost:1313/`.
 
 {{% /steps %}}
 
-
 When using [CI/CD](https://en.wikipedia.org/wiki/CI/CD) for Hugo website deployment, it's essential to ensure that the following command is executed before running the `hugo` command.
 
 ```shell
@@ -180,7 +177,6 @@ git submodule update --init
 ```
 
 Failure to run this command results in the theme folder not being populated with Hextra theme files, leading to a build failure.
-
 
 {{% details title="How to update theme?" %}}
 
@@ -205,7 +201,7 @@ See [Git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) for mo
 Explore the following sections to start adding more contents:
 
 {{< cards >}}
-  {{< card link="../guide/organize-files" title="Organize Files" icon="document-duplicate" >}}
-  {{< card link="../guide/configuration" title="Configuration" icon="adjustments" >}}
-  {{< card link="../guide/markdown" title="Markdown" icon="markdown" >}}
+{{< card link="../guide/organize-files" title="Organize Files" icon="document-duplicate" >}}
+{{< card link="../guide/configuration" title="Configuration" icon="adjustments" >}}
+{{< card link="../guide/markdown" title="Markdown" icon="markdown" >}}
 {{< /cards >}}

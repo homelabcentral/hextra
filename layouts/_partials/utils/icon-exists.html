@@ -1,0 +1,26 @@
+{{/* Report whether an icon name can be rendered by `utils/icon.html`.
+
+  `utils/icon.html` calls `errorf` for an unknown name, which fails the build.
+  Use this guard before passing a name that comes from site configuration, so a
+  typo degrades to a missing icon instead of a broken site.
+
+  Remote names (`provider:name`) are reported as available; `utils/icon.html`
+  validates the provider and the fetch itself.
+
+  @param {string} name The icon name to check.
+  @returns {bool}
+
+  @example {{ if partial "utils/icon-exists.html" (dict "name" $icon)
+}}
+*/}}
+{{- $name := .name | default "" -}}
+{{- $exists := false -}}
+{{- with $name -}}
+  {{- if strings.Contains . ":" -}}
+    {{- $exists = true -}}
+  {{- else -}}
+    {{- $siteData := partial "utils/hugo-compat/site-data.html" . -}}
+    {{- $exists = ne (index $siteData.icons .) nil -}}
+  {{- end -}}
+{{- end -}}
+{{- return $exists -}}

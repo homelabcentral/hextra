@@ -1,0 +1,34 @@
+{{/* A single metric within the `stats` shortcode.
+
+  @param {string} value The headline figure.
+  @param {string} label The short description of the figure.
+  @param {string} icon Optional icon displayed above the figure.
+
+  @example {{< stat value="40+" label="Shortcodes"
+>}}Compose
+pages without bespoke
+templates.{{< /stat >}}
+*/}}
+{{- $value := .Get "value" -}}
+{{- $label := .Get "label" -}}
+{{- $icon := .Get "icon" -}}
+
+{{- if not $value -}}
+  {{- errorf "The %q shortcode requires a 'value' parameter. See %s" .Name .Position -}}
+{{- end -}}
+
+
+<div class="hextra-stat">
+  {{- with $icon -}}
+    <div class="hextra-stat__icon">
+      {{- partial "utils/icon" (dict "name" . "attributes" `height=20 aria-hidden="true"`) -}}
+    </div>
+  {{- end -}}
+  <div class="hextra-stat__value">{{ $value | markdownify }}</div>
+  {{- with $label -}}
+    <div class="hextra-stat__label">{{ . | markdownify }}</div>
+  {{- end -}}
+  {{- with .InnerDeindent -}}
+    <div class="hextra-stat__body">{{ $.Page.RenderString (dict "display" "block") . }}</div>
+  {{- end -}}
+</div>

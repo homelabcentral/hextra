@@ -1,8 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="{{ .Site.Language.Lang }}" dir="{{ partial "utils/hugo-compat/language-direction.html" .Site.Language | default `ltr` }}">
   {{- partial "head.html" . -}}
-  <body>
-    <a href="#content" class="hx:sr-only hx:focus-visible:not-sr-only hx:focus-visible:fixed hx:focus-visible:z-50 hx:focus-visible:top-2 hx:focus-visible:left-2 hx:focus-visible:bg-primary-500 hx:focus-visible:text-white hx:focus-visible:px-4 hx:focus-visible:py-2 hx:focus-visible:rounded-md hx:focus-visible:text-sm hx:focus-visible:font-medium">
+  {{/* Chroma generates the line-number table, so the divider between the numbers
+    and the code cannot be switched on per block - the class goes here instead
+    and the rule in highlight.css is scoped to it. Off unless asked for.
+  */}}
+  {{/* The attribute is assembled as a whole rather than opened in the tag and
+    closed by an end action, and there is a space before it: the plugin reads
+    a tag name followed immediately by an action as a dynamic tag name and
+    fails on the file. The space costs an empty `<body >` when no attribute
+    applies, which is valid and renders identically.
+  */}}
+  {{- $bodyAttrs := "" -}}
+  {{- with site.Params.highlight -}}
+    {{- with .lineNumberDivider -}}
+      {{/* Both shapes are accepted. `lineNumberDivider: true` is the obvious
+        thing to write, and evaluating `.enable` on it used to fail every page
+        of the build with `can't evaluate field enable in type bool`, blaming
+        this template rather than the configuration that caused it.
+
+        Compared through printf so only a real `true` switches it on: a quoted
+        "false" from YAML would otherwise be a truthy string.
+      */}}
+      {{- $enabled := printf "%v" . -}}
+      {{- if reflect.IsMap . -}}
+        {{- $enabled = printf "%v" .enable -}}
+      {{- end -}}
+      {{- if eq $enabled "true" -}}
+        {{- $bodyAttrs = ` class="hextra-lineno-divider"` -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  <body {{ $bodyAttrs | safeHTMLAttr }}>
+    <a href="#content" class="hx:sr-only hx:focus-visible:not-sr-only hx:focus-visible:fixed hx:focus-visible:z-50 hx:focus-visible:top-2 hx:focus-visible:left-2 hx:focus-visible:bg-hextra-accent-500 hx:focus-visible:text-white hx:focus-visible:px-4 hx:focus-visible:py-2 hx:focus-visible:rounded-md hx:focus-visible:text-sm hx:focus-visible:font-medium">
       {{- (T "skipToContent") | default "Skip to content" -}}
     </a>
     {{- partial "banner.html" . -}}

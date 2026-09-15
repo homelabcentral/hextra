@@ -1,0 +1,43 @@
+{{/* Related posts, scored by how many tags they share with the current post.
+
+  Hugo's built-in `.Related` indexes `keywords` and `date` by default, so it
+  returns nothing on a tag-driven blog without extra site configuration; the
+  tag intersection below needs none.
+
+  @param {page} context The post.
+  @param {dict} config The dict returned by `blog/config.html`.
+
+  @example {{ partial "blog/related.html" (dict "context" . "config" $cfg)
+}}
+*/}}
+{{- $related := .config.article.related -}}
+{{- if $related.enable -}}
+  {{- $context := .context -}}
+  {{- $tags := $context.Params.tags | default slice -}}
+  {{- if $tags -}}
+    {{- $scored := slice -}}
+    {{- range where (where site.RegularPages "Section" $context.Section) "Permalink" "!=" $context.Permalink -}}
+      {{- $shared := len (intersect ($.context.Params.tags | default slice) (.Params.tags | default slice)) -}}
+      {{- if gt $shared 0 -}}
+        {{- $scored = $scored | append (dict "page" . "score" $shared) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- with $scored -}}
+      {{- $posts := first $related.count (sort . "score" "desc") -}}
+      {{- $title := (T "relatedPosts") | default "Related posts" -}}
+      <section class="hextra-blog-related">
+        <h2 class="hextra-blog-related-title">{{ $title }}</h2>
+        <ul class="hextra-blog-related-list">
+          {{- range $posts -}}
+            <li>
+              <a class="hextra-blog-related-link" href="{{ .page.RelPermalink }}">
+                <span class="hextra-blog-related-label">{{ .page.LinkTitle }}</span>
+                <span class="hextra-blog-related-meta">{{ partial "utils/format-date" .page.Date }}</span>
+              </a>
+            </li>
+          {{- end -}}
+        </ul>
+      </section>
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

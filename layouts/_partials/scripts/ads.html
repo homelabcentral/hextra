@@ -1,0 +1,30 @@
+{{/* Ad network loaders.
+
+  Emitted only on pages that actually rendered an ad, gated on the "hasAds"
+  store flag in scripts.html, and only for the networks that page used - a
+  post with one EthicalAds unit never fetches AdSense.
+
+  Carbon is absent on purpose. It writes its ad at the position of its own
+  script element, so `ads/slot.html` emits that inline at the slot instead.
+
+  AdSense is skipped when `verifyAllPages` is on, because `ads/verify.html` has
+  already put the loader in the head of every page and two loaders for one
+  publisher id is a configuration Google warns about.
+*/}}
+
+{{- $providers := .Store.Get "hextraAdProviders" | default slice -}}
+{{- $ads := partialCached "ads/config.html" . .RelPermalink -}}
+{{- $inHead := false -}}
+{{- with index $ads.providers "adsense" }}{{ $inHead = index . "verifyallpages" }}{{ end -}}
+
+{{- if and (in $providers "adsense") (not $inHead) -}}
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+  {{- /* One loader per publisher id in use; see ads/slot.html. */ -}}
+  {{- range $client := (.Store.Get "hextraAdClients" | default slice) -}}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $client }}" crossorigin="anonymous"></script>
+  {{- end -}}
+{{- end -}}
+
+{{- if in $providers "ethicalads" -}}
+  <script async src="https://media.ethicalads.io/media/client/ethicalads.min.js"></script>
+{{- end -}}

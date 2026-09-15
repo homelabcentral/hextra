@@ -25,8 +25,8 @@ Hextra یک پوسته مدرن، سریع و کامل برای [Hugo][hugo] ا�
 ## سوال یا بازخورد دارید؟
 
 {{< callout emoji="❓" >}}
-  Hextra هنوز در حال توسعه فعال است.
-  سوال یا بازخوردی دارید؟ با خیال راحت [یک issue باز کنید](https://github.com/imfing/hextra/issues)!
+Hextra هنوز در حال توسعه فعال است.
+سوال یا بازخوردی دارید؟ با خیال راحت [یک issue باز کنید](https://github.com/homelabcentral/hextra/issues)!
 {{< /callout >}}
 
 ## بعدی
@@ -34,7 +34,7 @@ Hextra یک پوسته مدرن، سریع و کامل برای [Hugo][hugo] ا�
 برای شروع، مستقیماً به بخش زیر بروید:
 
 {{< cards >}}
-  {{< card link="getting-started" title="شروع به کار" icon="document-text" subtitle="یاد بگیرید چگونه با استفاده از Hextra وب‌سایت بسازید" >}}
+{{< card link="getting-started" title="شروع به کار" icon="document-text" subtitle="یاد بگیرید چگونه با استفاده از Hextra وب‌سایت بسازید" >}}
 {{< /cards >}}
 
 [hugo]: https://gohugo.io/

@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       var newState = folder.nextElementSibling.dataset.state === "open" ? "closed" : "open";
       folder.nextElementSibling.dataset.state = newState;
-      folder.setAttribute('aria-expanded', newState === 'open' ? 'true' : 'false');
+      folder.setAttribute("aria-expanded", newState === "open" ? "true" : "false");
     });
   });
 });

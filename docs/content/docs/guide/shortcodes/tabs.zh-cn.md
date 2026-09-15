@@ -7,9 +7,9 @@ next: /docs/guide/deploy-site
 
 {{< tabs >}}
 
-  {{< tab name="macOS" >}}**macOS**: 苹果公司开发的桌面操作系统。{{< /tab >}}
-  {{< tab name="Linux" >}}**Linux**: 一款开源操作系统。{{< /tab >}}
-  {{< tab name="Windows" >}}**Windows**: 微软公司开发的桌面操作系统。{{< /tab >}}
+{{< tab name="macOS" >}}**macOS**: 苹果公司开发的桌面操作系统。{{< /tab >}}
+{{< tab name="Linux" >}}**Linux**: 一款开源操作系统。{{< /tab >}}
+{{< tab name="Windows" >}}**Windows**: 微软公司开发的桌面操作系统。{{< /tab >}}
 
 {{< /tabs >}}
 
@@ -51,7 +51,6 @@ next: /docs/guide/deploy-site
 
 {{< /tabs >}}
 
-
 ### 添加图标
 
 在每个 `tab` 上使用 `icon` 参数，可以在标签文本前显示图标。
@@ -75,7 +74,6 @@ next: /docs/guide/deploy-site
 
 {{< /tabs >}}
 
-
 ### 使用Markdown
 
 支持包括代码块在内的Markdown语法：
@@ -96,26 +94,31 @@ next: /docs/guide/deploy-site
 
 {{< tabs >}}
 
-  {{< tab name="JSON" >}}
-  ```json
-  { "hello": "world" }
-  ```
-  {{< /tab >}}
+{{< tab name="JSON" >}}
 
-  {{< tab name="YAML" >}}
-  ```yaml
-  hello: world
-  ```
-  {{< /tab >}}
+```json
+{ "hello": "world" }
+```
 
-  {{< tab name="TOML" >}}
-  ```toml
-  hello = "world"
-  ```
-  {{< /tab >}}
+{{< /tab >}}
+
+{{< tab name="YAML" >}}
+
+```yaml
+hello: world
+```
+
+{{< /tab >}}
+
+{{< tab name="TOML" >}}
+
+```toml
+hello = "world"
+```
+
+{{< /tab >}}
 
 {{< /tabs >}}
-
 
 ### 同步标签页
 

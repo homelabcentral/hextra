@@ -1,0 +1,299 @@
+/*
+  highlight.js token colours, mapped onto the Chroma palette.
+
+  `codeimporter live=true` re-fetches its source in the reader's browser, where
+  Chroma - a Go library that only exists during the build - is unavailable, so
+  highlight.js does the work instead. It emits a completely different class
+  vocabulary (`hljs-keyword` rather than `k`), so this file translates it back
+  onto the exact colours in ./light.css and ./dark.css. A refreshed block should
+  be visually indistinguishable from the build-time one it replaced.
+
+  Nesting mirrors those two files: inside `.highlight` for light, `.dark
+  .highlight` for dark. The Chroma class each rule borrows from is named in a
+  comment so the two stay in step when the theme is regenerated.
+
+  Where a palette leaves a token uncoloured (`.na` and `.nb` in dark, `.py` and
+  the colour half of `.gl` in both), no rule is written here either - inheriting
+  is what Chroma does, and inventing a colour would make the live block differ
+  from its neighbours.
+
+  This file is written by hand while ./light.css and ./dark.css are generated
+  by `hugo gen chromastyles`, so regenerating those two silently leaves this one
+  on the old palette. After a regeneration, diff the colours here against the
+  Chroma class named in each comment.
+*/
+
+.highlight {
+  /* k */
+  .hljs-keyword,
+  .hljs-selector-tag {
+    color: #000000;
+    font-weight: bold;
+  }
+  /* kc */
+  .hljs-literal {
+    color: #000000;
+    font-weight: bold;
+  }
+  /* kt */
+  .hljs-type {
+    color: #445588;
+    font-weight: bold;
+  }
+  /* o */
+  .hljs-operator {
+    color: #000000;
+    font-weight: bold;
+  }
+
+  /* na */
+  .hljs-attr,
+  .hljs-attribute,
+  .hljs-selector-attr,
+  .hljs-selector-pseudo {
+    color: #008080;
+  }
+  /* nb */
+  .hljs-built_in {
+    color: #0086b3;
+  }
+  /* nc */
+  .hljs-class,
+  .hljs-title.class_,
+  .hljs-selector-class {
+    color: #445588;
+    font-weight: bold;
+  }
+  /* nf */
+  .hljs-title,
+  .hljs-title.function_ {
+    color: #990000;
+    font-weight: bold;
+  }
+  /* nt */
+  .hljs-tag,
+  .hljs-name {
+    color: #000080;
+  }
+  /* nv */
+  .hljs-variable,
+  .hljs-template-variable {
+    color: #008080;
+  }
+  /* no */
+  .hljs-selector-id {
+    color: #008080;
+  }
+  /* py is uncoloured in the light palette, so .hljs-property inherits. */
+
+  /* s */
+  .hljs-string,
+  .hljs-meta .hljs-string {
+    color: #dd1144;
+  }
+  /* se */
+  .hljs-char.escape_ {
+    color: #dd1144;
+  }
+  /* sr */
+  .hljs-regexp {
+    color: #009926;
+  }
+  /* ss */
+  .hljs-symbol,
+  .hljs-bullet {
+    color: #990073;
+  }
+  /* m */
+  .hljs-number {
+    color: #009999;
+  }
+
+  /* c */
+  .hljs-comment,
+  .hljs-quote {
+    color: #999988;
+    font-style: italic;
+  }
+  /* cs */
+  .hljs-doctag {
+    color: #999999;
+    font-weight: bold;
+    font-style: italic;
+  }
+  /* cp */
+  .hljs-meta,
+  .hljs-meta .hljs-keyword {
+    color: #999999;
+    font-weight: bold;
+    font-style: italic;
+  }
+
+  /* gd */
+  .hljs-deletion {
+    color: #000000;
+    background-color: #ffdddd;
+  }
+  /* gi */
+  .hljs-addition {
+    color: #000000;
+    background-color: #ddffdd;
+  }
+  /* ge */
+  .hljs-emphasis {
+    color: #000000;
+    font-style: italic;
+  }
+  /* gs */
+  .hljs-strong {
+    font-weight: bold;
+  }
+  /* gh */
+  .hljs-section {
+    color: #999999;
+  }
+  /* gl */
+  .hljs-link {
+    text-decoration: underline;
+  }
+}
+
+.dark .highlight {
+  /* k */
+  .hljs-keyword,
+  .hljs-selector-tag {
+    color: #ff7b72;
+    font-weight: normal;
+  }
+  /* kc */
+  .hljs-literal {
+    color: #79c0ff;
+    font-weight: normal;
+  }
+  /* kt */
+  .hljs-type {
+    color: #ff7b72;
+    font-weight: normal;
+  }
+  /* o */
+  .hljs-operator {
+    color: #ff7b72;
+    font-weight: bold;
+  }
+
+  /* na, nb: uncoloured in the dark palette - inherit, as Chroma does. */
+  .hljs-attr,
+  .hljs-attribute,
+  .hljs-selector-attr,
+  .hljs-selector-pseudo {
+    color: inherit;
+  }
+  .hljs-built_in {
+    color: inherit;
+  }
+
+  /* nc */
+  .hljs-class,
+  .hljs-title.class_,
+  .hljs-selector-class {
+    color: #f0883e;
+    font-weight: bold;
+  }
+  /* nf */
+  .hljs-title,
+  .hljs-title.function_ {
+    color: #d2a8ff;
+    font-weight: bold;
+  }
+  /* nt */
+  .hljs-tag,
+  .hljs-name {
+    color: #7ee787;
+  }
+  /* nv */
+  .hljs-variable,
+  .hljs-template-variable {
+    color: #79c0ff;
+  }
+  /* no */
+  .hljs-selector-id {
+    color: #79c0ff;
+    font-weight: bold;
+  }
+  /* py */
+  .hljs-property {
+    color: #79c0ff;
+  }
+
+  /* s */
+  .hljs-string,
+  .hljs-meta .hljs-string {
+    color: #a5d6ff;
+  }
+  /* se */
+  .hljs-char.escape_ {
+    color: #79c0ff;
+  }
+  /* sr */
+  .hljs-regexp {
+    color: #79c0ff;
+  }
+  /* ss */
+  .hljs-symbol,
+  .hljs-bullet {
+    color: #a5d6ff;
+  }
+  /* m */
+  .hljs-number {
+    color: #a5d6ff;
+  }
+
+  /* c */
+  .hljs-comment,
+  .hljs-quote {
+    color: #8b949e;
+    font-style: italic;
+  }
+  /* cs */
+  .hljs-doctag {
+    color: #8b949e;
+    font-weight: bold;
+    font-style: italic;
+  }
+  /* cp */
+  .hljs-meta,
+  .hljs-meta .hljs-keyword {
+    color: #8b949e;
+    font-weight: bold;
+    font-style: italic;
+  }
+
+  /* gd */
+  .hljs-deletion {
+    color: #ffa198;
+    background-color: #490202;
+  }
+  /* gi */
+  .hljs-addition {
+    color: #56d364;
+    background-color: #0f5323;
+  }
+  /* ge */
+  .hljs-emphasis {
+    color: inherit;
+    font-style: italic;
+  }
+  /* gs */
+  .hljs-strong {
+    font-weight: bold;
+  }
+  /* gh */
+  .hljs-section {
+    color: #79c0ff;
+    font-weight: bold;
+  }
+  /* gl */
+  .hljs-link {
+    text-decoration: underline;
+  }
+}

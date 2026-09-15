@@ -1,3 +1,22 @@
+{{/* Markdown image render hook.
+
+  An image under assets/ is treated the same way a cover image is: converted
+  to WebP, downscaled if it is wider than the content column needs, measured
+  so it reserves its space before it loads, and given an inlined placeholder
+  to show while it does. A cover and a body image are the same image used in
+  two places; there is no reason for them to be delivered differently.
+
+  Images under static/ are still passed through verbatim — Hugo cannot open
+  them — and SVGs and GIFs are left alone, the former because `.Process` does
+  not handle them and the latter because it would flatten the animation.
+
+  When an image is downscaled and `imageZoom` is on, the original is handed to
+  medium-zoom as `data-zoom-src`, so clicking through still shows full
+  resolution. That is why downscaling here costs nothing: the small file is
+  what loads, the large one only what you opt into.
+
+  `params.images.contentMaxWidth` overrides the 1920px target.
+*/}}
 {{- $alt := .PlainText | safeHTML -}}
 {{- $lazyLoading := .Page.Site.Params.enableImageLazyLoading | default true -}}
 {{- $enableImageZoom := .Page.Site.Params.imageZoom.enable | default false -}}
@@ -12,29 +31,58 @@
 {{- $startsWithSlash := hasPrefix $dest "/" -}}
 {{- $startsWithRelative := hasPrefix $dest "../" -}}
 
+{{/* Resolve to a resource where we can, and fall back to the previous
+  URL-rewriting behaviour where we cannot. */}}
+{{- $resource := false -}}
 {{- if and $dest $isLocal -}}
   {{- if $startsWithSlash -}}
-    {{- with or (.PageInner.Resources.Get $url.Path) (resources.Get $url.Path) -}}
-      {{/* Images under assets directory */}}
-      {{- $query := cond $url.RawQuery (printf "?%s" $url.RawQuery) "" -}}
-      {{- $fragment := cond $url.Fragment (printf "#%s" $url.Fragment) "" -}}
-      {{- $dest = printf "%s%s%s" .RelPermalink $query $fragment -}}
-    {{- else -}}
+    {{- $resource = or (.PageInner.Resources.Get $url.Path) (resources.Get $url.Path) -}}
+    {{- if not $resource -}}
       {{/* Images under static directory */}}
-      {{- $dest = (relURL (strings.TrimPrefix "/" $dest)) -}}
+      {{- $dest = relURL (strings.TrimPrefix "/" $dest) -}}
     {{- end -}}
   {{- else -}}
     {{/* Resolve page bundle resource for multilingual permalink */}}
-    {{- with .PageInner.Resources.Get (strings.TrimPrefix "./" $url.Path) -}}
-      {{- $query := cond $url.RawQuery (printf "?%s" $url.RawQuery) "" -}}
-      {{- $fragment := cond $url.Fragment (printf "#%s" $url.Fragment) "" -}}
-      {{- $dest = printf "%s%s%s" .RelPermalink $query $fragment -}}
-    {{- else -}}
-      {{- if and $isPage (not $startsWithRelative) -}}
-        {{ $dest = (printf "../%s" $dest) }}
-      {{- end -}}
+    {{- $resource = .PageInner.Resources.Get (strings.TrimPrefix "./" $url.Path) -}}
+    {{- if and (not $resource) $isPage (not $startsWithRelative) -}}
+      {{- $dest = printf "../%s" $dest -}}
     {{- end -}}
   {{- end -}}
+{{- end -}}
+
+{{- $width := "" -}}
+{{- $height := "" -}}
+{{- $lqip := "" -}}
+{{- $zoomSrc := "" -}}
+
+{{- with $resource -}}
+  {{- $query := cond $url.RawQuery (printf "?%s" $url.RawQuery) "" -}}
+  {{- $fragment := cond $url.Fragment (printf "#%s" $url.Fragment) "" -}}
+  {{- $out := . -}}
+  {{- $sub := .MediaType.SubType -}}
+  {{- if not (in (slice "svg" "gif") $sub) -}}
+    {{- $target := 1920 -}}
+    {{/* Nested `with` rather than `site.Params.images.contentMaxWidth`: the
+      chained form errors when the parent key is absent, and `index` would
+      miss it because Hugo lowercases param keys. */}}
+    {{- with site.Params.images -}}
+      {{- with .contentMaxWidth -}}
+        {{- $target = int . -}}
+      {{- end -}}
+    {{- end -}}
+    {{/* Resizing to its own width when the image is already small enough
+      re-encodes it as WebP without resampling: a screenshot of UI text loses
+      legibility to a fractional downscale, and gains nothing from one. */}}
+    {{- $out = .Process (printf "Resize %dx webp q80" (cond (gt .Width $target) $target .Width)) -}}
+    {{- $width = $out.Width -}}
+    {{- $height = $out.Height -}}
+    {{- $tiny := .Process "Resize 16x webp q20" -}}
+    {{- $lqip = printf "data:image/webp;base64,%s" ($tiny.Content | base64Encode) -}}
+    {{- if gt .Width $target -}}
+      {{- $zoomSrc = .RelPermalink -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $dest = printf "%s%s%s" $out.RelPermalink $query $fragment -}}
 {{- end -}}
 
 {{- $attributes := "" -}}
@@ -45,15 +93,28 @@
   {{- end -}}
 {{- end -}}
 
+{{/* An author-supplied width or height wins, so a markdown attribute can still
+  size an image by hand. */}}
+{{- if or (index .Attributes "width") (index .Attributes "height") -}}
+  {{- $width = "" -}}
+  {{- $height = "" -}}
+{{- end -}}
+
+{{- $extra := "" -}}
+{{- with $width }}{{ $extra = printf "%s width=%q" $extra (string .) }}{{ end -}}
+{{- with $height }}{{ $extra = printf "%s height=%q" $extra (string .) }}{{ end -}}
+{{- with $zoomSrc }}{{ if $enableImageZoom }}{{ $extra = printf "%s data-zoom-src=%q" $extra . }}{{ end }}{{ end -}}
+{{- with $lqip }}{{ $extra = printf "%s style=\"--hextra-lqip:url('%s')\"" $extra . }}{{ end -}}
+
 {{- if $enableImageZoom -}}
   {{- .Page.Store.Set "hasImageZoom" true -}}
 {{- end -}}
 
 {{- with .Title -}}
   <figure>
-    <img src="{{ $dest | safeURL }}" title="{{ . }}" alt="{{ $alt }}" {{ $attributes | safeHTMLAttr }}{{ if $enableImageZoom }} data-zoomable{{ end }}{{ if $lazyLoading }} loading="lazy"{{ end }} />
+    <img src="{{ $dest | safeURL }}" title="{{ . }}" alt="{{ $alt }}" {{ $attributes | safeHTMLAttr }}{{ $extra | safeHTMLAttr }}{{ if $enableImageZoom }} data-zoomable{{ end }}{{ if $lazyLoading }} loading="lazy"{{ end }} />
     <figcaption>{{ . }}</figcaption>
   </figure>
 {{- else -}}
-  <img src="{{ $dest | safeURL }}" alt="{{ $alt }}" {{ $attributes | safeHTMLAttr }}{{ if $enableImageZoom }} data-zoomable{{ end }}{{ if $lazyLoading }} loading="lazy"{{ end }} />
+  <img src="{{ $dest | safeURL }}" alt="{{ $alt }}" {{ $attributes | safeHTMLAttr }}{{ $extra | safeHTMLAttr }}{{ if $enableImageZoom }} data-zoomable{{ end }}{{ if $lazyLoading }} loading="lazy"{{ end }} />
 {{- end -}}

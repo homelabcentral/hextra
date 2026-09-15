@@ -36,13 +36,13 @@ languages:
 هوگو از مدیریت ترجمه‌ها بر اساس نام فایل پشتیبانی می‌کند. به عنوان مثال، اگر فایلی به نام `content/docs/_index.md` به زبان انگلیسی داریم، می‌توانیم فایل `content/docs/_index.fr.md` را برای ترجمه فرانسوی ایجاد کنیم.
 
 {{< filetree/container >}}
-  {{< filetree/folder name="content" >}}
-    {{< filetree/folder name="docs" state="open" >}}
-      {{< filetree/file name="_index.md" >}}
-      {{< filetree/file name="_index.fr.md" >}}
-      {{< filetree/file name="_index.ja.md" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="content" >}}
+{{< filetree/folder name="docs" state="open" >}}
+{{< filetree/file name="_index.md" >}}
+{{< filetree/file name="_index.fr.md" >}}
+{{< filetree/file name="_index.ja.md" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 توجه: هوگو از [ترجمه بر اساس دایرکتوری محتوا](https://gohugo.io/content-management/multilingual/#translation-by-content-directory) نیز پشتیبانی می‌کند.

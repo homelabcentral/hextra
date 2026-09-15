@@ -1,20 +1,52 @@
-{{- $lastUpdated := (T "lastUpdated") | default "Last updated on" -}}
+{{/* The meta row under a page's content: a license notice at the inline-start
+  and the last-updated date at the inline-end.
+
+  The two are independent switches. Either renders alone, and the date holds
+  its inline-end position through `margin-inline-start: auto` rather than
+  `justify-between` — which would pull it to the start when it is the only
+  child. With both off the partial emits the bare spacer it always has, so the
+  layouts above keep their bottom margin either way.
+
+  The license sentence is the `license` i18n string, whose `%s` is replaced by
+  the linked license name; `params.license` supplies only the name and URL.
+
+  @param {page} . The page.
+
+  @example {{ partial "components/last-updated.html" .
+}}
+*/}}
 {{- $page := . -}}
 
+{{- $date := "" -}}
 {{- if site.Params.displayUpdatedDate -}}
-  {{- with .Lastmod -}}
-    {{ $datetime := (time.Format "2006-01-02T15:04:05.000Z" .) }}
-    <div class="hx:mt-12 hx:mb-8 hx:block hx:text-xs hx:text-gray-500 hx:ltr:text-right hx:rtl:text-left hx:dark:text-gray-400">
-      {{ $lastUpdated }} <time datetime="{{ $datetime }}">{{ partial "utils/format-date" . }}</time>
-      {{- if site.Params.displayUpdatedAuthor -}}
-        {{- with $page.GitInfo -}}
-          {{ print " • " .AuthorName | safeHTML }}
-        {{- end -}}
+  {{- with $page.Lastmod -}}
+    {{- $author := "" -}}
+    {{- if site.Params.displayUpdatedAuthor -}}
+      {{- with $page.GitInfo -}}
+        {{- $author = printf " • %s" .AuthorName -}}
       {{- end -}}
-    </div>
-  {{- else -}}
-    <div class="hx:mt-16"></div>
+    {{- end -}}
+    {{- $date = printf `%s <time datetime="%s">%s</time>%s` ((T "lastUpdated") | default "Last updated on") (time.Format "2006-01-02T15:04:05.000Z" .) (partial "utils/format-date" .) $author -}}
   {{- end -}}
+{{- end -}}
+
+{{- $license := "" -}}
+{{- with site.Params.license -}}
+  {{- if .enable -}}
+    {{- $label := .name | default "CC BY 4.0" -}}
+    {{- with .url -}}
+      {{- $label = printf `<a class="hextra-page-license-link" href="%s" rel="license noreferrer" target="_blank">%s</a>` . $label -}}
+    {{- end -}}
+    {{- $format := (T "license") | default "This post is licensed under %s by the author." -}}
+    {{- $license = printf $format $label -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if or $license $date -}}
+  <div class="hextra-page-meta">
+    {{- with $license }}<div class="hextra-page-license">{{ . | safeHTML }}</div>{{ end -}}
+    {{- with $date }}<div class="hextra-page-updated">{{ . | safeHTML }}</div>{{ end -}}
+  </div>
 {{- else -}}
   <div class="hx:mt-16"></div>
 {{- end -}}

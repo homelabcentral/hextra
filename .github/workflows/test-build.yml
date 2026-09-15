@@ -1,11 +1,16 @@
 name: Build Tests
 
 on:
+  push:
   pull_request:
     branches: [main]
 
+# The event is part of the group on purpose: push and pull_request both fire
+# for a same-repo push with an open PR, and without it they share a group and
+# cancel each other - leaving the push run cancelled and the pull_request run
+# skipped by the guard below, so nothing runs at all.
 concurrency:
-  group: build-tests-${{ github.head_ref || github.ref_name }}
+  group: build-tests-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 defaults:
@@ -15,8 +20,13 @@ defaults:
 jobs:
   build-tests:
     runs-on: ubuntu-latest
+    # Push covers every branch in this repository; pull_request is kept only for
+    # PRs opened from a fork, whose pushes land in the fork and never fire here.
+    # Without this guard both events fire for a same-repo push with an open PR,
+    # running the suite twice.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     env:
-      HUGO_VERSION: 0.161.1
+      HUGO_VERSION: 0.166.0
       # These specs build temporary Hugo sites and inspect the output files
       # directly, so no browser or web server is needed. Setting BASE_URL
       # keeps Playwright from starting the docs webServer.
@@ -33,6 +43,11 @@ jobs:
         with:
           node-version: "24"
           cache: npm
+
+      # No dependencies needed: the generator is plain Node. Runs before the
+      # slower steps so a stale skill reference fails the job early.
+      - name: Check generated skill references are current
+        run: node scripts/build-skill.mjs --check
 
       - name: Setup Hugo
         run: |

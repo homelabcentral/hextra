@@ -1,3 +1,20 @@
+{{/* Embed an asciinema terminal recording.
+
+  The cast file is resolved in order: a page resource, a global asset, then a
+  static file. An absolute URL is used as given.
+
+  @param {string} 0|file The .cast recording to play.
+  @param {string} theme Player theme. Default "asciinema".
+  @param {string} speed Playback speed multiplier. Default 1.
+  @param {bool} autoplay Start playing on load. Default false.
+  @param {bool} loop Restart when the recording ends. Default false.
+  @param {string} poster Frame to show before playback, e.g. "npt:0:05".
+  @param {string} markers Comma-separated markers, each a time in seconds or "time:label", e.g. "5,12:Install,30:Done".
+
+  @example {{< asciinema file="demo.cast" >}}
+  @example {{< asciinema file="demo.cast" theme="asciinema" speed="1" autoplay=true loop=true poster="npt:0:05" >}}
+*/}}
+
 {{- /* Get parameters */ -}}
 {{- $castFile := .Get "file" | default (.Get 0) -}}
 {{- $theme := .Get "theme" | default "asciinema" -}}
@@ -14,7 +31,7 @@
 {{- if $isLocal -}}
   {{- /* Local file handling */ -}}
   {{- $found := false -}}
-  
+
   {{- /* Try page resources first */ -}}
   {{- if not $isPage -}}
     {{- with .Page.Resources.Get $castFile -}}
@@ -22,7 +39,7 @@
       {{- $found = true -}}
     {{- end -}}
   {{- end -}}
-  
+
   {{- /* Try global resources if not found in page resources */ -}}
   {{- if not $found -}}
     {{- with resources.Get $castFile -}}
@@ -30,7 +47,7 @@
       {{- $found = true -}}
     {{- end -}}
   {{- end -}}
-  
+
   {{- /* Try static files if not found in resources */ -}}
   {{- if not $found -}}
     {{- if hasPrefix $castFile "/" -}}
@@ -42,7 +59,7 @@
       {{- $found = true -}}
     {{- end -}}
   {{- end -}}
-  
+
   {{- /* If still not found, raise an error */ -}}
   {{- if not $found -}}
     {{- errorf "Asciinema cast file not found: %s. Please ensure the file exists in your assets, static/, or provide a valid remote URL." $castFile -}}
@@ -75,14 +92,16 @@
 {{- /* Mark page as using asciinema */ -}}
 {{- .Page.Store.Set "hasAsciinema" true -}}
 
-<div class="asciinema-player"
-     role="region"
-     aria-label="{{ (T "terminalRecording") | default "Terminal recording" }}"
-     data-cast-file="{{ $castFile }}"
-     data-theme="{{ $theme }}"
-     data-speed="{{ $speed }}"
-     data-autoplay="{{ $autoplay }}"
-     data-loop="{{ $loop }}"
-     {{- if ne $poster "" -}}data-poster="{{ $poster | safeURL }}"{{- end -}}
-     {{- if $markerConfig -}}data-markers="{{ $markerConfig | safeJS }}"{{- end -}}>
-</div>
+
+<div
+  class="asciinema-player"
+  role="region"
+  aria-label="{{ (T "terminalRecording") | default "Terminal recording" }}"
+  data-cast-file="{{ $castFile }}"
+  data-theme="{{ $theme }}"
+  data-speed="{{ $speed }}"
+  data-autoplay="{{ $autoplay }}"
+  data-loop="{{ $loop }}"
+  {{- if ne $poster "" -}}data-poster="{{ $poster | safeURL }}"{{- end -}}
+  {{- if $markerConfig -}}data-markers="{{ $markerConfig | safeJS }}"{{- end -}}
+></div>

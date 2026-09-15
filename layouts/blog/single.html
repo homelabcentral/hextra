@@ -1,6 +1,8 @@
 {{ define "main" }}
+  {{- $cfg := partial "blog/config.html" . -}}
+  {{- $showRail := and $cfg.rail.enable $cfg.rail.onArticle -}}
   <div class="hx:mx-auto hx:flex hextra-max-page-width">
-    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" true) }}
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" (not $showRail)) }}{{ if $showRail }}{{ partial "blog/rail.html" (dict "context" . "config" $cfg) }}{{ end }}
     {{ partial "toc.html" . }}
     <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--hextra-navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">
       <main id="content" class="hx:w-full hx:min-w-0 hextra-max-content-width hx:px-6 hx:pt-4 hx:md:px-12">
@@ -8,11 +10,11 @@
         {{ partial "breadcrumb.html" (dict "page" . "enable" true) }}
         {{ if .Title }}
           <div class="hx:flex hx:flex-col hx:sm:flex-row hx:items-start hx:sm:items-center hx:sm:justify-between hx:gap-4 hx:mt-2">
-            <h1 class="hx:mb-0 hx:text-4xl hx:font-bold hx:tracking-tight hx:text-slate-900 hx:dark:text-slate-100">{{ .Title }}</h1>
+            <h1 class="hx:mb-0 hx:text-4xl hx:font-bold hx:tracking-tight hx:text-neutral-900 hx:dark:text-neutral-100">{{ .Title }}</h1>
             {{ partial "components/page-context-menu" . }}
           </div>
         {{ end }}
-        <div class="hx:mt-4 hx:mb-16 hx:text-gray-500 hx:dark:text-gray-400 hx:text-sm hx:flex hx:items-center hx:flex-wrap hx:gap-y-2">
+        <div class="hx:mt-4 hx:mb-5 hx:text-neutral-500 hx:dark:text-neutral-400 hx:text-sm hx:flex hx:items-center hx:flex-wrap hx:gap-y-2">
           {{- with $date := .Date }}<span class="hx:mr-1">{{ partial "utils/format-date" $date }}</span>{{ end -}}
           {{- $lazyLoading := site.Params.enableImageLazyLoading | default true -}}
           {{ if and .Date .Params.authors }}<span class="hx:mx-1">·</span>{{ end -}}
@@ -40,17 +42,53 @@
               {{- end -}}
             {{- end -}}
           {{- end -}}
+          {{- if $cfg.article.readingTime -}}
+            {{- if or .Date .Params.authors }}<span class="hx:mx-1">·</span>{{ end -}}
+            <span class="hx:mr-1">{{ partial "utils/reading-time.html" . }}</span>
+          {{- end -}}
+          {{- if and $cfg.article.tags .Params.tags -}}
+            <span class="hx:mx-1">·</span>
+            <span class="hx:inline-flex hx:flex-wrap hx:gap-x-1">{{ partial "tags.html" (dict "context" .) }}</span>
+          {{- end -}}
         </div>
+        {{/* Between the metadata and the cover image: the reader knows what
+          the post is before being told where it sits in the series.
+        */}}
+        {{- partial "blog/series.html" (dict "context" . "config" $cfg) -}}
+        {{ if $cfg.article.cover }}{{ partialCached "blog/cover.html" (dict "page" . "variant" "hero") .RelPermalink "hero" }}{{ end }}
         <div class="content">
           {{ partial "custom/content-begin.html" . }}
           {{ .Content }}
           {{ partial "custom/content-end.html" . }}
         </div>
+        {{- partial "ads/slot.html" (dict "context" . "name" "blogbottom") -}}
         {{- partial "components/last-updated.html" . -}}
+        {{- partial "blog/share.html" (dict "context" . "config" $cfg) -}}
+        {{- partial "blog/related.html" (dict "context" . "config" $cfg) -}}
+        {{/* Within a series, the series order is the useful order: it replaces
+          the date-ordered pager rather than sitting next to it. The nav renders
+          nothing for a series of one, in which case the pager still applies.
+
+          The pager's own switches still come first, because they are explicit
+          where membership of a series is not: `displayPagination: false`
+          suppresses both, and a post that names its own `prev`/`next` - including
+          `prev: false` as a kill switch - keeps the pager it configured. Series
+          order supersedes `reversePagination`, which orders the same posts by
+          date; the store is still set so the pager sees it on the fall-through.
+        */}}
         {{- if (site.Params.blog.article.displayPagination | default true) -}}
           {{- .Store.Set "reversePagination" (.Params.reversePagination | default true) -}}
-          {{- partial "components/pager.html" . -}}
+          {{- $seriesNav := "" -}}
+          {{- if not (or (isset .Params "prev") (isset .Params "next")) -}}
+            {{- $seriesNav = partial "blog/series.html" (dict "context" . "config" $cfg "variant" "nav") -}}
+          {{- end -}}
+          {{- if trim $seriesNav " \n\t" -}}
+            {{- $seriesNav | safeHTML -}}
+          {{- else -}}
+            {{- partial "components/pager.html" . -}}
+          {{- end -}}
         {{ end }}
+        {{- partial "ads/slot.html" (dict "context" . "name" "blogend") -}}
         {{- partial "components/comments.html" . -}}
         {{ partial "custom/page-end.html" . }}
       </main>

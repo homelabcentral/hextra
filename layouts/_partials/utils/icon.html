@@ -5,6 +5,11 @@
 {{- $isRemoteIcon := false -}}
 
 {{- if not $icon -}}
+  {{/* Vendored icons (see scripts/vendor-codeblock-icons.mjs) — avoids remote fetches for built-in code block icons */}}
+  {{- $icon = index (index $siteData "icons-vendored" | default dict) $name -}}
+{{- end -}}
+
+{{- if not $icon -}}
   {{- $remoteProvider := "" -}}
   {{- $remoteName := "" -}}
   {{- if strings.Contains $name ":" -}}
@@ -21,6 +26,7 @@
       "lucide" (dict "url" "https://unpkg.com/lucide-static@1/icons/%s.svg")
       "tabler" (dict "url" "https://unpkg.com/@tabler/icons@3/icons/outline/%s.svg")
       "simple" (dict "url" "https://cdn.jsdelivr.net/npm/simple-icons@16/icons/%s.svg")
+      "iconify" (dict "url" "https://api.iconify.design/%s.svg")
     -}}
     {{- with site.Params.icons.remote -}}
       {{- if isset . "enable" -}}
@@ -72,6 +78,14 @@
   {{- if $isRemoteIcon -}}
     {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
     {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+  {{- end -}}
+  {{/* 235 of the icons in data/icons.yaml already carry aria-hidden, so a
+    caller passing its own would otherwise emit the attribute twice. Drop the
+    source one and let the caller win, the same way width/height are handled
+    for remote icons above.
+  */}}
+  {{- if strings.Contains $attributes "aria-hidden" -}}
+    {{- $icon = replaceRE `(<svg[^>]*?)\saria-hidden=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
   {{- end -}}
   {{- $icon = replaceRE "<svg" (printf "<svg %s" $attributes) $icon -}}
 {{- end -}}

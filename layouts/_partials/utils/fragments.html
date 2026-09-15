@@ -1,5 +1,4 @@
-{{- /*
-  fragments.html - Split page content into searchable fragments
+{{/* fragments.html - Split page content into searchable fragments
 
   This partial processes a Hugo page and splits its content into fragments based on headings,
   creating a data structure suitable for search indexing. It supports different fragment types
@@ -14,19 +13,19 @@
 
   Example:
   Input page with content:
-    # Introduction
-    This is the intro text.
-    ## Setup
-    Setup instructions here.
-    # Configuration
-    Config details here.
+  # Introduction
+  This is the intro text.
+  ## Setup
+  Setup instructions here.
+  # Configuration
+  Config details here.
 
   Output (type "content"):
   {
-    "": "This is the intro text.",
-    "intro#Introduction": "This is the intro text. Setup instructions here.",
-    "setup#Setup": "Setup instructions here.", 
-    "config#Configuration": "Config details here."
+  "": "This is the intro text.",
+  "intro#Introduction": "This is the intro text. Setup instructions here.",
+  "setup#Setup": "Setup instructions here.",
+  "config#Configuration": "Config details here."
   }
 
   Fragment types:
@@ -34,7 +33,7 @@
   - "heading": Returns heading keys with empty content
   - "title": Returns empty content (title handled elsewhere)
   - "summary": Returns page summary only
-*/ -}}
+*/}}
 
 {{- /* Extract page context and fragment type */ -}}
 {{- $page := .context -}}

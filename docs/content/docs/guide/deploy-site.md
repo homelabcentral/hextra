@@ -9,7 +9,6 @@ This page provides guides for deploying your Hextra site on various platforms.
 
 <!--more-->
 
-
 ## GitHub Pages
 
 [GitHub Pages](https://docs.github.com/pages) is the recommended way to deploy and host your website for free.
@@ -101,10 +100,9 @@ jobs:
 
 {{% /details %}}
 
-
 {{< callout type="warning" >}}
-  In your repository settings, set the **Pages** > **Build and deployment** > **Source** to **GitHub Actions**:
-  ![](https://user-images.githubusercontent.com/5097752/266784808-99676430-884e-42ab-b901-f6534a0d6eee.png)
+In your repository settings, set the **Pages** > **Build and deployment** > **Source** to **GitHub Actions**:
+![](https://user-images.githubusercontent.com/5097752/266784808-99676430-884e-42ab-b901-f6534a0d6eee.png)
 {{< /callout >}}
 
 By default, the above GitHub Actions workflow `.github/workflows/pages.yaml` assumes that the site is deploying to `https://<USERNAME>.github.io/<REPO>/`.
@@ -120,7 +118,6 @@ run: |
 
 If you are deploying to your own domain, please change the `--baseURL` value accordingly.
 
-
 ## Cloudflare Pages
 
 1. Put your site source code in a Git repository (e.g. GitHub)
@@ -135,9 +132,9 @@ If you are deploying to your own domain, please change the `--baseURL` value acc
 | Build directory   | `public`             |
 
 For more details, check out:
+
 - [Deploy a Hugo site](https://developers.cloudflare.com/pages/framework-guides/deploy-a-hugo-site/#deploy-with-cloudflare-pages).
 - [Language support and tools](https://developers.cloudflare.com/pages/platform/language-support-and-tools/).
-
 
 ## Netlify
 
@@ -150,7 +147,6 @@ For more details, check out:
 4. Deploy!
 
 Check [Hugo on Netlify](https://docs.netlify.com/integrations/frameworks/hugo/) for more details.
-
 
 ## Vercel
 

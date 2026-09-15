@@ -1,0 +1,101 @@
+{{/* Resolve a page's cover image and return its URL and dimensions.
+
+  Resolution order:
+  1. the explicit `image` parameter, if given
+  2. front matter `cover`, then `featured_image`
+  3. a page bundle image resource matching `*cover*`, then `*featured*`
+  (the same convention `layouts/list.rss.xml` uses)
+
+  A named image is looked up in the page's own resources first, then in global
+  assets, then treated as a path under /static. Remote URLs and SVGs are passed
+  through unprocessed.
+
+  That last step is a guess: Hugo cannot see /static at build time, so a name
+  that matches no resource is handed back as a URL and only 404s in the
+  browser. `verify` withdraws the guess for a *relative* name - one that
+  matched no page resource and no asset, and that does not start with `/` - so
+  a caller with something to fall back on can tell that nothing was found.
+  A rooted `/images/hero.png` is still passed through either way; it is the
+  spelling the docs give for a static file, and there is nothing to check it
+  against.
+
+  Local raster images also get an `lqip`: a 16px-wide copy inlined as a data
+  URI. Painted as the `background-image` of the same `<img>`, it stands in for
+  the cover until the real pixels arrive. They cover it only where the image is
+  opaque, so `assets/js/core/lqip.js` drops the property once the image has
+  loaded; without that, a cover with transparent corners or a drop shadow keeps
+  a blurred fringe around its edges for good. It is empty for remote images and
+  SVGs, which are passed through unprocessed and so have no resource to
+  downscale.
+
+  @param {page} page The page to resolve the image for.
+  @param {string} [image] An explicit image path, overriding front matter.
+  @param {string} [process] Image processing spec. Default "Resize 800x webp q80".
+  @param {bool} [lqip] Generate the placeholder. Default true.
+  @param {bool} [verify] Return nothing rather than guessing at a relative name that matched no resource. Default false.
+  @returns {dict} `url`, `width`, `height`, `lqip` — empty dict when there is no image.
+
+  @example {{ $cover := partial "utils/page-image.html" (dict "page" . "process" "Resize 1600x webp q80")
+}}
+*/}}
+{{- $page := .page -}}
+{{- $process := .process | default "Resize 800x webp q80" -}}
+{{- $image := .image -}}
+{{- $lqip := "" -}}
+{{- $wantLqip := not (eq .lqip false) -}}
+{{- $verify := eq (printf "%v" .verify) "true" -}}
+{{- $url := "" -}}
+{{- $width := 0 -}}
+{{- $height := 0 -}}
+
+{{- with $page -}}
+  {{- if not $image -}}
+    {{- $image = or .Params.cover .Params.featured_image -}}
+  {{- end -}}
+
+  {{- $resource := false -}}
+  {{- if $image -}}
+    {{- if (urls.Parse $image).Scheme -}}
+      {{- $url = $image -}}
+    {{- else -}}
+      {{- $resource = or (.Resources.Get $image) (resources.Get $image) -}}
+      {{- if not $resource -}}
+        {{- if hasPrefix $image "/" -}}
+          {{- $url = relURL (strings.TrimPrefix "/" $image) -}}
+        {{- else if not $verify -}}
+          {{- $url = $image -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- else -}}
+    {{- with .Resources.ByType "image" -}}
+      {{- $resource = or (.GetMatch "*cover*") (.GetMatch "*featured*") -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- with $resource -}}
+    {{- if eq .MediaType.SubType "svg" -}}
+      {{- $url = .RelPermalink -}}
+    {{- else -}}
+      {{- $processed := .Process $process -}}
+      {{- $url = $processed.RelPermalink -}}
+      {{- $width = $processed.Width -}}
+      {{- $height = $processed.Height -}}
+      {{/* 16px wide is small enough to inline as text rather than cost a
+        second request, and stretching it back up is what produces the blur —
+        no filter needed, which matters because a filter on the `<img>` would
+        blur the real image too.
+      */}}
+      {{- if $wantLqip -}}
+        {{- $tiny := .Process "Resize 16x webp q20" -}}
+        {{- $lqip = printf "data:image/webp;base64,%s" ($tiny.Content | base64Encode) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $result := dict -}}
+{{- with $url -}}
+  {{- $result = dict "url" . "width" $width "height" $height "lqip" $lqip -}}
+{{- end -}}
+{{- return $result -}}

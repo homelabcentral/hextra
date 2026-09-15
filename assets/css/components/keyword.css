@@ -1,0 +1,18 @@
+.hextra-keyword {
+  @apply hx:inline-flex hx:items-center hx:gap-1.5 hx:align-middle;
+  @apply hx:rounded-md hx:border hx:px-2 hx:py-0.5 hx:text-sm hx:leading-6;
+  @apply hx:border-neutral-300 hx:bg-neutral-100 hx:text-neutral-800;
+  @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-800 hx:dark:text-neutral-200;
+
+  .hextra-keyword__text > p {
+    @apply hx:m-0 hx:inline;
+  }
+
+  a {
+    @apply hx:text-inherit;
+  }
+}
+
+.hextra-keywords {
+  @apply hx:flex hx:flex-wrap hx:items-center hx:gap-2 hx:my-4;
+}

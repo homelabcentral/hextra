@@ -1,0 +1,44 @@
+{{/* A single entry within the `timeline` shortcode.
+
+  @param {string} header The title of the entry.
+  @param {string} subheader Optional secondary line below the title.
+  @param {string} badge Optional short text shown as a badge next to the title.
+  @param {string} badgeColor Optional badge colour, see the badge shortcode.
+  @param {string} icon Optional icon shown on the timeline rail.
+
+  @example {{< timeline-item header="v1.0" badge="2024" icon="star" >}}Content{{< /timeline-item >}}
+*/}}
+{{- $header := .Get "header" -}}
+{{- $subheader := .Get "subheader" -}}
+{{- $badge := .Get "badge" -}}
+{{- $badgeColor := .Get "badgeColor" | default "gray" -}}
+{{- $icon := .Get "icon" -}}
+
+
+<li class="hextra-timeline__item">
+  <span class="hextra-timeline__marker" aria-hidden="true">
+    {{- with $icon -}}
+      {{- partial "utils/icon" (dict "name" . "attributes" `height=14`) -}}
+    {{- end -}}
+  </span>
+  <div class="hextra-timeline__content">
+    {{- if or $header $badge -}}
+      <div class="hextra-timeline__head">
+        {{- with $header -}}
+          <div class="hextra-timeline__header">{{ . | markdownify }}</div>
+        {{- end -}}
+        {{- with $badge -}}
+          <div class="hextra-timeline__badge">
+            {{- partial "shortcodes/badge.html" (dict "content" . "color" $badgeColor "border" true) -}}
+          </div>
+        {{- end -}}
+      </div>
+    {{- end -}}
+    {{- with $subheader -}}
+      <div class="hextra-timeline__subheader">{{ . | markdownify }}</div>
+    {{- end -}}
+    {{- with .InnerDeindent -}}
+      <div class="hextra-timeline__body">{{ $.Page.RenderString (dict "display" "block") . }}</div>
+    {{- end -}}
+  </div>
+</li>

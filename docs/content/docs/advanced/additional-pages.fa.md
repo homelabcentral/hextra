@@ -13,7 +13,7 @@ Hextra چند صفحهٔ اضافی دارد که باید به‌صورت جد�
 ## واژه‌نامه
 
 {{< callout type="info" >}}
-  برای اطلاعات بیشتر دربارهٔ پشتیبانی واژه‌نامهٔ داخلی Hugo، به [مرجع سریع واژه‌نامهٔ Hugo](https://gohugo.io/quick-reference/glossary/) مراجعه کنید.
+برای اطلاعات بیشتر دربارهٔ پشتیبانی واژه‌نامهٔ داخلی Hugo، به [مرجع سریع واژه‌نامهٔ Hugo](https://gohugo.io/quick-reference/glossary/) مراجعه کنید.
 {{< /callout >}}
 
 ### فایل دادهٔ منبع
@@ -21,17 +21,17 @@ Hextra چند صفحهٔ اضافی دارد که باید به‌صورت جد�
 تعاریف اصطلاحات به‌صورت متمرکز در فایل دادهٔ `termbase.yaml` برای هر [زبان پشتیبانی‌شده](../multi-language/) ذخیره می‌شوند.
 
 {{< filetree/container >}}
-  {{< filetree/folder name="data" state="open" >}}
-    {{< filetree/folder name="en" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="fr" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-    {{< filetree/folder name="ja" state="open" >}}
-      {{< filetree/file name="termbase.yaml" >}}
-    {{< /filetree/folder >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="data" state="open" >}}
+{{< filetree/folder name="en" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="fr" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< filetree/folder name="ja" state="open" >}}
+{{< filetree/file name="termbase.yaml" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 هر فایل YAML شامل فهرستی از اصطلاحات واژه‌نامه است. هر ورودی شامل موارد زیر است:

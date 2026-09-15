@@ -21,7 +21,7 @@ next: /docs/guide/deploy-site
 ### Options
 
 | Parameter    | Description             |
-|--------------|-------------------------|
+| ------------ | ----------------------- |
 | `title`      | عنوان البطاقة.          |
 | `subtitle`   | العنوان الفرعي للبطاقة. |
 | `class`      | فئة البطاقة.            |
@@ -48,7 +48,7 @@ next: /docs/guide/deploy-site
 ### Options
 
 | Parameter | Description  |
-|-----------|--------------|
+| --------- | ------------ |
 | `cols`    | عدد الأعمدة. |
 | `style`   | نمط الشبكة.  |
 
@@ -60,7 +60,7 @@ next: /docs/guide/deploy-site
 
 ```
 {{</* hextra/hero-badge */>}}
-  <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-primary-400"></div>
+  <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-hextra-accent-400"></div>
   <span>Free, open source</span>
   {{</* icon name="arrow-circle-right" attributes="height=14" */>}}
 {{</* /hextra/hero-badge */>}}
@@ -69,7 +69,7 @@ next: /docs/guide/deploy-site
 ### Options
 
 | Parameter | Description  |
-|-----------|--------------|
+| --------- | ------------ |
 | `link`    | رابط الشارة. |
 | `class`   | فئة الشارة.  |
 | `style`   | شكل الشارة.  |
@@ -87,7 +87,7 @@ next: /docs/guide/deploy-site
 ### Options
 
 | Parameter | Description |
-|-----------|-------------|
+| --------- | ----------- |
 | `link`    | رابط الزر.  |
 | `text`    | نص الزر.    |
 | `style`   | شكل الزر.   |
@@ -107,7 +107,7 @@ next: /docs/guide/deploy-site
 ### Options
 
 | Parameter     | Description                             |
-|---------------|-----------------------------------------|
+| ------------- | --------------------------------------- |
 | `class`       | فئة الحاوية.                            |
 | `cols`        | عدد الأعمدة (الافتراضي: `2`).           |
 | `image`       | صورة الحاوية.                           |
@@ -135,7 +135,7 @@ next: /docs/guide/deploy-site
 ### Options
 
 | Parameter | Description    |
-|-----------|----------------|
+| --------- | -------------- |
 | `style`   | أسلوب العنوان. |
 
 ## `hextra/hero-section`
@@ -151,7 +151,7 @@ next: /docs/guide/deploy-site
 ### Options
 
 | Parameter | Description                    |
-|-----------|--------------------------------|
+| --------- | ------------------------------ |
 | `heading` | مستوى العنوان (افتراضي: `h2`). |
 | `style`   | نمط العنوان.                   |
 | `content` | محتوى العنوان.                 |
@@ -171,5 +171,5 @@ next: /docs/guide/deploy-site
 ### Options
 
 | Parameter | Description    |
-|-----------|----------------|
+| --------- | -------------- |
 | `style`   | أسلوب الترجمة. |

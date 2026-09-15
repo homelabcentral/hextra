@@ -1,0 +1,23 @@
+{{/* The markup for a named creative under `params.ads.custom`.
+
+  The `custom` provider exists for house ads and sponsor banners - anything
+  with no ad network behind it. Its markup lives in configuration rather than
+  in the page, for two reasons: one creative can then be reused by several
+  placements, and a configured slot can serve it, which inner shortcode content
+  could never do.
+
+  Hugo lowercases configuration keys, so creative names are matched lowercase.
+
+  @param {string} . The creative name.
+  @returns {string} Raw HTML, or an empty string if no such creative exists.
+
+  @example {{ $html := partial "ads/creative.html" "sponsor"
+}}
+*/}}
+{{- $html := "" -}}
+{{- with site.Params.ads.custom -}}
+  {{- if reflect.IsMap . -}}
+    {{- $html = printf "%v" ((index . (lower $)) | default "") -}}
+  {{- end -}}
+{{- end -}}
+{{- return $html -}}

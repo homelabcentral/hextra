@@ -1,0 +1,137 @@
+{{/* Render a card for a Hugging Face model or dataset, with its task, likes and
+  download count.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração).
+
+  @param {string} model Model as "owner/name", e.g. "google-bert/bert-base-uncased".
+  @param {string} dataset Dataset as "owner/name", e.g. "stanfordnlp/imdb".
+  @param {bool} showThumbnail Show the owner's avatar. Default false.
+
+  @example {{< huggingface model="google-bert/bert-base-uncased" >}}
+@example
+{{< huggingface dataset="stanfordnlp/imdb" >}}
+*/}}
+{{- $model := .Get "model" -}}
+{{- $dataset := .Get "dataset" -}}
+{{- $showThumbnail := eq (printf "%v" (.Get "showThumbnail")) "true" -}}
+
+{{- if and $model $dataset -}}
+  {{- errorf "The %q shortcode takes either a 'model' or a 'dataset', not both. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- $id := $model | default $dataset -}}
+{{- if not $id -}}
+  {{- errorf "The %q shortcode requires a 'model' or 'dataset' parameter. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- if not (findRE `^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)?$` $id) -}}
+  {{- errorf "The %q shortcode was given an invalid id %q. See %s" .Name $id .Position -}}
+{{- end -}}
+
+{{- $kind := cond (ne $dataset "") "datasets" "models" -}}
+{{- $path := cond (ne $dataset "") (printf "datasets/%s" $id) $id -}}
+
+{{- $card := dict
+  "url" (printf "https://huggingface.co/%s" $path)
+  "title" $id
+  "icon" "huggingface"
+-}}
+
+{{- $enabled := partial "utils/remote-fetch-enabled.html" . -}}
+
+{{- if $enabled -}}
+  {{- $api := printf "https://huggingface.co/api/%s/%s" $kind $id -}}
+  {{- with try (resources.GetRemote $api) -}}
+    {{- with .Err -}}
+      {{- warnf "huggingface: unable to fetch %q, rendering a plain card: %s" $api . -}}
+    {{- else with .Value -}}
+      {{- with . | transform.Unmarshal -}}
+        {{/* The task tag is the most useful one-line summary the API offers for a
+          model; datasets have no equivalent, so they fall back to the kind.
+        */}}
+        {{- $language := .pipeline_tag | default (cond (eq $kind "datasets") "dataset" "model") -}}
+
+        {{- /* Hugging Face counts likes and downloads, not stars and forks. */ -}}
+        {{- /* Tested against nil: zero likes is a fact, not a missing value. */ -}}
+        {{- $metrics := slice -}}
+        {{- $likes := .likes -}}
+        {{- if ne $likes nil -}}
+          {{- $metrics = $metrics | append (dict "icon" "heart" "label" ((T "likes") | default "likes") "value" $likes) -}}
+        {{- end -}}
+        {{- $downloads := .downloads -}}
+        {{- if ne $downloads nil -}}
+          {{- $metrics = $metrics | append (dict "icon" "download" "label" ((T "downloads") | default "downloads") "value" $downloads) -}}
+        {{- end -}}
+
+        {{- $card = merge $card (dict
+          "title" (.id | default $card.title)
+          "language" $language
+          "metrics" $metrics
+          )
+        -}}{{/* Datasets return description at the top level. cardData.description
+          was the only field read before, and the dataset API never returns
+          it, so every dataset card came out with no description at all.
+        */}}
+        {{- $description := .description -}}
+        {{- if not $description -}}
+          {{- with .cardData -}}
+            {{- $description = .description -}}
+          {{- end -}}
+        {{- end -}}
+        {{- with $description -}}
+          {{- $card = merge $card (dict "description" .) -}}
+        {{- end -}}
+      {{- end -}}
+    {{- else -}}
+      {{/* resources.GetRemote reports an HTTP 404 as a nil resource and no error,
+        so without this branch a missing or gated repository degrades to a bare
+        card with nothing written to the build log. Hugging Face happens to
+        answer 401 for gated repositories, which does surface as an error, but
+        a plain typo does not.
+      */}}
+      {{- warnf "huggingface: %q was not found, rendering a plain card" $api -}}
+    {{- end -}}
+  {{- end -}}
+  {{/* Self-hosted rather than linked, so the card makes no third-party request.
+
+    The avatar endpoint answers with JSON metadata rather than an image -
+    {"avatarUrl": "https://cdn-avatars.huggingface.co/...png"} - so it has to
+    be unmarshalled and the URL it points at fetched separately. It also
+    covers organizations only: a user-owned repository answers 404, which
+    resources.GetRemote reports as a nil resource with no error.
+  */}}
+  {{- if and $showThumbnail (in $id "/") -}}
+    {{- $owner := index (split $id "/") 0 -}}
+    {{- $lookup := printf "https://huggingface.co/api/organizations/%s/avatar" $owner -}}
+    {{- $avatarURL := "" -}}
+
+    {{- with try (resources.GetRemote $lookup) -}}
+      {{- with .Err -}}
+        {{- warnf "huggingface: unable to look up the avatar for %q: %s" $owner . -}}
+      {{- else with .Value -}}
+        {{- with . | transform.Unmarshal -}}
+          {{- $avatarURL = .avatarUrl -}}
+        {{- end -}}
+      {{- else -}}
+        {{- warnf "huggingface: %q has no organization avatar" $owner -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- with $avatarURL -}}
+      {{- $ext := path.Ext (urls.Parse .).Path | default ".png" -}}
+      {{- with try (resources.GetRemote .) -}}
+        {{- with .Err -}}
+          {{- warnf "huggingface: unable to fetch the avatar for %q: %s" $owner . -}}
+        {{- else with .Value -}}
+          {{- with resources.Copy (printf "images/huggingface/%s%s" $owner $ext) . -}}
+            {{- $card = merge $card (dict "thumbnail" .RelPermalink "thumbnailFit" "contain") -}}
+          {{- end -}}
+        {{- else -}}
+          {{- warnf "huggingface: the avatar for %q returned no content" $owner -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- partial "components/repo-card.html" $card -}}

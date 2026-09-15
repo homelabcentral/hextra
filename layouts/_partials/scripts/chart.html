@@ -1,0 +1,219 @@
+{{/* Chart.js loader and initialiser.
+
+  Loaded only on pages that use the shortcode, gated on the "hasChart" store
+  flag in scripts.html.
+
+  The library is vendored under assets/js/vendor (see scripts/vendor-js.mjs) so
+  neither the build nor the page depends on a CDN. Point params.chart.js at
+  another asset to override it.
+*/}}
+
+{{- $asset := site.Params.chart.js | default "js/vendor/chart.umd.min.js" -}}
+{{- with resources.Get $asset -}}
+  {{- $js := . | fingerprint -}}
+  <script defer src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
+{{- else -}}
+  {{- errorf "Chart.js asset not found at %q. Run `npm run vendor:js` or set params.chart.js." $asset -}}
+{{- end -}}
+
+
+<script>
+  (() => {
+    // Charts are drawn onto a canvas, which inherits no colour, so the ink has
+    // to be handed to Chart.js as a literal value. Take it from the element the
+    // chart is drawn in: `components/chart.css` sets --hextra-chart-ink and
+    // --hextra-chart-grid on the panel, and the same rule that flips the panel
+    // between light and dark flips them. Asking the DOM which mode is current
+    // and choosing here is what put the wrong mode's ink on the panel; reading
+    // the computed value cannot disagree with what is on screen.
+    //
+    // The fallbacks matter only when the stylesheet has not been rebuilt, since
+    // these properties ship in the compiled CSS.
+    const FALLBACK_INK = { light: "#262626", dark: "#e5e5e5" };
+    const FALLBACK_GRID = { light: "rgba(0,0,0,0.12)", dark: "rgba(255,255,255,0.14)" };
+
+    const palette = (el) => {
+      const style = getComputedStyle(el || document.documentElement);
+      const mode = document.documentElement.classList.contains("dark") ? "dark" : "light";
+      return {
+        text: style.getPropertyValue("--hextra-chart-ink").trim() || FALLBACK_INK[mode],
+        grid: style.getPropertyValue("--hextra-chart-grid").trim() || FALLBACK_GRID[mode],
+      };
+    };
+
+    // Chart.js ships an auto-colour plugin, but it opts out as soon as
+    // Chart.defaults.borderColor is customised - which the theme code above
+    // does - leaving every dataset the near-transparent built-in default. So
+    // assign a palette explicitly. Readable on both backgrounds, and ordered
+    // so the first few series stay distinguishable when desaturated.
+    const series = ["#38bdf8", "#f472b6", "#a78bfa", "#34d399", "#fbbf24", "#fb7185", "#22d3ee", "#c084fc"];
+
+    // Types that colour each data point rather than each dataset.
+    const perPoint = new Set(["pie", "doughnut", "polarArea"]);
+
+    const applyColors = (config) => {
+      const datasets = (config.data && config.data.datasets) || [];
+      datasets.forEach((ds, i) => {
+        const type = ds.type || config.type;
+        const color = series[i % series.length];
+
+        if (perPoint.has(type)) {
+          if (!ds.backgroundColor) {
+            const count = (ds.data || []).length;
+            ds.backgroundColor = Array.from({ length: count }, (_, j) => series[j % series.length]);
+          }
+          return;
+        }
+
+        if (!ds.borderColor) ds.borderColor = color;
+        if (!ds.backgroundColor) {
+          // Filled marks read better solid; line areas need to stay see-through.
+          ds.backgroundColor = type === "line" || type === "radar" ? `${color}33` : color;
+        }
+      });
+    };
+
+    // Chart.js only shows a tooltip when the cursor is over a point itself, so
+    // hovering a line between two points does nothing. Index mode picks the
+    // nearest position on the x axis and reports every series at once, which is
+    // what a reader expects from a line or bar chart. Authors can still set
+    // options.interaction to get the stricter behaviour back.
+    const applyInteraction = (config) => {
+      const type = config.type;
+      if (perPoint.has(type)) return;
+
+      config.options = config.options || {};
+      if (!config.options.interaction) {
+        config.options.interaction = { mode: "index", intersect: false };
+      }
+    };
+
+    // Axis numbers are the one thing `Chart.defaults` cannot be trusted with.
+    // The scale scope is declared with `_fallback: false` and reaches the root
+    // palette only through `route("scale.ticks", "color", "", "color")`; a
+    // config that touches `options.scales` at all can end that route, and the
+    // ticks then fall back to the library's own mid-grey - `#666`, which is
+    // 2.7:1 on the dark panel and unreadable.
+    //
+    // A plugin sidesteps the whole question. By `beforeUpdate` every scale in
+    // `chart.options.scales` is materialised, including the x and y a cartesian
+    // chart never declared, so the colours can be written onto the resolved
+    // options directly.
+    //
+    // Authors keep their say: a colour set in the shortcode is honoured on
+    // every redraw. It has to be read off the shortcode's own configuration
+    // before a chart is ever built, though - Chart.js resolves options against
+    // that same object, so by the second draw it carries whatever the plugin
+    // wrote on the first, and reading it from the chart would preserve the
+    // previous theme's ink as though the author had asked for it.
+    const authored = new Map();
+
+    const captureAuthored = (id, config) => {
+      if (authored.has(id)) return;
+      const scales = (config.options && config.options.scales) || {};
+      const seen = {};
+      for (const [scaleId, scale] of Object.entries(scales)) {
+        seen[scaleId] = {
+          ticks: scale.ticks?.color,
+          grid: scale.grid?.color,
+          title: scale.title?.color,
+        };
+      }
+      authored.set(id, seen);
+    };
+
+    const themeScales = {
+      id: "hextraScaleColors",
+      beforeUpdate(chart) {
+        const colors = palette(chart.canvas);
+        const scales = chart.options.scales || {};
+
+        // Legend and tooltip text resolve from Chart.defaults, which is global
+        // and therefore whatever the last chart drawn set it to. `options.color`
+        // is the scope they route to, so pinning it per chart is enough.
+        //
+        // Do not reach further in and replace `plugins.legend.labels`: it is a
+        // resolver proxy, and swapping it for a plain object detaches
+        // `generateLabels` from the chart, which then throws on `data.datasets`
+        // mid-update and takes every chart after it on the page down with it.
+        chart.options.color = colors.text;
+
+        const own = authored.get(chart.canvas.id) || {};
+
+        for (const [id, scale] of Object.entries(scales)) {
+          const mine = own[id] || {};
+          if (scale.ticks) scale.ticks.color = mine.ticks || colors.text;
+          if (scale.grid) scale.grid.color = mine.grid || colors.grid;
+          if (scale.title) scale.title.color = mine.title || colors.text;
+          if (scale.pointLabels) scale.pointLabels.color = colors.text;
+        }
+      },
+    };
+
+    const instances = new Map();
+
+    // Chart.js ships its own "Helvetica Neue" default, which ignores
+    // params.fonts entirely. Read the body stack off the document so axis
+    // labels and legends match the rest of the page; the variable already
+    // carries its fallbacks, so this degrades exactly as the CSS does.
+    const bodyFont = () => getComputedStyle(document.documentElement).getPropertyValue("--font-body").trim();
+
+    const draw = () => {
+      if (typeof Chart === "undefined") return;
+      // Only a starting point for anything the plugin below does not reach;
+      // every chart then overrides it from its own panel.
+      const colors = palette(document.querySelector(".hextra-chart"));
+      Chart.defaults.color = colors.text;
+      Chart.defaults.borderColor = colors.grid;
+      // Empty only if the stylesheet has not applied yet; leaving Chart.js to
+      // its own default beats setting an empty family.
+      const font = bodyFont();
+      if (font) Chart.defaults.font.family = font;
+
+      Chart.register(themeScales);
+
+      for (const entry of window.hextraCharts || []) {
+        const canvas = document.getElementById(entry.id);
+        if (!canvas) continue;
+
+        applyColors(entry.config);
+        applyInteraction(entry.config);
+        captureAuthored(entry.id, entry.config);
+
+        // Chart.js cannot restyle in place; destroy and rebuild on theme change.
+        const existing = instances.get(entry.id);
+        if (existing) existing.destroy();
+
+        instances.set(entry.id, new Chart(canvas, entry.config));
+      }
+    };
+
+    const isDark = () => document.documentElement.classList.contains("dark");
+
+    const start = () => {
+      draw();
+      let timeout;
+      let wasDark = isDark();
+      new MutationObserver(() => {
+        // Any class change on <html> lands here, including the one that
+        // dismissing the announcement banner makes. Redrawing on those
+        // destroyed and rebuilt every chart on the page and replayed all their
+        // entrance animations, so only act on an actual theme change.
+        if (isDark() === wasDark) return;
+        wasDark = isDark();
+        clearTimeout(timeout);
+        timeout = setTimeout(draw, 150);
+      }).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    };
+
+    // The library is deferred, so wait for it rather than racing it.
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", start);
+    } else {
+      start();
+    }
+  })();
+</script>

@@ -1,0 +1,12 @@
+{{- /*
+Group several `keyword` shortcodes into a responsive, wrapping row.
+
+Equivalent to Blowfish's `keywordList`, renamed to match Hextra's existing
+container/item pairs (`cards`/`card`, `tabs`/`tab`).
+
+@example {{< keywords >}}{{< keyword >}}Hugo{{< /keyword >}}{{< /keywords >}}
+*/ -}}
+
+<div class="hextra-keywords not-prose">
+  {{- .Inner -}}
+</div>

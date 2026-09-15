@@ -7,9 +7,9 @@ next: /docs/guide/deploy-site
 
 {{< tabs >}}
 
-  {{< tab name="macOS" >}}**macOS**: Apple が提供するデスクトップオペレーティングシステム。{{< /tab >}}
-  {{< tab name="Linux" >}}**Linux**: オープンソースのオペレーティングシステム。{{< /tab >}}
-  {{< tab name="Windows" >}}**Windows**: Microsoft が提供するデスクトップオペレーティングシステム。{{< /tab >}}
+{{< tab name="macOS" >}}**macOS**: Apple が提供するデスクトップオペレーティングシステム。{{< /tab >}}
+{{< tab name="Linux" >}}**Linux**: オープンソースのオペレーティングシステム。{{< /tab >}}
+{{< tab name="Windows" >}}**Windows**: Microsoft が提供するデスクトップオペレーティングシステム。{{< /tab >}}
 
 {{< /tabs >}}
 
@@ -51,7 +51,6 @@ next: /docs/guide/deploy-site
 
 {{< /tabs >}}
 
-
 ### アイコンを追加する
 
 各タブに `icon` を指定すると、ラベルの前にアイコンを表示できます。
@@ -75,7 +74,6 @@ next: /docs/guide/deploy-site
 
 {{< /tabs >}}
 
-
 ### Markdown の使用
 
 コードブロックを含む Markdown 構文もサポートされています:
@@ -96,26 +94,31 @@ next: /docs/guide/deploy-site
 
 {{< tabs >}}
 
-  {{< tab name="JSON" >}}
-  ```json
-  { "hello": "world" }
-  ```
-  {{< /tab >}}
+{{< tab name="JSON" >}}
 
-  {{< tab name="YAML" >}}
-  ```yaml
-  hello: world
-  ```
-  {{< /tab >}}
+```json
+{ "hello": "world" }
+```
 
-  {{< tab name="TOML" >}}
-  ```toml
-  hello = "world"
-  ```
-  {{< /tab >}}
+{{< /tab >}}
+
+{{< tab name="YAML" >}}
+
+```yaml
+hello: world
+```
+
+{{< /tab >}}
+
+{{< tab name="TOML" >}}
+
+```toml
+hello = "world"
+```
+
+{{< /tab >}}
 
 {{< /tabs >}}
-
 
 ### タブの同期
 

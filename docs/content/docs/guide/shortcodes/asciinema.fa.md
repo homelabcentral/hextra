@@ -25,6 +25,7 @@ your-site/
 ```
 
 در فایل markdown خود:
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -41,6 +42,7 @@ your-site/
 ```
 
 در فایل markdown خود:
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -57,6 +59,7 @@ your-site/
 ```
 
 در فایل markdown خود:
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -77,6 +80,7 @@ your-site/
 ### نحوه کارکرد جستجوی فایل
 
 shortcode به ترتیب زیر فایل‌های cast شما را به طور خودکار پیدا می‌کند:
+
 1. **منابع بسته صفحه** (اگر از بسته صفحه استفاده می‌کنید)
 2. **دایرکتوری assets جهانی** (`assets/`)
 3. **دایرکتوری Static** (`static/`)
@@ -89,7 +93,7 @@ shortcode به ترتیب زیر فایل‌های cast شما را به طور 
 این یک مثال پیشرفته است که تمام پارامترهای موجود را نشان می‌دهد:
 
 ```markdown
-{{</* asciinema 
+{{</* asciinema
   file="demo.cast"
   theme="dracula"
   speed="2"
@@ -99,23 +103,22 @@ shortcode به ترتیب زیر فایل‌های cast شما را به طور 
 */>}}
 ```
 
-{{< asciinema 
+{{< asciinema
   file="casts/demo.cast"
   theme="dracula"
   speed="2"
   autoplay="true"
   loop="true"
-  markers="1.5:Installation,3.2:Configuration,5.8:Testing"
->}}
+  markers="1.5:Installation,3.2:Configuration,5.8:Testing" >}}
 
 ## پارامترها
 
-| پارامتر | نوع | پیش‌فرض | توضیحات |
-|---------|-----|---------|---------|
-| `file` | string | - | مسیر فایل .cast (ضروری). از فایل‌های محلی، مسیرهای مطلق و URL های راه دور پشتیبانی می‌کند |
-| `theme` | string | `"asciinema"` | تم پخش‌کننده |
-| `speed` | number | `1` | ضریب سرعت پخش |
-| `autoplay` | boolean | `false` | شروع خودکار پخش |
-| `loop` | boolean | `false` | پخش حلقه‌ای |
-| `poster` | string | `""` | پوستر (فریم پیش‌نمایش) برای نمایش تا زمان شروع پخش. از نمادگذاری NPT پشتیبانی می‌کند (مثل "npt:1:23") |
-| `markers` | string | `""` | نشانگرهای زمانی جدا شده با کاما. فرمت: "زمان:برچسب" یا فقط "زمان" (مثل "1.5:Installation,3.2:Configuration,5.8") |
+| پارامتر    | نوع     | پیش‌فرض       | توضیحات                                                                                                          |
+| ---------- | ------- | ------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `file`     | string  | -             | مسیر فایل .cast (ضروری). از فایل‌های محلی، مسیرهای مطلق و URL های راه دور پشتیبانی می‌کند                        |
+| `theme`    | string  | `"asciinema"` | تم پخش‌کننده                                                                                                     |
+| `speed`    | number  | `1`           | ضریب سرعت پخش                                                                                                    |
+| `autoplay` | boolean | `false`       | شروع خودکار پخش                                                                                                  |
+| `loop`     | boolean | `false`       | پخش حلقه‌ای                                                                                                      |
+| `poster`   | string  | `""`          | پوستر (فریم پیش‌نمایش) برای نمایش تا زمان شروع پخش. از نمادگذاری NPT پشتیبانی می‌کند (مثل "npt:1:23")            |
+| `markers`  | string  | `""`          | نشانگرهای زمانی جدا شده با کاما. فرمت: "زمان:برچسب" یا فقط "زمان" (مثل "1.5:Installation,3.2:Configuration,5.8") |

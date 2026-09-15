@@ -8,10 +8,10 @@ function enableCollapsibles() {
   buttons.forEach(function (button) {
     button.addEventListener("click", function (e) {
       e.preventDefault();
-      const list = button.closest('li');
+      const list = button.closest("li");
       if (list) {
         list.classList.toggle("open");
-        button.setAttribute('aria-expanded', list.classList.contains('open') ? 'true' : 'false');
+        button.setAttribute("aria-expanded", list.classList.contains("open") ? "true" : "false");
       }
     });
   });
@@ -32,6 +32,6 @@ function scrollToActiveItem() {
   const yDistance = visibleActiveItem.getBoundingClientRect().top - sidebarScrollbar.getBoundingClientRect().top;
   sidebarScrollbar.scrollTo({
     behavior: "instant",
-    top: yDistance - yOffset
+    top: yDistance - yOffset,
   });
 }

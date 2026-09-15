@@ -1,0 +1,198 @@
+{{/* Render one ad.
+
+  The single renderer behind both entry points: the layout slots call it with a
+  slot name, and the `ad` shortcode calls it with an options map it has already
+  assembled. Provider differences live here and nowhere else.
+
+  It emits the ad and nothing around it - no list item, no grid cell - so each
+  caller supplies whatever wrapper its own markup requires.
+
+  Outside production it draws a labelled dashed box at the reserved height
+  instead of the ad. Local work can see and tune the layout, no ad network is
+  contacted from a development build, and no policy is at risk from one.
+
+  Every class here is a `hextra-ad` class, never a bare utility. Component CSS
+  is built with `@apply`, so those rules always ship; a `hx:` utility written
+  straight into this markup would be tree-shaken out of any site whose own
+  pages never render an ad.
+
+  @param {page} context The page being rendered.
+  @param {string} name Slot to look up in the configuration, e.g. "blogbottom".
+  @param {dict} options Pre-resolved options, used instead of `name`.
+  @param {string} variant Presentation variant. One of "" (default), list.
+  @param {string} position Where the caller is rendering, for warnings.
+
+  @example {{ partial "ads/slot.html" (dict "context" . "name" "blogbottom")
+}}
+*/}}
+{{- $ctx := .context -}}
+{{- $variant := .variant | default "" -}}
+
+{{- $opts := .options -}}
+{{- if .name -}}
+  {{- $ads := partialCached "ads/config.html" $ctx $ctx.RelPermalink -}}
+  {{- if $ads.enable -}}
+    {{- $opts = index $ads.slots .name -}}
+  {{- end -}}
+{{- end -}}
+
+{{/* Indexed through `with` rather than `and`: a slot looked up while ads are
+  disabled is nil, and indexing nil is an error, not a false.
+*/}}
+{{- $enabled := false -}}
+{{- with $opts }}{{ $enabled = index . "enable" }}{{ end -}}
+
+{{- if $enabled -}}
+  {{- $provider := index $opts "provider" -}}
+  {{- $id := index $opts "slot" -}}
+
+  {{/* A length reaches a style attribute, so it is checked rather than
+    trusted.
+  */}}
+  {{- $length := `^[0-9]+(\.[0-9]+)?(px|rem|em|vh|vw|%)$` -}}
+  {{- $height := printf "%v" (index $opts "height") -}}
+  {{- if and $height (not (findRE $length $height)) -}}
+    {{- warnf "ads: ignoring height %q, which is not a CSS length" $height -}}
+    {{- $height = "280px" -}}
+  {{- end -}}
+  {{- $maxWidth := printf "%v" ((index $opts "maxwidth") | default "") -}}
+  {{- if and $maxWidth (not (findRE $length $maxWidth)) -}}
+    {{- warnf "ads: ignoring maxWidth %q, which is not a CSS length" $maxWidth -}}
+    {{- $maxWidth = "" -}}
+  {{- end -}}
+
+  {{/* Precomputed, not inlined into the tag: Prettier wraps a long attribute
+    across lines and the newlines land inside the value, which would ship
+    data-full-width-responsive=" true " to every page carrying an ad.
+  */}}
+  {{- $fullWidth := cond (eq (printf "%v" (index $opts "fullwidth")) "false" | not) "true" "false" -}}
+
+  {{- $align := printf "%v" (index $opts "align") -}}
+  {{- if not (in (slice "left" "center" "right") $align) -}}
+    {{- warnf "ads: unknown align %q, falling back to 'center'" $align -}}
+    {{- $align = "center" -}}
+  {{- end -}}
+
+  {{/* An ad fills the width it is given - a responsive unit with no width to
+    measure collapses to nothing - so alignment needs `maxWidth` to leave it
+    somewhere to move. Asking for one without the other is an authoring
+    mistake with no visible effect, which is worth saying out loud rather than
+    ignoring. Reported once per build, not once per page.
+  */}}
+  {{- if and (ne $align "center") (not $maxWidth) -}}
+    {{- warnidf (printf "ads-align-%s" $align) "ads: align %q needs maxWidth to have any effect, because an ad fills the width it is given. Set maxWidth on the %s slot, or drop the align." $align (index $opts "name") -}}
+  {{- end -}}
+
+  {{/* Carbon writes its ad at the position of its own script element and
+    serves one placement per page, so a second one renders nothing at all.
+  */}}
+  {{- $live := or hugo.IsProduction (not (index $opts "production")) -}}
+  {{- $skip := false -}}
+  {{- if and $live (eq $provider "carbon") -}}
+    {{- if $ctx.Store.Get "hextraAdCarbon" -}}
+      {{- warnf "ads: Carbon serves one placement per page, so the %s slot on %s was skipped" (index $opts "name") $ctx.RelPermalink -}}
+      {{/* Skipped, not downgraded: falling through to the placeholder would
+        put a development box on a production page.
+      */}}
+      {{- $skip = true -}}
+    {{- else -}}
+      {{- $ctx.Store.Set "hextraAdCarbon" true -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- if and (not $skip) (or $live (index $opts "placeholder")) -}}
+    {{- $classes := slice "hextra-ad" (printf "hextra-ad--%s" $align) -}}
+    {{- with $variant }}{{ $classes = $classes | append (printf "hextra-ad--%s" .) }}{{ end -}}
+    {{- if index $opts "border" }}{{ $classes = $classes | append "hextra-ad--bordered" }}{{ end -}}
+    {{- if index $opts "background" }}{{ $classes = $classes | append "hextra-ad--filled" }}{{ end -}}
+    {{- if not $live }}{{ $classes = $classes | append "hextra-ad--placeholder" }}{{ end -}}
+    {{- with index $opts "class" }}{{ $classes = $classes | append . }}{{ end -}}
+
+    {{- $style := printf "--hextra-ad-height: %s;" $height -}}
+    {{- with $maxWidth }}{{ $style = printf "%s --hextra-ad-max-width: %s;" $style . }}{{ end -}}
+
+    {{/* Assembled as a list rather than written inline: Prettier deletes a
+      literal space that sits next to a template action, which silently fused
+      these separators together the first time this was written that way.
+    */}}
+    {{- $note := slice -}}
+    {{- if not $live -}}
+      {{- with index $opts "name" }}{{ $note = $note | append . }}{{ end -}}
+      {{- with $provider }}{{ $note = $note | append . }}{{ end -}}
+      {{- with $id }}{{ $note = $note | append . }}{{ end -}}
+      {{- $note = $note | append $height -}}
+    {{- end -}}
+
+    {{- $label := "" -}}
+    {{- if index $opts "label" -}}
+      {{- $label = (index $opts "labeltext") | default ((T "advertisement") | default "Advertisement") -}}
+    {{- end -}}
+
+    {{- if $live -}}
+      {{- $ctx.Store.Set "hasAds" true -}}
+      {{- $used := $ctx.Store.Get "hextraAdProviders" | default slice -}}
+      {{- if not (in $used $provider) -}}
+        {{- $ctx.Store.Set "hextraAdProviders" ($used | append $provider) -}}
+      {{- end -}}
+      {{/* AdSense scopes its loader to one publisher id, so the ids actually
+        used are collected rather than assumed: a page mixing two accounts
+        needs a loader for each.
+      */}}
+      {{- if eq $provider "adsense" -}}
+        {{- $clients := $ctx.Store.Get "hextraAdClients" | default slice -}}
+        {{- $client := index $opts "client" -}}
+        {{- if not (in $clients $client) -}}
+          {{- $ctx.Store.Set "hextraAdClients" ($clients | append $client) -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+
+
+    <div class="{{ delimit ($classes | append "not-prose") " " }}" {{ printf "style=%q" $style | safeHTMLAttr }}>
+      {{- with $label }}<span class="hextra-ad__label">{{ . }}</span>{{ end -}}
+      {{- if not $live -}}
+        <div class="hextra-ad__slot">
+          <span class="hextra-ad__note">{{ delimit $note " · " }}</span>
+        </div>
+      {{- else if eq $provider "adsense" -}}
+        {{- if eq (index $opts "consent") "npa" -}}
+          {{- /* Serve non-personalised ads until a consent tool says otherwise. */ -}}
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).requestNonPersonalizedAds = 1;
+          </script>
+        {{- end -}}
+        <ins
+          class="adsbygoogle hextra-ad__slot"
+          style="display: block"
+          data-ad-client="{{ index $opts "client" }}"
+          data-ad-slot="{{ $id }}"
+          {{ with index $opts "format" }}data-ad-format="{{ . }}"{{ end }}
+          {{ with index $opts "layout" }}data-ad-layout="{{ . }}"{{ end }}
+          {{ with index $opts "layoutkey" }}data-ad-layout-key="{{ . }}"{{ end }}
+          data-full-width-responsive="{{ $fullWidth }}"
+          {{ if index $opts "test" }}data-adtest="on"{{ end }}
+        ></ins>
+        {{/* adsbygoogle is a queue, which is why the loader can sit at the
+          end of the body and this push can run before it arrives.
+        */}}
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      {{- else if eq $provider "ethicalads" -}}
+        {{- $keywords := (index $opts "keywords") | default slice -}}
+        <div
+          class="{{ printf "hextra-ad__slot %s" (index $opts "style") }}"
+          data-ea-publisher="{{ index $opts "publisher" }}"
+          data-ea-type="{{ index $opts "type" }}"
+          {{ with $keywords }}data-ea-keywords="{{ delimit . "|" }}"{{ end }}
+        ></div>
+      {{- else if eq $provider "carbon" -}}
+        <div class="hextra-ad__slot">
+          <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve={{ index $opts "serve" }}&placement={{ index $opts "placement" }}" id="_carbonads_js"></script>
+        </div>
+      {{- else if eq $provider "custom" -}}
+        <div class="hextra-ad__slot">{{ index $opts "html" | safeHTML }}</div>
+      {{- end -}}
+    </div>
+  {{- end -}}
+{{- end -}}

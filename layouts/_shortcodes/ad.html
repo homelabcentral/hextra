@@ -1,0 +1,164 @@
+{{/* Place one advertisement at this point in the page.
+
+  The layout slots configured under `params.ads.slots` cover the repeating
+  positions - the end of an article, between index cards. This shortcode covers
+  the rest: anywhere you want an ad by hand, including between two paragraphs,
+  which no slot can reach.
+
+  Every parameter defaults to the matching key under `params.ads`, so a site
+  that has configured a provider needs only the ad unit id here. Anything set
+  on the call applies to this one ad.
+
+  Nothing renders when `params.ads` is absent, when `params.ads.enable` is
+  false, or when the page's front matter says `ads: false`. Outside production
+  a dashed placeholder box is drawn at the reserved height instead of the ad.
+
+  @param {string} slot The ad unit id. Required for AdSense. For the custom provider, the name of a creative under `params.ads.custom`.
+  @param {string} provider One of adsense (default), ethicalads, carbon, custom.
+  @param {string} format AdSense ad format. One of auto (default), fluid, rectangle, vertical, horizontal.
+  @param {string} layout AdSense ad layout, for in-feed and in-article units.
+  @param {string} layoutKey AdSense layout key, for in-feed units.
+  @param {bool} fullWidth Let an AdSense unit go full width on small screens. Default true.
+  @param {bool} test Request test ads rather than live ones. Default false.
+  @param {string} client AdSense publisher id, overriding params.ads.adsense.client.
+  @param {string} publisher EthicalAds publisher id, overriding params.ads.ethicalads.publisher.
+  @param {string} type EthicalAds creative type. One of image (default), text.
+  @param {string} style EthicalAds shape. One of horizontal (default), vertical, raw.
+  @param {string} keywords Comma-separated keywords to target an EthicalAds unit.
+  @param {string} serve Carbon serve id, overriding params.ads.carbon.serve.
+  @param {string} placement Carbon placement id, overriding params.ads.carbon.placement.
+  @param {string} height Reserved height, as a CSS length. Default 280px.
+  @param {string} maxWidth Cap the width, as a CSS length.
+  @param {string} align One of center (default), left, right.
+  @param {string} class Extra classes for the wrapper.
+  @param {bool} label Show the "Advertisement" caption. Default true.
+  @param {string} labelText Replace the caption text.
+  @param {bool} border Draw a hairline around the ad. Default true.
+  @param {bool} background Tint the area behind the ad. Default true.
+  @param {bool} placeholder Draw the dashed box outside production. Default true.
+  @param {bool} production Only render the real ad in production. Default true.
+  @param {string} consent Set to npa to ask AdSense for non-personalised ads.
+  @param {string} variant Presentation variant. One of "" (default), list.
+
+  or
+
+  @param {string} 0 The ad unit id.
+
+  @example {{< ad slot="1234567890" >}}
+  @example {{< ad slot="1234567890" format="fluid" height="120px" label=false >}}
+  @example {{< ad provider="ethicalads" type="text" >}}
+  @example {{< ad provider="custom" slot="sponsor" >}}
+*/}}
+{{- $ads := partialCached "ads/config.html" .Page .Page.RelPermalink -}}
+
+{{- if $ads.enable -}}
+  {{- $slot := printf "%v" ((.Get "slot") | default (.Get 0) | default "") -}}
+  {{- $provider := (.Get "provider") | default (index $ads "provider") -}}
+
+  {{/* The resolved configuration doubles as the defaults: it already carries
+    every common key at its top level. `slots` and `providers` ride along
+    unread, which is cheaper than restating the key list here. */}}
+  {{- $opts := $ads -}}
+  {{- with index $ads.providers $provider -}}
+    {{- $opts = merge $opts . -}}
+  {{- end -}}
+
+  {{/* Each parameter is read by name rather than through a loop over a key
+    table. The loop was shorter, but scripts/build-skill.mjs finds a
+    shortcode's parameters by scanning for Get calls with a literal quoted
+    argument, so every parameter read through the loop was published in the
+    skill reference as "documented but not read by the template". That scan
+    reads comments too, which is why this one does not spell such a call out.
+
+    The key each one sets is the lowercase spelling Hugo stores configuration
+    under, so both paths through `ads/slot.html` read the same map. */}}
+  {{- with .Get "format" }}{{ $opts = merge $opts (dict "format" .) }}{{ end -}}
+  {{- with .Get "layout" }}{{ $opts = merge $opts (dict "layout" .) }}{{ end -}}
+  {{- with .Get "layoutKey" }}{{ $opts = merge $opts (dict "layoutkey" .) }}{{ end -}}
+  {{- with .Get "client" }}{{ $opts = merge $opts (dict "client" .) }}{{ end -}}
+  {{- with .Get "publisher" }}{{ $opts = merge $opts (dict "publisher" .) }}{{ end -}}
+  {{- with .Get "type" }}{{ $opts = merge $opts (dict "type" .) }}{{ end -}}
+  {{- with .Get "style" }}{{ $opts = merge $opts (dict "style" .) }}{{ end -}}
+  {{- with .Get "serve" }}{{ $opts = merge $opts (dict "serve" .) }}{{ end -}}
+  {{- with .Get "placement" }}{{ $opts = merge $opts (dict "placement" .) }}{{ end -}}
+  {{- with .Get "height" }}{{ $opts = merge $opts (dict "height" .) }}{{ end -}}
+  {{- with .Get "maxWidth" }}{{ $opts = merge $opts (dict "maxwidth" .) }}{{ end -}}
+  {{- with .Get "align" }}{{ $opts = merge $opts (dict "align" .) }}{{ end -}}
+  {{- with .Get "class" }}{{ $opts = merge $opts (dict "class" .) }}{{ end -}}
+  {{- with .Get "labelText" }}{{ $opts = merge $opts (dict "labeltext" .) }}{{ end -}}
+  {{- with .Get "consent" }}{{ $opts = merge $opts (dict "consent" .) }}{{ end -}}
+
+  {{/* A bool needs three states: absent leaves the configured value alone,
+    while true and false both override it. `with` and `default` cannot express
+    that - they treat false as absent, and saying false is usually the whole
+    point of passing one.
+
+    Nor can the absent case be found by comparing against nil: for a call with
+    named parameters, `ne (.Get "label") nil` reports true even when "label"
+    was never passed, which silently forced every unset bool to false. The
+    string comparison below is the same idiom `video.html` uses, and it has no
+    such blind spot: an absent parameter formats as "<nil>", which matches
+    neither "true" nor "false". */}}
+  {{- with printf "%v" (.Get "label") }}{{ if in (slice "true" "false") . }}{{ $opts = merge $opts (dict "label" (eq . "true")) }}{{ end }}{{ end -}}
+  {{- with printf "%v" (.Get "border") }}{{ if in (slice "true" "false") . }}{{ $opts = merge $opts (dict "border" (eq . "true")) }}{{ end }}{{ end -}}
+  {{- with printf "%v" (.Get "background") }}{{ if in (slice "true" "false") . }}{{ $opts = merge $opts (dict "background" (eq . "true")) }}{{ end }}{{ end -}}
+  {{- with printf "%v" (.Get "fullWidth") }}{{ if in (slice "true" "false") . }}{{ $opts = merge $opts (dict "fullwidth" (eq . "true")) }}{{ end }}{{ end -}}
+  {{- with printf "%v" (.Get "test") }}{{ if in (slice "true" "false") . }}{{ $opts = merge $opts (dict "test" (eq . "true")) }}{{ end }}{{ end -}}
+  {{- with printf "%v" (.Get "placeholder") }}{{ if in (slice "true" "false") . }}{{ $opts = merge $opts (dict "placeholder" (eq . "true")) }}{{ end }}{{ end -}}
+  {{- with printf "%v" (.Get "production") }}{{ if in (slice "true" "false") . }}{{ $opts = merge $opts (dict "production" (eq . "true")) }}{{ end }}{{ end -}}
+
+  {{- with .Get "keywords" -}}
+    {{- $opts = merge $opts (dict "keywords" (split . "," | apply "trim" "." " ")) -}}
+  {{- end -}}
+
+  {{- $opts = merge $opts (dict "enable" true "name" "ad shortcode" "provider" $provider "slot" $slot) -}}
+
+  {{/* `custom` renders a named creative from configuration rather than inner
+    content. A template that reads a shortcode's body makes Hugo demand a
+    closing tag on every call of it, including the network ones, so the markup
+    cannot come from the body. */}}
+  {{- if eq $provider "custom" -}}
+    {{- $opts = merge $opts (dict "html" (partial "ads/creative.html" $slot)) -}}
+  {{- end -}}
+
+  {{/* errorf logs and carries on, so every check has to guard the rest. */}}
+  {{- $ok := true -}}
+  {{- if not (in (slice "adsense" "ethicalads" "carbon" "custom") $provider) -}}
+    {{- errorf "The %q shortcode was given provider %q. One of adsense, ethicalads, carbon, custom. See %s" .Name $provider .Position -}}
+    {{- $ok = false -}}
+  {{- end -}}
+  {{- if and $ok (eq $provider "adsense") -}}
+    {{- if not $slot -}}
+      {{- errorf "The %q shortcode requires a 'slot' parameter, the AdSense ad unit id. See %s" .Name .Position -}}
+      {{- $ok = false -}}
+    {{- else if not (index $opts "client") -}}
+      {{- warnidf "ads-adsense-client" "ads: params.ads.adsense.client is not set, so no AdSense ad can render." -}}
+      {{- $ok = false -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if and $ok (eq $provider "ethicalads") (not (index $opts "publisher")) -}}
+    {{- warnidf "ads-ethicalads-publisher" "ads: params.ads.ethicalads.publisher is not set, so no EthicalAds unit can render." -}}
+    {{- $ok = false -}}
+  {{- end -}}
+  {{- if and $ok (eq $provider "carbon") (or (not (index $opts "serve")) (not (index $opts "placement"))) -}}
+    {{- warnidf "ads-carbon-keys" "ads: Carbon needs both params.ads.carbon.serve and params.ads.carbon.placement." -}}
+    {{- $ok = false -}}
+  {{- end -}}
+  {{- if and $ok (eq $provider "custom") -}}
+    {{- if not $slot -}}
+      {{- errorf "The %q shortcode with provider %q requires a 'slot' parameter naming a creative under params.ads.custom. See %s" .Name $provider .Position -}}
+      {{- $ok = false -}}
+    {{- else if not (index $opts "html") -}}
+      {{- errorf "The %q shortcode refers to the creative %q, which is not defined under params.ads.custom. See %s" .Name $slot .Position -}}
+      {{- $ok = false -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- if $ok -}}
+    {{- partial "ads/slot.html" (dict
+      "context" .Page
+      "options" $opts
+      "variant" (.Get "variant")
+      ) -}}
+  {{- end -}}
+{{- end -}}

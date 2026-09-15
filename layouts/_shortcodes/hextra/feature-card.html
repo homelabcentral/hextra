@@ -1,4 +1,4 @@
-{{- /*
+{{/*
 A shortcode for displaying a feature card.
 
 @param {string} title The title of the card.
@@ -11,7 +11,7 @@ A shortcode for displaying a feature card.
 @param {string} link The link of the card.
 
 @example {{< hextra/feature-card title="Feature Card" subtitle="This is a feature card." >}}
-*/ -}}
+*/}}
 
 {{- $title := .Get "title" -}}
 {{- $subtitle := .Get "subtitle" -}}
@@ -25,14 +25,24 @@ A shortcode for displaying a feature card.
 {{- $external := hasPrefix $link "http" -}}
 {{- $href := cond (strings.HasPrefix $link "/") ($link | relURL) $link -}}
 
-{{- if hasPrefix $image "/" -}}
-  {{- $image = relURL (strings.TrimPrefix "/" $image) -}}
+{{/* Resolve against assets first, the same way `utils/page-image.html` and
+  `_markup/render-image.html` do, so an image can live under assets/ and be
+  referenced by an absolute path. Falls back to treating the path as a static
+  file, which is how this shortcode always behaved. */}}
+{{- if and $image (not (urls.Parse $image).Scheme) -}}
+  {{- with or (.Page.Resources.Get $image) (resources.Get $image) -}}
+    {{- $image = .RelPermalink -}}
+  {{- else -}}
+    {{- if hasPrefix $image "/" -}}
+      {{- $image = relURL (strings.TrimPrefix $image "/") -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
 
 <a
   {{ with $link }}href="{{ $href }}" {{ with $external }} target="_blank" rel="noreferrer"{{ end }}{{ end }}
   {{ with $style }}style="{{ . | safeCSS }}"{{ end }}
-  class="{{ $class }} hextra-feature-card not-prose hx:block hx:relative hx:overflow-hidden hx:rounded-3xl hx:border hx:border-gray-200 hx:hover:border-gray-300 hx:dark:border-neutral-800 hx:dark:hover:border-neutral-700 hx:before:pointer-events-none hx:before:absolute hx:before:inset-0 hx:before:bg-glass-gradient"
+  class="{{ $class }} hextra-feature-card not-prose hx:block hx:relative hx:overflow-hidden hx:rounded-3xl hx:border hx:border-neutral-200 hx:hover:border-neutral-300 hx:dark:border-neutral-800 hx:dark:hover:border-neutral-700 hx:before:pointer-events-none hx:before:absolute hx:before:inset-0 hx:before:bg-glass-gradient"
 >
   <div class="hx:relative hx:w-full hx:p-6">
     <h3 class="hx:text-2xl hx:font-medium hx:leading-6 hx:mb-2 hx:flex hx:items-center">
@@ -43,7 +53,7 @@ A shortcode for displaying a feature card.
       {{ end -}}
       <span>{{ $title }}</span>
     </h3>
-    <p class="hx:text-gray-500 hx:dark:text-gray-400 hx:text-sm hx:leading-6">{{ $subtitle | markdownify }}</p>
+    <p class="hx:text-neutral-500 hx:dark:text-neutral-400 hx:text-sm hx:leading-6">{{ $subtitle | markdownify }}</p>
   </div>
   {{- with $image -}}
     <img src="{{ . }}" class="hx:absolute hx:max-w-none {{ $imageClass }}" alt="{{ $title }}" />

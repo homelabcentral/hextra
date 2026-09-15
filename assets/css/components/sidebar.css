@@ -1,6 +1,6 @@
 @media (max-width: 48rem) {
   .hextra-sidebar-container {
-    @apply hx:fixed hx:pt-[calc(var(--hextra-navbar-height)+var(--hextra-banner-height))] hx:top-0 hx:w-full hx:bottom-0 hx:z-15 hx:overscroll-contain hx:bg-white hx:dark:bg-dark;
+    @apply hx:fixed hx:pt-[calc(var(--hextra-navbar-height)+var(--hextra-banner-height))] hx:top-0 hx:w-full hx:bottom-0 hx:z-15 hx:overscroll-contain hx:bg-hextra-bg;
     transition: transform 0.4s cubic-bezier(0.52, 0.16, 0.04, 1);
     will-change: transform, opacity;
     contain: layout style;
@@ -18,4 +18,12 @@
   li.open > .hextra-sidebar-item > .hextra-sidebar-collapsible-button > svg > path {
     @apply hx:rotate-90;
   }
+}
+
+/* Separator entries ("More"): a rule above a small-caps section label,
+   matching the right side's widget headings and divider rhythm. The rule
+   and its spacing drop away when the separator opens the list. */
+.hextra-sidebar-separator {
+  @apply hx:mt-3.5 hx:mb-2 hx:border-t hx:border-neutral-200 hx:px-2 hx:pt-3.5 hx:text-xs hx:font-semibold hx:tracking-wider hx:uppercase hx:text-neutral-500 hx:first:mt-0 hx:first:border-t-0 hx:first:pt-0 hx:dark:border-neutral-800 hx:dark:text-neutral-400 hx:contrast-more:border-neutral-400;
+  word-break: break-word;
 }

@@ -105,7 +105,7 @@ menu:
 
 ### لوگو و عنوان
 
-برای تغییر لوگوی پیش‌فرض، فایل `hugo.yaml` را ویرایش کرده و مسیر فایل لوگوی خود را در دایرکتوری `static` اضافه کنید.
+برای تغییر لوگوی پیش‌فرض، فایل `hugo.yaml` را ویرایش کرده و مسیر فایل لوگوی خود را در دایرکتوری `static/icons` اضافه کنید.
 همچنین می‌توانید لینکی که کاربران با کلیک روی لوگو به آن هدایت می‌شوند را تغییر دهید و عرض و ارتفاع لوگو را بر حسب پیکسل تنظیم کنید.
 
 ```yaml {filename="hugo.yaml"}
@@ -114,8 +114,8 @@ params:
     displayTitle: true
     displayLogo: true
     logo:
-      path: images/logo.svg
-      dark: images/logo-dark.svg
+      path: icons/images/logo.svg
+      dark: icons/images/logo-dark.svg
       link: /
       width: 40
       height: 20
@@ -221,31 +221,33 @@ copyright: "© 2024 متن دلخواه شما"
 
 ### فاوآیکون
 
-برای سفارشی کردن [فاوآیکون](https://fa.wikipedia.org/wiki/فاوآیکون) سایت، فایل‌های آیکون را در پوشه `static` قرار دهید تا [فاوآیکون‌های پیش‌فرض قالب](https://github.com/imfing/hextra/tree/main/static) را جایگزین کنید:
+برای سفارشی کردن [فاوآیکون](https://fa.wikipedia.org/wiki/فاوآیکون) سایت، فایل‌های آیکون را در پوشه `static/icons` قرار دهید تا [فاوآیکون‌های پیش‌فرض قالب](https://github.com/imfing/hextra/tree/main/static) را جایگزین کنید:
 
 {{< filetree/container >}}
-  {{< filetree/folder name="static" >}}
-    {{< filetree/file name="android-chrome-192x192.png" >}}
-    {{< filetree/file name="android-chrome-512x512.png" >}}
-    {{< filetree/file name="apple-touch-icon.png" >}}
-    {{< filetree/file name="favicon-16x16.png" >}}
-    {{< filetree/file name="favicon-32x32.png" >}}
-    {{< filetree/file name="favicon-dark.svg" >}}
-    {{< filetree/file name="favicon.ico" >}}
-    {{< filetree/file name="favicon.svg" >}}
-    {{< filetree/file name="site.webmanifest" >}}
-  {{< /filetree/folder >}}
+{{< filetree/folder name="static" >}}
+{{< filetree/folder name="icons" >}}
+{{< filetree/file name="android-chrome-192x192.png" >}}
+{{< filetree/file name="android-chrome-512x512.png" >}}
+{{< filetree/file name="apple-touch-icon.png" >}}
+{{< filetree/file name="favicon-16x16.png" >}}
+{{< filetree/file name="favicon-32x32.png" >}}
+{{< filetree/file name="favicon-dark.svg" >}}
+{{< filetree/file name="favicon.ico" >}}
+{{< filetree/file name="favicon.svg" >}}
+{{< filetree/file name="site.webmanifest" >}}
+{{< /filetree/folder >}}
+{{< /filetree/folder >}}
 {{< /filetree/container >}}
 
 #### تنظیمات پایه
 
-حداقل، فایل `favicon.svg` را در پوشه `static` قرار دهید. این فایل به عنوان فاوآیکون پیش‌فرض سایت استفاده می‌شود.
+حداقل، فایل `favicon.svg` را در پوشه `static/icons` قرار دهید. این فایل به عنوان فاوآیکون پیش‌فرض سایت استفاده می‌شود.
 
 می‌توانید یک فاوآیکون SVG تطبیقی ایجاد کنید که به ترجیحات تم سیستم پاسخ دهد با استفاده از media queryهای CSS درون خود SVG، با پیروی از روش توضیح داده شده در [ساخت یک فاوآیکون تطبیقی](https://web.dev/articles/building/an-adaptive-favicon).
 
 #### پشتیبانی از حالت تاریک
 
-برای پشتیبانی بهتر از حالت تاریک، فایل `favicon-dark.svg` را در کنار `favicon.svg` در پوشه `static` قرار دهید. وقتی هر دو فایل موجود باشند، Hextra به طور خودکار:
+برای پشتیبانی بهتر از حالت تاریک، فایل `favicon-dark.svg` را در کنار `favicon.svg` در پوشه `static/icons` قرار دهید. وقتی هر دو فایل موجود باشند، Hextra به طور خودکار:
 
 - از `favicon.svg` برای حالت روشن یا زمانی که ترجیح تمی مشخص نشده استفاده می‌کند
 - به `favicon-dark.svg` تغییر می‌کند وقتی سیستم کاربر در حالت تاریک تنظیم شده است
@@ -298,6 +300,22 @@ params:
   # نمایش نویسنده آخرین تغییر
   displayUpdatedAuthor: true
 ```
+
+### اعلان مجوز
+
+می‌توان یک اعلان مجوز را در ابتدای همان سطری که تاریخ آخرین تغییر در آن قرار دارد نمایش داد؛ متن آن «This post is licensed under CC BY 4.0 by the author.» است و نام مجوز به آدرس آن پیوند می‌شود. تا وقتی `params.license.enable` روی `true` تنظیم نشود، پنهان می‌ماند.
+
+```yaml {filename="hugo.yaml"}
+params:
+  license:
+    enable: true
+    name: "CC BY 4.0"
+    url: "https://creativecommons.org/licenses/by/4.0/"
+```
+
+تنها نام و نشانی پیکربندی می‌شوند، بنابراین هر مجوزی کار می‌کند — `MIT`، `CC BY-SA 4.0` و مانند آن. جمله‌ای که آن‌ها را در بر می‌گیرد از رشته ترجمه `license` می‌آید و `%s` در آن با نام پیوندشده جای‌گزین می‌شود؛ آن را مانند هر رشته دیگری با افزودن کلید `license` به `i18n/<lang>.yaml` سایت خود بازنویسی کنید.
+
+اعلان و تاریخ مستقل از هم هستند: هر یک می‌تواند بدون دیگری نمایش داده شود.
 
 ### برچسب‌ها
 
@@ -500,6 +518,7 @@ params:
       links:
         - name: باز کردن در ChatGPT
           icon: chatgpt
+          description: درباره این صفحه سوال بپرسید
           url: "https://chatgpt.com/?hints=search&q=I%27m+looking+at+this+documentation%3A+{url}%0AHelp+me+understand+how+to+use+it."
 ```
 
@@ -507,6 +526,7 @@ params:
 
 - `name` - متن نمایشی لینک
 - `icon` - نام آیکون اختیاری (به [آیکون‌ها]({{% relref "docs/guide/shortcodes/icon" %}}) مراجعه کنید)
+- `description` - خط دوم اختیاری که با رنگ کم‌رنگ زیر نام نمایش داده می‌شود
 - `url` - آدرس با جایگزین‌های اختیاری
 
 ### نمایه FlexSearch

@@ -1,0 +1,76 @@
+{{/* Embed a YouTube video as a facade: a poster image and a play button that swap
+  themselves for the real player on click.
+
+  Hugo's built-in `youtube` shortcode loads YouTube's player iframe with the
+  page, costing several hundred kilobytes and setting third-party cookies before
+  anyone presses play. This loads an image instead, and only contacts YouTube
+  once the reader asks for the video.
+
+  The poster is fetched at build time and served from this site, so a page with
+  an embed makes no third-party request at all until it is played. If the fetch
+  fails the poster falls back to YouTube's CDN.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração), which wraps the
+  lite-youtube-embed library; this implementation has no dependency.
+
+  @param {string} id Required. The YouTube video id.
+  @param {string} label Accessible name for the play button, e.g. the video title.
+  @param {string} params Extra player parameters, e.g. "start=130&controls=0".
+
+  @example {{< youtube-lite id="dQw4w9WgXcQ" label="Never Gonna Give You Up" >}}
+*/}}
+{{- $id := .Get "id" | default (.Get 0) -}}
+
+{{- if not $id -}}
+  {{- errorf "The %q shortcode requires an 'id' parameter. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- if not (findRE `^[A-Za-z0-9_-]{11}$` $id) -}}
+  {{- errorf "The %q shortcode was given %q, which is not a YouTube video id. See %s" .Name $id .Position -}}
+{{- end -}}
+
+{{- $params := .Get "params" | default "" -}}
+{{- if and $params (not (findRE `^[A-Za-z0-9_=&.,%-]+$` $params)) -}}
+  {{- warnf "youtube-lite: dropping unsafe params %q. See %s" $params .Position -}}
+  {{- $params = "" -}}
+{{- end -}}{{/* default "" normalises the missing case: with positional parameters .Get on a
+  string key returns nil, `ne nil ""` is true, and the button rendered
+  aria-label="Play video: %!s(<nil>)". The activation script copies that string
+  into the iframe's title, so a screen-reader user heard the format error both
+  before and after playback.
+*/}}
+{{- $label := .Get "label" | default "" -}}
+{{- $buttonLabel := cond (ne $label "") (printf "%s: %s" ((T "playVideo") | default "Play video") $label) ((T "playVideo") | default "Play video") -}}{{/* Self-host the poster so an unplayed embed makes no third-party request. A
+  build that must not reach the network skips the fetch and keeps the CDN URL,
+  which is the same fallback an unreachable network already produces.
+*/}}
+{{- $remotePoster := printf "https://i.ytimg.com/vi/%s/hqdefault.jpg" $id -}}
+{{- $poster := $remotePoster -}}
+{{- if partial "utils/remote-fetch-enabled.html" . -}}
+  {{- with try (resources.GetRemote $remotePoster) -}}
+    {{- with .Err -}}
+      {{- warnf "youtube-lite: unable to fetch the poster for %q, falling back to YouTube's CDN: %s" $id . -}}
+    {{- else with .Value -}}
+      {{- with resources.Copy (printf "images/youtube/%s.jpg" $id) . -}}
+        {{- $poster = .RelPermalink -}}
+      {{- end -}}
+    {{- else -}}
+      {{- warnf "youtube-lite: no poster for %q, falling back to YouTube's CDN" $id -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- .Page.Store.Set "hasYoutubeLite" true -}}
+
+
+<div class="hextra-youtube-lite not-prose" data-youtube-id="{{ $id }}" data-youtube-params="{{ $params }}">
+  <button type="button" class="hextra-youtube-lite__trigger hx:hextra-focus-visible" aria-label="{{ $buttonLabel }}">
+    <img class="hextra-youtube-lite__poster" src="{{ $poster }}" alt="" loading="lazy" decoding="async" width="480" height="360" />
+    <span class="hextra-youtube-lite__play" aria-hidden="true">
+      <svg viewBox="0 0 68 48" focusable="false">
+        <path class="hextra-youtube-lite__play-bg" d="M66.5 7.7c-.8-2.9-2.5-5.4-5.4-6.2C55.8.1 34 0 34 0S12.2.1 6.9 1.5C4 2.3 2.3 4.8 1.5 7.7 0 13 0 24 0 24s0 11 1.5 16.3c.8 2.9 2.5 5.4 5.4 6.2C12.2 47.9 34 48 34 48s21.8-.1 27.1-1.5c2.9-.8 4.6-3.3 5.4-6.2C68 35 68 24 68 24s0-11-1.5-16.3z" />
+        <path d="M45 24 27 14v20" fill="#fff" />
+      </svg>
+    </span>
+  </button>
+</div>

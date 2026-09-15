@@ -1,0 +1,120 @@
+{{/* Resolve the blog layout configuration for a page into a single dict.
+
+  Every feature is opt-in: defining the corresponding block under
+  `params.blog` in the site configuration turns it on, and an explicit
+  `enable: false` turns it back off. A site with no `params.blog` gets a
+  configuration where everything is disabled, which renders the pre-existing
+  blog markup unchanged.
+
+  Config keys are lowercased by Hugo, so presence checks use lowercase names.
+
+  @param {page} . The page being rendered.
+  @returns {dict} rail, widgets, card, article
+
+  @example {{ $cfg := partial "blog/config.html" .
+}}
+*/}}
+{{- $page := . -}}
+{{- $blog := site.Params.blog -}}
+
+{{/* ---------------------------------------------------------------- rail */}}
+{{- $rail := dict "enable" false -}}
+{{- with $blog.rail -}}
+  {{- $rail = dict
+    "enable" (not (eq (index . "enable") false))
+    "onArticle" (eq (index . "onarticle") true)
+    "profile" (index . "profile")
+    "sponsor" (index . "sponsor")
+  -}}
+{{- end -}}
+
+{{/* Per-page opt-out: `blog: { rail: false }` in front matter */}}
+{{- with $page.Params.blog -}}
+  {{- if reflect.IsMap . -}}
+    {{- if eq (index . "rail") false -}}
+      {{- $rail = merge $rail (dict "enable" false) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{/* ------------------------------------------------------------- widgets */}}
+{{- $widgets := dict "enable" false -}}
+{{- with $blog.widgets -}}
+  {{- $config := . -}}
+  {{- $sections := dict -}}
+  {{- range $name, $default := (dict "recent" 5 "pinned" 3 "tags" 10) -}}
+    {{- $section := dict "enable" false "count" $default -}}
+    {{- with index $config $name -}}
+      {{- $section = dict
+        "enable" (not (eq (index . "enable") false))
+        "count" (int ((index . "count") | default $default))
+      -}}
+    {{- end -}}
+    {{- $sections = merge $sections (dict $name $section) -}}
+  {{- end -}}
+  {{- $widgets = merge (dict "enable" (not (eq (index $config "enable") false))) $sections -}}
+{{- end -}}
+
+{{/* ---------------------------------------------------------------- card */}}
+{{- $card := dict "enable" false "cover" false "readingTime" false -}}
+{{- with $blog.list.card -}}
+  {{- $enable := not (eq (index . "enable") false) -}}
+  {{- $card = dict
+    "enable" $enable
+    "cover" (and $enable (not (eq (index . "cover") false)))
+    "readingTime" (and $enable (not (eq (index . "readingtime") false)))
+  -}}
+{{- end -}}
+
+{{/* ------------------------------------------------------------- article */}}
+{{- $article := dict
+  "cover" false
+  "readingTime" false
+  "tags" false
+  "share" (dict "enable" false "links" slice)
+  "related" (dict "enable" false "count" 3)
+  "series" (dict "enable" false "opened" false)
+-}}
+{{- with $blog.article -}}
+  {{- $share := dict "enable" false "links" slice -}}
+  {{- with index . "share" -}}
+    {{- $share = dict
+      "enable" (and (not (eq (index . "enable") false)) (gt (len ((index . "links") | default slice)) 0))
+      "links" ((index . "links") | default slice)
+    -}}
+  {{- end -}}
+  {{- $related := dict "enable" false "count" 3 -}}
+  {{- with index . "related" -}}
+    {{- $related = dict
+      "enable" (not (eq (index . "enable") false))
+      "count" (int ((index . "count") | default 3))
+    -}}
+  {{- end -}}
+  {{/* Presence is the switch, so the check is `isset` rather than `with`:
+    `series: {}` and a bare `series:` are empty values that `with` would skip,
+    leaving the block an author wrote with no effect. Only an explicit false -
+    either `series: false` or `enable: false` - opts back out.
+  */}}
+  {{- $series := dict "enable" false "opened" false -}}
+  {{- if isset . "series" -}}
+    {{- $value := index . "series" -}}
+    {{- if reflect.IsMap $value -}}
+      {{- $series = dict
+        "enable" (not (eq (index $value "enable") false))
+        "opened" (eq (index $value "opened") true)
+      -}}
+    {{- else -}}
+      {{- $series = dict "enable" (ne $value false) "opened" false -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $article = dict
+    "cover" (eq (index . "cover") true)
+    "readingTime" (eq (index . "readingtime") true)
+    "tags" (eq (index . "tags") true)
+    "share" $share
+    "related" $related
+    "series" $series
+  -}}
+{{- end -}}
+
+{{- return (dict "rail" $rail "widgets" $widgets "card" $card "article" $article) -}}

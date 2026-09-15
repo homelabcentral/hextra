@@ -1,0 +1,21 @@
+{{/* A shortcode for presenting concise metrics in a responsive grid.
+
+  Use `stat` for each item. Ported from the Blowfish theme (MIT, Nuno Coração),
+  which names the column parameter `columns`; both spellings are accepted here.
+
+  @param {string} cols The number of columns (default 3).
+  @deprecated columns Blowfish's name for `cols`; still accepted.
+
+  @example {{< stats cols="3" >}}{{< /stats >}}
+*/}}
+{{- $cols := .Get "cols" | default (.Get "columns") | default 3 -}}
+{{- $cols = printf "%v" $cols -}}
+{{- if not (findRE `^[1-6]$` $cols) -}}
+  {{- warnf "stats: invalid cols value %q, falling back to 3" $cols -}}
+  {{- $cols = "3" -}}
+{{- end -}}
+
+
+<div class="hextra-stats not-prose" style="--hextra-stats-grid-cols: {{ $cols }};">
+  {{- .Inner -}}
+</div>

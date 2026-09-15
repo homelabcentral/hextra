@@ -1,0 +1,13 @@
+.hextra-lead {
+  @apply hx:my-6 hx:text-lg hx:leading-relaxed hx:text-neutral-600 hx:dark:text-neutral-300;
+  @apply hx:ltr:border-l-2 hx:rtl:border-r-2 hx:border-hextra-accent-500 hx:dark:border-hextra-accent-600;
+  @apply hx:ltr:pl-4 hx:rtl:pr-4;
+
+  > :first-child {
+    @apply hx:mt-0;
+  }
+
+  > :last-child {
+    @apply hx:mb-0;
+  }
+}

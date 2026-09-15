@@ -1,0 +1,35 @@
+{{/* The AdSense loader on every page, for account and site review.
+
+  AdSense approves an account and then each site, and it looks for its loader
+  on the live site while reviewing. The normal path emits that loader only on
+  pages that actually rendered an ad - right for performance, wrong for review,
+  because a site with no slots configured yet shows Google no code at all.
+
+  `params.ads.adsense.verifyAllPages: true` puts the loader in the head of
+  every page instead, which is also what Auto ads needs. When it is on,
+  `scripts/ads.html` leaves the AdSense loader alone so the page gets one
+  loader rather than two.
+
+  Still honours every switch that matters: nothing is emitted without
+  `params.ads`, with `enable: false`, on a page whose front matter says
+  `ads: false`, or outside a production build.
+
+  @param {page} . The page being rendered.
+
+  @example {{ partial "ads/verify.html" .
+}}
+*/}}
+{{- $ads := partialCached "ads/config.html" . .RelPermalink -}}
+
+{{- if $ads.enable -}}
+  {{- $live := or hugo.IsProduction (not (index $ads "production")) -}}
+  {{- $adsense := index $ads.providers "adsense" -}}
+  {{- if and $live $adsense (index $adsense "verifyallpages") -}}
+    {{- with index $adsense "client" -}}
+      <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ . }}" crossorigin="anonymous"></script>
+    {{- else -}}
+      {{- warnidf "ads-verify-client" "ads: params.ads.adsense.verifyAllPages is on but params.ads.adsense.client is not set." -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

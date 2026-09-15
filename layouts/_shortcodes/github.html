@@ -1,0 +1,115 @@
+{{/* Render a card for a GitHub repository, with its description and current star
+  and fork counts.
+
+  The repository is queried at build time, so the numbers are as of the last
+  build and the reader's browser contacts nobody.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração).
+
+  @param {string} repo Required. Repository as "owner/name".
+  @param {bool} showThumbnail Show the repository's social preview image. Default false.
+
+  @example {{< github repo="imfing/hextra" >}}
+@example
+{{< github repo="imfing/hextra" showThumbnail=true >}}
+*/}}
+{{- $repo := .Get "repo" | default (.Get 0) -}}
+
+{{- if not $repo -}}
+  {{- errorf "The %q shortcode requires a 'repo' parameter. See %s" .Name .Position -}}
+{{- end -}}
+
+{{- if not (findRE `^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$` $repo) -}}
+  {{- errorf "The %q shortcode expects a repo as \"owner/name\", got %q. See %s" .Name $repo .Position -}}
+{{- end -}}
+
+{{- $url := printf "https://github.com/%s" $repo -}}
+{{- $showThumbnail := eq (printf "%v" (.Get "showThumbnail")) "true" -}}
+
+{{- $card := dict "url" $url "title" $repo "icon" "github" -}}
+{{- $avatar := "" -}}
+
+{{- /* Turns every API call off, for builds that must not reach the network. */ -}}
+{{- $enabled := partial "utils/remote-fetch-enabled.html" . -}}
+
+{{- if $enabled -}}
+  {{- $headers := dict "Accept" "application/vnd.github+json" -}}{{/* The unauthenticated API allows 60 requests an hour per IP, which a build
+    with several cards on a shared CI runner will exhaust. A token raises that
+    to 5000.
+
+    The name has to start with HUGO_: Hugo's default security policy only
+    permits getenv on ^HUGO_ and ^CI$, and a denied read is a hard build error
+    rather than an empty string. Map GITHUB_TOKEN to it in CI.
+  */}}
+  {{- $token := getenv "HUGO_GITHUB_TOKEN" -}}
+  {{- with $token -}}
+    {{- $headers = merge $headers (dict "Authorization" (printf "Bearer %s" .)) -}}
+  {{- end -}}
+
+  {{- with try (resources.GetRemote (printf "https://api.github.com/repos/%s" $repo) (dict "headers" $headers)) -}}
+    {{- with .Err -}}
+      {{- warnf "github: unable to fetch %q, rendering a plain card: %s" $repo . -}}
+    {{- else with .Value -}}
+      {{- with . | transform.Unmarshal -}}
+        {{- $card = merge $card (dict
+          "description" .description
+          "language" .language
+          "stars" .stargazers_count
+          "forks" .forks_count
+          )
+        -}}
+        {{- with .owner -}}
+          {{- $avatar = .avatar_url -}}
+        {{- end -}}
+      {{- end -}}
+    {{- else -}}
+      {{/* resources.GetRemote reports an HTTP 404 as a nil resource and no error,
+        so without this branch a typo'd, renamed, deleted or private repository
+        degrades to a bare card with nothing written to the build log.
+      */}}
+      {{- warnf "github: %q was not found, rendering a plain card" $repo -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}{{/* Images are fetched and served from this site rather than linked:
+  opengraph.githubassets.com refuses hotlinked requests, so a linked preview
+  renders as a broken icon. Self-hosting also keeps the card free of
+  third-party requests.
+
+  That host also rate-limits generated previews hard - a 429 asking for a
+  fifteen minute backoff is routine - so the owner's avatar is used as a
+  fallback. It is square, hence the contain fit.
+*/}}
+{{- if and $showThumbnail $enabled -}}
+  {{- $thumbnail := "" -}}
+  {{- $fit := "cover" -}}
+
+  {{- $ogURL := printf "https://opengraph.githubassets.com/1/%s" $repo -}}
+  {{- with try (resources.GetRemote $ogURL) -}}
+    {{- with .Err -}}
+      {{- warnf "github: social preview for %q unavailable, falling back to the owner avatar: %s" $repo . -}}
+    {{- else with .Value -}}
+      {{- with resources.Copy (printf "images/github/%s.png" (replace $repo "/" "-")) . -}}
+        {{- $thumbnail = .RelPermalink -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- if and (not $thumbnail) $avatar -}}
+    {{- with try (resources.GetRemote (printf "%s&s=400" $avatar)) -}}
+      {{- with .Err -}}
+        {{- warnf "github: unable to fetch the owner avatar for %q: %s" $repo . -}}
+      {{- else with .Value -}}
+        {{- with resources.Copy (printf "images/github/%s-avatar.png" (replace $repo "/" "-")) . -}}
+          {{- $thumbnail = .RelPermalink -}}
+          {{- $fit = "contain" -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- with $thumbnail -}}
+    {{- $card = merge $card (dict "thumbnail" . "thumbnailFit" $fit) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- partial "components/repo-card.html" $card -}}

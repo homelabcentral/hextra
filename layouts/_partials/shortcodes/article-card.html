@@ -1,0 +1,127 @@
+{{/*
+  Shared card used by the `article` and `list` shortcodes.
+
+  Both run while Hugo is already rendering page content (search-data.json
+  renders every page), so this partial must never reach anything on the target
+  page that is derived from its rendered .Content - .Content itself, .Summary,
+  .WordCount, .ReadingTime, .TableOfContents. Touching any of them makes Hugo
+  render that page, and two pages whose cards point at each other then
+  deadlock the build with no error output at all. Date, reading time and
+  summary are resolved from front matter and .RawContent instead.
+
+  A card pointing at the page it sits on renders nothing.
+
+  @param {page} page The page to render.
+  @param {string} self RelPermalink of the page the card sits on.
+  @param {bool} showSummary Show the page summary. Default true.
+  @param {bool} compactSummary Clamp the summary to a single line. Default false.
+  @param {bool} cover Show the page's cover image when it has one. Default true.
+
+  @example {{ partial "shortcodes/article-card.html" (dict "page" $p "self" $self)
+}}
+*/}}
+
+{{- $showSummary := ne (printf "%v" .showSummary) "false" -}}
+{{- $compactSummary := eq (printf "%v" .compactSummary) "true" -}}
+{{- $showCover := ne (printf "%v" .cover) "false" -}}
+{{- $self := .self -}}
+
+{{- with .page -}}
+  {{- if ne .RelPermalink $self -}}
+
+    {{/* Same order as `blog/cover.html`, so a post's card and its hero never
+      disagree about which cover it has: a `cover` or `featured_image` the post
+      names itself beats `coverText`, and with both declared the lookup runs
+      with `verify` so a name that matches nothing falls back to the text
+      instead of emitting a broken `<img>`. A post with only a text cover skips
+      the lookup, which would otherwise run the resize and the LQIP encode and
+      then throw both away.
+    */}}
+    {{- $text := .Params.coverText -}}
+    {{- $named := or .Params.cover .Params.featured_image -}}
+    {{- $cover := dict -}}
+    {{- if and $showCover (or $named (not $text)) -}}
+      {{- $verify := false -}}
+      {{- if and $named $text -}}
+        {{- $verify = true -}}
+      {{- end -}}
+      {{- $cover = partial "utils/page-image.html" (dict "page" . "process" "Resize 400x webp q80" "verify" $verify) -}}
+    {{- end -}}
+    {{/* Read out here rather than inside the markup: `with $cover.url` rebinds
+      the context to the URL string, and the page is gone by then.
+    */}}
+    {{- $coverText := "" -}}
+    {{- if and $showCover (not $cover.url) -}}
+      {{- $coverText = $text -}}
+    {{- end -}}
+
+    {{- $date := "" -}}
+    {{- if not .Date.IsZero -}}
+      {{- $date = .Date | time.Format (site.Params.dateFormat | default ":date_long") -}}
+    {{- end -}}{{/*
+      .RawContent is the file as written, so reading it costs nothing and
+      cannot recurse. Shortcode calls are dropped first: they are markup, not
+      prose, and would otherwise be counted and shown verbatim.
+    */}}
+    {{- $raw := replaceRE `(?s)\{\{[%<].*?[%>]\}\}` " " .RawContent -}}
+
+    {{- /* Hugo's own reading time is ceil(words / 213). */ -}}
+    {{- $readingTime := "" -}}
+    {{- $words := countwords $raw -}}
+    {{- if gt $words 0 -}}
+      {{- $minutes := int (math.Ceil (div (float $words) 213.0)) -}}
+      {{- $readingTime = printf ((T "readingTime") | default "%d min read") $minutes -}}
+    {{- end -}}
+
+    {{- $summary := "" -}}
+    {{- if $showSummary -}}
+      {{- $summary = .Description | plainify | htmlUnescape -}}
+      {{- if not $summary -}}
+        {{- /* Enough Markdown stripped to read as prose; the card clamps it anyway. */ -}}
+        {{- $text := $raw -}}
+        {{- $text = replaceRE "(?s)```.*?```" " " $text -}}
+        {{- $text = replaceRE `(?m)^\s{0,3}(#{1,6}|>|[-*+]|\d+\.)\s+` "" $text -}}
+        {{- $text = replaceRE `!?\[([^\]]*)\]\([^)]*\)` "$1" $text -}}
+        {{- $text = replaceRE "[*_~`]" "" $text -}}
+        {{- $text = replaceRE `\s+` " " $text -}}
+        {{- $summary = $text | plainify | htmlUnescape | chomp | truncate 200 -}}
+      {{- end -}}
+    {{- end -}}
+
+    <a class="hextra-article-card not-prose" href="{{ .RelPermalink }}">
+      {{- /* A div, not a span: a text cover is a Chroma block. See `article.html`. */ -}}
+      {{- with $coverText -}}
+        <div class="hextra-article-card__cover">
+          {{- partial "components/command-block.html" (dict "lines" . "mode" "cover") -}}
+        </div>
+      {{- else -}}{{- with $cover.url -}}
+        <div class="hextra-article-card__cover">
+          <img
+            src="{{ . }}"
+            {{ with $cover.lqip }}style="{{ printf "--hextra-lqip:url('%s')" . | safeCSS }}"{{ end }}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            {{ with $cover.width }}width="{{ . }}"{{ end }}
+            {{ with $cover.height }}height="{{ . }}"{{ end }}
+          />
+        </div>
+      {{- end -}}{{- end -}}
+      <span class="hextra-article-card__body">
+        <span class="hextra-article-card__title">{{ .Title }}</span>
+        {{- if or $date $readingTime -}}
+          <span class="hextra-article-card__meta">
+            {{- with $date -}}<span>{{ . }}</span>{{- end -}}
+            {{- with $readingTime -}}<span>{{ . }}</span>{{- end -}}
+          </span>
+        {{- end -}}
+        {{- with $summary -}}
+          <span class="hextra-article-card__summary{{ if $compactSummary }} hextra-article-card__summary--compact{{ end }}">
+            {{- . -}}
+          </span>
+        {{- end -}}
+      </span>
+    </a>
+
+  {{- end -}}
+{{- end -}}

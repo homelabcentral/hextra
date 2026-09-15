@@ -25,6 +25,7 @@ your-site/
 ```
 
 markdown ファイル内：
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -41,6 +42,7 @@ your-site/
 ```
 
 markdown ファイル内：
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -57,6 +59,7 @@ your-site/
 ```
 
 markdown ファイル内：
+
 ```markdown
 {{</* asciinema file="demo.cast" */>}}
 ```
@@ -77,6 +80,7 @@ markdown ファイル内：
 ### ファイル検索の仕組み
 
 shortcode は以下の順序で cast ファイルを自動的に検索します：
+
 1. **ページバンドルリソース**（ページバンドルを使用している場合）
 2. **グローバル assets ディレクトリ**（`assets/`）
 3. **Static ディレクトリ**（`static/`）
@@ -89,7 +93,7 @@ shortcode は以下の順序で cast ファイルを自動的に検索します�
 利用可能なすべてのパラメータを紹介する高度な例：
 
 ```markdown
-{{</* asciinema 
+{{</* asciinema
   file="demo.cast"
   theme="dracula"
   speed="2"
@@ -99,23 +103,22 @@ shortcode は以下の順序で cast ファイルを自動的に検索します�
 */>}}
 ```
 
-{{< asciinema 
+{{< asciinema
   file="casts/demo.cast"
   theme="dracula"
   speed="2"
   autoplay="true"
   loop="true"
-  markers="1.5:Installation,3.2:Configuration,5.8:Testing"
->}}
+  markers="1.5:Installation,3.2:Configuration,5.8:Testing" >}}
 
 ## パラメータ
 
-| パラメータ | 型 | デフォルト | 説明 |
-|-----------|----|-----------|------|
-| `file` | string | - | .cast ファイルパス（必須）。ローカルファイル、絶対パス、リモート URL をサポート |
-| `theme` | string | `"asciinema"` | プレイヤーテーマ |
-| `speed` | number | `1` | 再生速度倍率 |
-| `autoplay` | boolean | `false` | 自動再生 |
-| `loop` | boolean | `false` | ループ再生 |
-| `poster` | string | `""` | 再生開始前に表示されるポスター（プレビューフレーム）。NPT表記法をサポート（例："npt:1:23"） |
-| `markers` | string | `""` | カンマ区切りの時間マーカー。形式："時間:ラベル" または "時間"のみ（例："1.5:Installation,3.2:Configuration,5.8"） |
+| パラメータ | 型      | デフォルト    | 説明                                                                                                              |
+| ---------- | ------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `file`     | string  | -             | .cast ファイルパス（必須）。ローカルファイル、絶対パス、リモート URL をサポート                                   |
+| `theme`    | string  | `"asciinema"` | プレイヤーテーマ                                                                                                  |
+| `speed`    | number  | `1`           | 再生速度倍率                                                                                                      |
+| `autoplay` | boolean | `false`       | 自動再生                                                                                                          |
+| `loop`     | boolean | `false`       | ループ再生                                                                                                        |
+| `poster`   | string  | `""`          | 再生開始前に表示されるポスター（プレビューフレーム）。NPT表記法をサポート（例："npt:1:23"）                       |
+| `markers`  | string  | `""`          | カンマ区切りの時間マーカー。形式："時間:ラベル" または "時間"のみ（例："1.5:Installation,3.2:Configuration,5.8"） |

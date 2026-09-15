@@ -1,4 +1,80 @@
 /* Table of Contents Scroll Spy Styles */
+
+/* The active item is marked by a rail on the inline-start edge as well as by
+   colour. Colour alone cannot carry it: accent-700 measures 5.42:1 against the
+   #f7f7f7 background but only 1.21:1 against the inactive links beside it, so
+   the selection reads as a hue shift with almost no lightness shift - hard to
+   see, and a WCAG 1.4.1 Use of Color problem as much as a contrast one. The
+   rail is 5.42:1 against the background, past the 3:1 SC 1.4.11 asks of a
+   non-text indicator.
+
+   The rail lives on the li, not the link, for two reasons. Every row reserves
+   it in transparent, so colouring it in cannot shift the text sideways. And the
+   li carries no padding utilities, whereas the link carries the nesting
+   indentation as physical `ltr:pl-` / `rtl:pr-` classes - a logical padding on
+   the link would land outside Tailwind's utility layer and win over them,
+   flattening the hierarchy. Anchoring to the li also keeps the rail at one x
+   for every level, which is what makes it read as a rail. */
+.hextra-toc ul li {
+  @apply hx:border-s-2 hx:border-s-transparent hx:ps-2;
+}
+
+.hextra-toc ul li:has(> a.hextra-toc-active) {
+  @apply hx:border-s-hextra-accent-700 hx:dark:border-s-hextra-accent-400;
+}
+
+/* `:has()` is the only way to colour the li from a class the scroll spy puts
+   on the link, and a browser that does not understand a selector drops the
+   whole rule rather than the one part - so without a fallback the rail simply
+   never appears, the text still recolours, and the result is the colour-only
+   indicator this file exists to replace. Firefox before 121, including the
+   ESR 115 builds still in the field, is that browser.
+
+   The fallback draws the same rail from the link, which is the one element
+   reachable without `:has()`, as an absolutely positioned pseudo-element. That
+   keeps it out of layout entirely: nothing reserves space, nothing shifts, and
+   the two hazards the rule above avoids by living on the li are avoided here
+   too. A border on the link would sit flush against the text, because the 8px
+   gap is the li's `ps-2`; adding padding to the link to restore it would land
+   outside Tailwind's utility layer and beat the `ltr:pl-*` nesting classes,
+   flattening the hierarchy.
+
+   `-10px` is the li's 2px border plus its 8px padding, so the bar lands in the
+   channel the li already reserves - the same pixels as the rule above. It is
+   one x for every level because the link's border box is: the nesting
+   indentation is padding inside that box, so it moves the text and not the
+   edge.
+
+   Browsers with `:has()` never see this block, so there is no doubled rail. */
+@supports not selector(:has(*)) {
+  .hextra-toc ul li > a.hextra-toc-active {
+    position: relative;
+  }
+
+  .hextra-toc ul li > a.hextra-toc-active::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: -10px;
+    width: 2px;
+    @apply hx:bg-hextra-accent-700;
+  }
+
+  /* The dark half is written as an ancestor selector rather than
+     `@apply hx:dark:bg-...`. The variant is defined in styles.css as
+     `&:where(.dark, .dark *)`, which appends to the selector - and a
+     pseudo-element has to come last, so on this rule Tailwind emitted a
+     `:where()` with an empty list. That is valid CSS matching nothing, so the
+     dark rail silently rendered in the light colour. */
+  :where(.dark, .dark *) .hextra-toc ul li > a.hextra-toc-active::before {
+    @apply hx:bg-hextra-accent-400;
+  }
+}
+
+/* accent-700 rather than the accent-600 used for hover elsewhere: on the light
+   background (#f7f7f7) accent-600 measures 3.71:1, under the 4.5:1 WCAG AA
+   floor for 14px text. accent-700 is 5.41:1. Dark mode keeps accent-400 at
+   8.67:1 on #111111. */
 .hextra-toc a.hextra-toc-active {
-  @apply hx:text-gray-900! hx:dark:text-gray-50! hx:transition-all hx:duration-200;
+  @apply hx:text-hextra-accent-700! hx:dark:text-hextra-accent-400! hx:transition-all hx:duration-200;
 }

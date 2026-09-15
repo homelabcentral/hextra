@@ -1,11 +1,11 @@
-// {{ $faviconDarkExists := fileExists (path.Join "static" "favicon-dark.svg") }}
+// {{ $faviconDarkExists := fileExists (path.Join "static" "icons" "favicon-dark.svg") }}
 (function () {
   const faviconEl = document.getElementById("favicon-svg");
   const faviconDarkExists = "{{ $faviconDarkExists }}" === "true";
 
   if (faviconEl && faviconDarkExists) {
-    const lightFavicon = '{{ "favicon.svg" | relURL }}';
-    const darkFavicon = '{{ "favicon-dark.svg" | relURL }}';
+    const lightFavicon = '{{ "icons/favicon.svg" | relURL }}';
+    const darkFavicon = '{{ "icons/favicon-dark.svg" | relURL }}';
 
     const darkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 

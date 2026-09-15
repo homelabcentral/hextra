@@ -1,0 +1,59 @@
+{{/* Embed a link to another page as a card, with its cover, meta and summary.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração). As in the original, a card
+  pointing at its own page renders nothing.
+
+  @param {string} link Required. Path or permalink of the page, e.g. "/blog/my-post".
+  May also be given as the first positional parameter.
+  @param {bool} showSummary Show the page summary. Default true.
+  @param {bool} compactSummary Clamp the summary to a single line. Default false.
+  @param {bool} cover Show the page's cover image when it has one. Default true.
+
+  @example {{< article link="/blog/my-post" >}}
+@example
+{{< article "/blog/my-post" >}}
+@example
+{{< article link="/blog/my-post" compactSummary=true cover=false >}}
+*/}}{{/* default "" normalises the missing case: .Get returns nil rather than an
+  empty string for a key that is absent from positional parameters.
+*/}}
+{{- $link := .Get "link" | default (.Get 0) | default "" -}}{{/* errorf logs and carries on, so every check has to guard the rest of the
+  template with an else. Falling through used to reach the "unable to find"
+  message with a nil link and print %!q(<nil>) alongside the real error.
+*/}}
+{{- if not $link -}}
+  {{- errorf "The %q shortcode requires a 'link' parameter. See %s" .Name .Position -}}
+{{- else -}}
+  {{- $self := "" -}}
+  {{- with .Page -}}
+    {{- $self = .RelPermalink -}}
+  {{- end -}}
+
+  {{- $target := site.GetPage $link -}}
+
+  {{- if not $target -}}
+    {{- errorf "The %q shortcode was unable to find %q. See %s" .Name $link .Position -}}
+  {{- else -}}
+    {{- if eq $target.RelPermalink $self -}}
+      {{- warnf "The 'article' shortcode links to its own page, skipping." -}}
+    {{- end -}}
+
+    {{/* Wrapped in a div so Goldmark reads the output as an HTML block. A bare
+      `<a ...>` on a line of its own does not meet any HTML-block start
+      condition, so Markdown wraps it in a paragraph - and the card's cover can
+      hold a `coverText` command block, which Chroma renders as a div. A div
+      inside a p is invalid and the parser splits it back out.
+    */}}
+    <div class="hextra-article">
+      {{- partial "shortcodes/article-card.html" (dict
+        "page" $target
+        "self" $self
+        "showSummary" (.Get "showSummary")
+        "compactSummary" (.Get "compactSummary")
+        "cover" (.Get "cover")
+        )
+      -}}
+    </div>
+  {{- end -}}
+
+{{- end -}}

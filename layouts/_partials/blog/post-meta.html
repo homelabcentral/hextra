@@ -1,0 +1,30 @@
+{{/* Inline metadata row for a post: date, reading time, tags.
+
+  Shared by the post card and the post hero so both read identically.
+
+  @param {page} page The post.
+  @param {bool} [readingTime] Show reading time.
+  @param {bool} [tags] Show tags.
+
+  @example {{ partial "blog/post-meta.html" (dict "page" . "readingTime" true "tags" true)
+}}
+*/}}
+{{- $page := .page -}}
+{{- $showReadingTime := .readingTime | default false -}}
+{{- $showTags := and (.tags | default false) $page.Params.tags -}}
+
+{{- if or $page.Date $showReadingTime $showTags -}}
+  <div class="hextra-blog-meta">
+    {{- with $page.Date -}}
+      <time datetime="{{ .Format "2006-01-02" }}">{{ partial "utils/format-date" . }}</time>
+    {{- end -}}
+    {{- if $showReadingTime -}}
+      {{- if $page.Date }}<span class="hextra-blog-meta-sep" aria-hidden="true">·</span>{{ end -}}
+      <span>{{ partial "utils/reading-time.html" $page }}</span>
+    {{- end -}}
+    {{- if $showTags -}}
+      {{- if or $page.Date $showReadingTime }}<span class="hextra-blog-meta-sep" aria-hidden="true">·</span>{{ end -}}
+      <span class="hextra-blog-meta-tags">{{ partial "tags.html" (dict "context" $page) }}</span>
+    {{- end -}}
+  </div>
+{{- end -}}

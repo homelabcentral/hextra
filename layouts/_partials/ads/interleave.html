@@ -1,0 +1,28 @@
+{{/* Whether an ad belongs after the post at this index in a list.
+
+  Shared by the blog index's two render branches - card and plain - so the
+  counting rule cannot drift between them.
+
+  Nothing is placed after the final post on a page: the ad would sit against
+  the pagination links, and on a configuration that also sets `blogEnd` the two
+  would land within a couple of elements of each other.
+
+  @param {dict} slot The resolved `bloglist` slot from `ads/config.html`.
+  @param {int} index Zero-based index of the post just rendered.
+  @param {int} total Number of posts on this page of the list.
+  @returns {bool}
+
+  @example {{ if partial "ads/interleave.html" (dict "slot" $slot "index" $i "total" $total)
+}}
+*/}}
+{{- $slot := .slot -}}
+{{- $show := false -}}
+{{- $on := false -}}
+{{- with $slot }}{{ $on = index . "enable" }}{{ end -}}
+{{- if $on -}}
+  {{- $n := sub (add .index 1) (int (index $slot "offset")) -}}
+  {{- if and (gt $n 0) (lt (add .index 1) .total) -}}
+    {{- $show = eq (mod $n (int (index $slot "every"))) 0 -}}
+  {{- end -}}
+{{- end -}}
+{{- return $show -}}

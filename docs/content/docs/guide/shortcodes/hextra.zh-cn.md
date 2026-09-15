@@ -20,16 +20,16 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter    | Description |
-|--------------|-------------|
-| `title`      | 卡片的标题。      |
-| `subtitle`   | 卡片的副标题。     |
-| `class`      | 卡片的类别。      |
-| `image`      | 卡片的图片。      |
-| `imageClass` | 图片的类别。      |
-| `style`      | 卡片的样式。      |
-| `icon`       | 卡片的图标。      |
-| `link`       | 卡片的链接。      |
+| Parameter    | Description    |
+| ------------ | -------------- |
+| `title`      | 卡片的标题。   |
+| `subtitle`   | 卡片的副标题。 |
+| `class`      | 卡片的类别。   |
+| `image`      | 卡片的图片。   |
+| `imageClass` | 图片的类别。   |
+| `style`      | 卡片的样式。   |
+| `icon`       | 卡片的图标。   |
+| `link`       | 卡片的链接。   |
 
 ## `hextra/feature-grid`
 
@@ -47,10 +47,10 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `cols`    | 列数。         |
-| `style`   | 网格的样式。      |
+| Parameter | Description  |
+| --------- | ------------ |
+| `cols`    | 列数。       |
+| `style`   | 网格的样式。 |
 
 ## `hextra/hero-badge`
 
@@ -60,7 +60,7 @@ next: /docs/guide/deploy-site
 
 ```
 {{</* hextra/hero-badge */>}}
-  <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-primary-400"></div>
+  <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-hextra-accent-400"></div>
   <span>Free, open source</span>
   {{</* icon name="arrow-circle-right" attributes="height=14" */>}}
 {{</* /hextra/hero-badge */>}}
@@ -68,11 +68,11 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `link`    | 徽章的链接。      |
-| `class`   | 徽章的类别。      |
-| `style`   | 徽章的样式。      |
+| Parameter | Description  |
+| --------- | ------------ |
+| `link`    | 徽章的链接。 |
+| `class`   | 徽章的类别。 |
+| `style`   | 徽章的样式。 |
 
 ## `hextra/hero-button`
 
@@ -86,11 +86,11 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `link`    | 按钮的链接。      |
-| `text`    | 按钮的文本。      |
-| `style`   | 按钮的样式。      |
+| Parameter | Description  |
+| --------- | ------------ |
+| `link`    | 按钮的链接。 |
+| `text`    | 按钮的文本。 |
+| `style`   | 按钮的样式。 |
 
 ## `hextra/hero-container`
 
@@ -106,19 +106,19 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter     | Description              |
-|---------------|--------------------------|
-| `class`       | 容器的类。                    |
-| `cols`        | 列数（默认值：`2`）。             |
-| `image`       | 容器的图片。                   |
+| Parameter     | Description                               |
+| ------------- | ----------------------------------------- |
+| `class`       | 容器的类。                                |
+| `cols`        | 列数（默认值：`2`）。                     |
+| `image`       | 容器的图片。                              |
 | `imageCard`   | 是否将图片显示为卡片（默认值：`false`）。 |
-| `imageClass`  | 图片的类。                    |
-| `imageLink`   | 图片的链接。                   |
-| `imageStyle`  | 图片的样式。                   |
-| `imageTitle`  | 图片的标题。                   |
-| `imageWidth`  | 图片的宽度（默认值：`350`）。        |
-| `imageHeight` | 图片的高度（默认值：`350`）。        |
-| `style`       | 容器的样式。                   |
+| `imageClass`  | 图片的类。                                |
+| `imageLink`   | 图片的链接。                              |
+| `imageStyle`  | 图片的样式。                              |
+| `imageTitle`  | 图片的标题。                              |
+| `imageWidth`  | 图片的宽度（默认值：`350`）。             |
+| `imageHeight` | 图片的高度（默认值：`350`）。             |
+| `style`       | 容器的样式。                              |
 
 ## `hextra/hero-headline`
 
@@ -134,9 +134,9 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `style`   | 标题的样式。      |
+| Parameter | Description  |
+| --------- | ------------ |
+| `style`   | 标题的样式。 |
 
 ## `hextra/hero-section`
 
@@ -150,11 +150,11 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description     |
-|-----------|-----------------|
+| Parameter | Description                |
+| --------- | -------------------------- |
 | `heading` | 标题级别（默认值：`h2`）。 |
-| `style`   | 标题的样式。          |
-| `content` | 标题的内容。          |
+| `style`   | 标题的样式。               |
+| `content` | 标题的内容。               |
 
 ## `hextra/hero-subtitle`
 
@@ -170,6 +170,6 @@ next: /docs/guide/deploy-site
 
 ### Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `style`   | 字幕的样式。      |
+| Parameter | Description  |
+| --------- | ------------ |
+| `style`   | 字幕的样式。 |

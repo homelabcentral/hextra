@@ -1,7 +1,24 @@
+{{/* Tag links for a page.
+
+  Emits anchors only; the caller supplies the wrapper, so a chip caller is
+  expected to wrap them in `.hextra-tag-cloud`.
+
+  @param {page} context The page whose `tags` front matter is rendered.
+  @param {string} [variant] "chip" for the bordered pills used by the trending
+  tags widget. Any other value renders inline text links.
+
+  @example {{ partial "tags.html" (dict "context" . "variant" "chip")
+}}
+*/}}
 {{- $context := .context -}}
+{{- $isChip := eq (.variant | default "inline") "chip" -}}
 
 {{- range $tag := $context.Params.tags -}}
   {{- with $context.Site.GetPage (printf "/tags/%s" $tag) -}}
-    <a class="hx:inline-block hx:whitespace-nowrap hx:mr-2 hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-100 hx:contrast-more:text-gray-800 hx:contrast-more:dark:text-gray-50" href="{{ .RelPermalink }}">#{{ $tag }}</a>
+    {{- if $isChip -}}
+      <a class="hextra-tag-chip" href="{{ .RelPermalink }}">#{{ $tag }}</a>
+    {{- else -}}
+      <a class="hx:inline-block hx:whitespace-nowrap hx:mr-2 hx:text-neutral-500 hx:hover:text-neutral-900 hx:dark:text-neutral-400 hx:dark:hover:text-neutral-100 hx:contrast-more:text-neutral-800 hx:contrast-more:dark:text-neutral-50" href="{{ .RelPermalink }}">#{{ $tag }}</a>
+    {{- end -}}
   {{- end -}}
 {{- end -}}

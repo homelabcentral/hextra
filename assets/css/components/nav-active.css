@@ -1,0 +1,8 @@
+/* Single source of truth for the "current page" highlight, shared by the
+   docs sidebar and the blog rail nav. Restyle it here so the two surfaces
+   cannot drift apart. Imported after blog.css so the active background also
+   wins over the nav link's hover background. */
+.hextra-sidebar-active-item,
+.hextra-blog-nav-link[aria-current="page"] {
+  @apply hx:bg-hextra-accent-200 hx:font-semibold hx:text-hextra-accent-800 hx:contrast-more:border hx:contrast-more:border-hextra-accent-500 hx:dark:bg-hextra-accent-400/10 hx:dark:text-hextra-accent-600 hx:contrast-more:dark:border-hextra-accent-500;
+}

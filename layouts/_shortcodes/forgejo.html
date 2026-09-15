@@ -1,0 +1,26 @@
+{{/* Render a card for a Forgejo repository, with its description, language and
+  current star and fork counts.
+
+  Forgejo exposes the Gitea API, so this is the `gitea` shortcode with the
+  Forgejo icon. Forgejo is self-hosted, so `server` is required — for the
+  best-known instance, use the `codeberg` shortcode instead.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração).
+
+  @param {string} repo Required. Repository as "owner/name".
+  @param {string} server Required. Instance URL, e.g. "https://v11.next.forgejo.org".
+  @param {bool} showThumbnail Show the owner's avatar. Default false.
+  @param {string} icon Icon shown before the title. Default "forgejo".
+
+  @example {{< forgejo server="https://v11.next.forgejo.org" repo="a/mastodon" >}}
+*/}}
+{{- partial "shortcodes/gitea-card.html" (dict
+  "repo" (.Get "repo")
+  "server" (.Get "server")
+  "icon" (.Get "icon" | default "forgejo")
+  "showThumbnail" (.Get "showThumbnail")
+  "provider" "forgejo"
+  "shortcode" .Name
+  "position" .Position
+  )
+-}}

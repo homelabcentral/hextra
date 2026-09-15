@@ -1,0 +1,45 @@
+{{/* A shortcode for rendering a button that highlights a primary action.
+
+  `pageRef` resolves an internal page reference against the current page, so the
+  resulting URL is language- and trailing-slash-aware in the same way as the
+  theme's navigation. It takes precedence over `href` when both are set.
+
+  Ported from the Blowfish theme (MIT, Nuno Coração), with the `style` parameter
+  from its `cta` shortcode folded in.
+
+  @param {string} pageRef Path to an internal page, e.g. "/docs/guide/configuration".
+  @param {string} href Any URL or path.
+  @param {string} target The anchor target attribute, e.g. "_blank".
+  @param {string} rel The anchor rel attribute.
+  @param {string} style One of primary (default), outline, ghost.
+  @param {string} icon Optional icon name shown before the label.
+
+  @example {{< button href="https://gohugo.io" target="_blank" >}}Hugo{{< /button >}}
+@example {{< button pageRef="/docs/guide/organize-files" style="outline" >}}Get
+started{{< /button >}}
+*/}}
+{{- $pageRef := .Get "pageRef" -}}
+{{- $href := .Get "href" -}}
+{{- $url := "" -}}
+
+{{- with $pageRef -}}
+  {{- with $.Page.GetPage . -}}
+    {{- $url = .RelPermalink -}}
+  {{- else -}}
+    {{- errorf "The %q shortcode was unable to resolve pageRef %q. See %s" $.Name . $.Position -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if not $url -}}
+  {{- $url = cond (hasPrefix $href "/") ($href | relURL) $href -}}
+{{- end -}}
+
+{{- partial "shortcodes/button.html" (dict
+  "url" $url
+  "label" (.InnerDeindent | .Page.RenderString)
+  "style" (.Get "style")
+  "target" (.Get "target")
+  "rel" (.Get "rel")
+  "icon" (.Get "icon")
+  )
+-}}

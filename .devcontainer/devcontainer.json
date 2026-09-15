@@ -1,17 +1,162 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/go:1",
+  "name": "Hextra - theme development",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspaces/hextra",
+
+  // SSH: git over SSH inside the container needs two separate things, and only
+  // one of them is configuration.
+  //
+  // 1. Signing. VS Code forwards the host ssh-agent automatically - it starts a
+  //    helper in the container, creates a fresh socket there, proxies the agent
+  //    protocol back to the host and sets SSH_AUTH_SOCK. Nothing to declare,
+  //    and no way to opt out. The host socket is never bind-mounted, so the
+  //    macOS launchd socket path is irrelevant. Private keys stay on the host.
+  //
+  // 2. Choosing WHICH key. A forwarded agent offers every key it holds, in
+  //    agent order, and GitHub accepts the first one that maps to an account,
+  //    then stops - so a host with more than one GitHub key authenticates as
+  //    whichever it happened to offer first. ssh's only selection mechanism is
+  //    IdentityFile + IdentitiesOnly (ssh_config(5)); there is no way to pick
+  //    by fingerprint or comment. That means ssh has to be able to READ the
+  //    host's ~/.ssh/config, which is a file, which needs a mount.
+  //
+  // The mount is declared in docker-compose.yml, NOT here, and deliberately so.
+  // The equivalent for this file is written out below, commented; uncommenting
+  // it works, but the `readonly` would be silently discarded, giving the
+  // read-write access to the host's real private keys. The reason is that the
+  // two orchestrators take different paths through the devcontainers CLI:
+  //
+  //   - image/Dockerfile containers (spec-node/singleContainer.ts) pass the
+  //     mount string through verbatim as `--mount <string>`, so Docker itself
+  //     parses `readonly` and it works.
+  //   - compose containers (spec-node/dockerCompose.ts) parse it into a Mount
+  //     object first and re-emit it into a generated override file via
+  //     convertMountToVolume(), which builds `${source}:${target}` and nothing
+  //     else. The Mount interface is { type, source, target, external } - it
+  //     has no readonly field, so the flag is gone before the volume string is
+  //     built. No warning is issued.
+  //
+  // This repo is compose-based ("dockerComposeFile" above), so the mount lives
+  // in docker-compose.yml where long syntax supports read_only: true.
+  //
+  // Read-only costs nothing here: ssh only wants to WRITE to ~/.ssh to append
+  // to known_hosts, which fails with a non-fatal "Failed to add the host to the
+  // list of known hosts" warning and connects anyway - and only for a host the
+  // Mac has never connected to. In exchange, nothing running in this container
+  // (npm lifecycle scripts, Playwright, act, go install) can modify or delete
+  // the host's keys.
+  //
+  // Requires `IgnoreUnknown UseKeychain` in a LEADING `Host *` block on the
+  // host: UseKeychain is macOS-only and Linux OpenSSH aborts the entire file on
+  // it ("Bad configuration option: usekeychain"). It has to be in a block that
+  // matches every host, not inside a narrower one, or the other blocks still
+  // abort the parse.
+  //
+  // Ready to uncomment. If you do, DELETE the bind entry from
+  // docker-compose.yml first - two mounts on the same target is an error - and
+  // accept that this one is read-write.
+  //
+  // "mounts": [
+  //   "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,readonly"
+  // ],
   "features": {
     "ghcr.io/devcontainers/features/hugo:1": {
       "extended": true,
-      "version": "0.161.1"
+      "version": "0.166.0"
     },
-    "ghcr.io/devcontainers/features/node:1": {}
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    // Docker CLI against the host daemon (socket mounted in docker-compose.yml)
+    // so `make ci*` can run act inside the container.
+    // moby: false — the moby packages don't exist on Debian trixie (this
+    // image's base); Docker's official CLI packages do.
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "moby": false
+    },
+    "ghcr.io/devcontainers-extra/features/act:1": {},
+    // GitHub CLI, authenticated as whoever owns the token in GH_TOKEN (see the
+    // environment block in docker-compose.yml). Needed because git over SSH and
+    // the GitHub API authenticate separately: the forwarded agent covers pushes,
+    // but `gh pr create` is a REST call and needs a token of its own.
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   "customizations": {
     "vscode": {
-      "extensions": ["mhutchie.git-graph", "esbenp.prettier-vscode", "tamasfe.even-better-toml", "budparr.language-hugo-vscode"]
+      "extensions": [
+        "mhutchie.git-graph",
+        "esbenp.prettier-vscode",
+        "tamasfe.even-better-toml",
+        "budparr.language-hugo-vscode",
+        "bradlc.vscode-tailwindcss",
+        "austenc.tailwind-docs",
+        "Zarifprogrammer.tailwind-snippets",
+        "kamikillerto.vscode-colorize",
+        "ecmel.vscode-html-css",
+        "Zignd.html-css-class-completion"
+      ]
     }
   },
-  "postCreateCommand": "npm install",
-  "forwardPorts": [1313]
+  // docs/public is gitignored and will not exist on a fresh clone. Create it on
+  // the host first, otherwise Docker creates it as root and the build cannot
+  // write there.
+  "initializeCommand": "mkdir -p docs/public",
+  // The node_modules named volume (docker-compose.yml) is created empty and
+  // root-owned, because nothing exists at that path in the image for Docker to
+  // seed ownership from. Claim it for the container user before installing,
+  // otherwise npm fails with EACCES on the first mkdir.
+  //
+  // Playwright browsers are not in the image and not in node_modules; they go
+  // to ~/.cache/ms-playwright. Run unprivileged so that cache is owned by the
+  // container user; --with-deps elevates on its own for the apt step only.
+  // Chromium only: playwright.config.ts declares no projects.
+  //
+  // Then the two content-authoring tools: freeze renders code snippets to SVG
+  // with the font embedded, asciinema records the .cast files the asciinema
+  // shortcode plays. Last so a failure here cannot block npm or the Playwright
+  // browser download, which the test suite depends on - and independent of
+  // each other, and non-fatal. They were `&&`-chained to the required steps
+  // and to each other, so an unpinned `apt-get` hiccup skipped freeze and
+  // failed postCreateCommand outright, after which `make doctor` advises
+  // reopening in the devcontainer: the step that had just failed. Neither
+  // tool is needed to build, test or preview the site.
+  //
+  // freeze needs no sudo and no arch detection: the base image (golang:trixie)
+  // sets GOPATH=/go and puts /go/bin on PATH, and freeze is pure Go, no cgo.
+  // Pinned; `go install` verifies it against sum.golang.org.
+  //
+  // asciinema comes from Debian rather than upstream - 2.4.0 against 3.2.1 -
+  // which costs `asciinema convert` and live streaming, neither of which is
+  // needed to produce docs casts. It records asciicast v2 and the player is
+  // loaded unpinned from jsDelivr, which reads v2 and v3 both.
+  //
+  // The apt-get update is deliberate even though `playwright install
+  // --with-deps` directly above runs one of its own; depending on that as an
+  // implicit side effect would break the moment the Playwright step moves.
+  "postCreateCommand": "sudo chown -R \"$(id -u):$(id -g)\" node_modules && npm install && npx playwright install --with-deps chromium || exit 1; { sudo apt-get update && sudo apt-get install -y --no-install-recommends asciinema; } || echo 'devcontainer: asciinema unavailable (optional, docs casts only)'; go install github.com/charmbracelet/freeze@v0.2.2 || echo 'devcontainer: freeze unavailable (optional, snippet SVGs only)'; gh repo set-default homelabcentral/hextra 2>/dev/null || true;",
+  // Docker Desktop's VirtioFS periodically serves uid 0 for the *root inode* of
+  // a bind mount. Measured in this container: 32 of 300 reads (~11%), in ~1s
+  // windows roughly every 25s. Children are never affected - 0 of 300 on both
+  // the repo and .git - because they are looked up from their parent, while the
+  // mount root has no parent and is answered from a separate code path.
+  //
+  // Git checks the ownership of the worktree, which here is the mount root, so
+  // ~11% of git calls see uid 0 and abort with "detected dubious ownership".
+  // hugo.yaml sets enableGitInfo, so `make preview` makes hundreds of git calls
+  // per build and reliably loses that lottery; the Source Control panel goes
+  // blank for the same reason.
+  //
+  // This does not repair the ownership - nothing can, the value is fabricated
+  // per-read and is not stored anywhere - it tells git to stop consulting it.
+  // See docker/for-mac#6298 and #6243, both open.
+  //
+  // postStart, not postCreate: the value is wrong intermittently for the life
+  // of the container, so this has to be in place on every start, not just the
+  // first. Guarded so repeated starts do not append duplicate entries.
+  "postStartCommand": "git config --global --get-all safe.directory 2>/dev/null | grep -qxF \"${containerWorkspaceFolder}\" || git config --global --add safe.directory \"${containerWorkspaceFolder}\"",
+  // 1313 is the Hugo dev server, preview:8043 is the goStatic service, 9323 is
+  // the Playwright HTML report (`make report`, or served automatically after a
+  // failing run).
+  "forwardPorts": [1313, "preview:8043", 9323]
 }

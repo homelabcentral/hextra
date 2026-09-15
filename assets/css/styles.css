@@ -3,17 +3,44 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary-50: hsl(var(--primary-hue) var(--primary-saturation) calc(var(--primary-lightness) + calc(calc(100% - var(--primary-lightness)) / 50) * 47));
-  --color-primary-100: hsl(var(--primary-hue) var(--primary-saturation) calc(var(--primary-lightness) + calc(calc(100% - var(--primary-lightness)) / 50) * 44));
-  --color-primary-200: hsl(var(--primary-hue) var(--primary-saturation) calc(var(--primary-lightness) + calc(calc(100% - var(--primary-lightness)) / 50) * 36));
-  --color-primary-300: hsl(var(--primary-hue) var(--primary-saturation) calc(var(--primary-lightness) + calc(calc(100% - var(--primary-lightness)) / 50) * 27));
-  --color-primary-400: hsl(var(--primary-hue) var(--primary-saturation) calc(var(--primary-lightness) + calc(calc(100% - var(--primary-lightness)) / 50) * 16));
-  --color-primary-500: hsl(var(--primary-hue) var(--primary-saturation) var(--primary-lightness));
-  --color-primary-600: hsl(var(--primary-hue) var(--primary-saturation) calc(calc(var(--primary-lightness) / 50) * 45));
-  --color-primary-700: hsl(var(--primary-hue) var(--primary-saturation) calc(calc(var(--primary-lightness) / 50) * 39));
-  --color-primary-800: hsl(var(--primary-hue) var(--primary-saturation) calc(calc(var(--primary-lightness) / 50) * 32));
-  --color-primary-900: hsl(var(--primary-hue) var(--primary-saturation) calc(calc(var(--primary-lightness) / 50) * 24));
-  --color-dark: #111;
+  /*
+    The page background, as one token rather than a light/dark class pair.
+
+    Neither value is a Tailwind step - #f7f7f7 falls between `neutral-50` and
+    `neutral-100`, and #111111 between `neutral-900` and `neutral-950` - so
+    they have to be named. Defining the token once and flipping it under
+    `.dark` (below) means `hx:bg-hextra-bg` is correct in both modes with no
+    `dark:` twin, which is what keeps the handful of surfaces that continue the
+    page - the navbar blur, the sidebar drawer, sticky footers, step markers -
+    from drifting away from `body` one edit at a time.
+  */
+  --color-hextra-bg: var(--hextra-bg);
+
+  /* Accent color pelette */
+  --color-hextra-accent-50: var(--color-accent-color-50);
+  --color-hextra-accent-100: var(--color-accent-color-100);
+  --color-hextra-accent-200: var(--color-accent-color-200);
+  --color-hextra-accent-300: var(--color-accent-color-300);
+  --color-hextra-accent-400: var(--color-accent-color-400);
+  --color-hextra-accent-500: var(--color-accent-color-500);
+  --color-hextra-accent-600: var(--color-accent-color-600);
+  --color-hextra-accent-700: var(--color-accent-color-700);
+  --color-hextra-accent-800: var(--color-accent-color-800);
+  --color-hextra-accent-900: var(--color-accent-color-900);
+  --color-hextra-accent-950: var(--color-accent-color-950);
+
+  /*
+    Tailwind owns `--font-mono`, and its default wins on source order: this
+    file compiles into main.css, which head.html concatenates *after*
+    variables.css. Pointing it at our own variable sidesteps that — custom
+    properties resolve at use time, so the declaration order stops mattering.
+    The indirection is the same trick `--color-hextra-accent-*` already uses
+    for `--color-accent-color-*` above.
+
+    The effect is that `hx:font-mono` follows params.fonts.mono everywhere,
+    including the four places that already used it before the param existed.
+  */
+  --font-mono: var(--font-monospace);
 }
 
 html {
@@ -21,34 +48,46 @@ html {
 }
 
 body {
-  @apply hx:w-full hx:bg-white hx:dark:bg-dark hx:dark:text-gray-100;
+  @apply hx:w-full hx:bg-hextra-bg hx:dark:text-neutral-100;
+  /* @apply hx:w-full hx:bg-neutral-200 hx:dark:bg-neutral-800 hx:dark:text-neutral-100; */
+  /* @apply hx:w-full hx:bg-neutral-50 hx:dark:bg-neutral-950 hx:dark:text-neutral-100; */
 }
 
 :root {
-  --primary-hue: 212deg;
-  --primary-saturation: 100%;
-  --primary-lightness: 50%;
+  --hextra-bg: #f7f7f7;
+
   --hextra-navbar-height: 3.5rem;
   --hextra-banner-height: 2rem;
   --menu-height: 3.75rem; /* 60px */
+
+  /* Custom accent color */
+  --color-accent-color-50: oklch(0.977 0.013 236.62);
+  --color-accent-color-100: oklch(0.951 0.026 236.824);
+  --color-accent-color-200: oklch(0.901 0.058 230.902);
+  --color-accent-color-300: oklch(0.828 0.111 230.318);
+  --color-accent-color-400: oklch(0.746 0.16 232.661);
+  --color-accent-color-500: oklch(0.685 0.169 237.323);
+  --color-accent-color-600: oklch(0.588 0.158 241.966);
+  --color-accent-color-700: oklch(0.5 0.134 242.749);
+  --color-accent-color-800: oklch(0.443 0.11 240.79);
+  --color-accent-color-900: oklch(0.391 0.09 240.876);
+  --color-accent-color-950: oklch(0.293 0.066 243.157);
 }
 
 .dark {
-  --primary-hue: 204deg;
-  --primary-saturation: 100%;
-  --primary-lightness: 50%;
+  --hextra-bg: #111111;
 }
 
 @utility hextra-focus {
-  @apply hx:outline-none hx:ring-2 hx:ring-primary-200 hx:ring-offset-1 hx:ring-offset-primary-300 hx:dark:ring-primary-800 hx:dark:ring-offset-primary-700;
+  @apply hx:outline-none hx:ring-2 hx:ring-hextra-accent-200 hx:ring-offset-1 hx:ring-offset-hextra-accent-300 hx:dark:ring-hextra-accent-800 hx:dark:ring-offset-hextra-accent-700;
 }
 
 @utility hextra-focus-visible {
-  @apply hx:focus-visible:outline-none hx:focus-visible:ring-2 hx:focus-visible:ring-primary-200 hx:focus-visible:ring-offset-1 hx:focus-visible:ring-offset-primary-300 hx:dark:focus-visible:ring-primary-800 hx:dark:focus-visible:ring-offset-primary-700;
+  @apply hx:focus-visible:outline-none hx:focus-visible:ring-2 hx:focus-visible:ring-hextra-accent-200 hx:focus-visible:ring-offset-1 hx:focus-visible:ring-offset-hextra-accent-300 hx:dark:focus-visible:ring-hextra-accent-800 hx:dark:focus-visible:ring-offset-hextra-accent-700;
 }
 
 @utility hextra-focus-visible-inset {
-  @apply hx:focus-visible:outline-none hx:focus-visible:ring-inset hx:focus-visible:ring-2 hx:focus-visible:ring-primary-200 hx:dark:focus-visible:ring-primary-800 hx:focus-visible:ring-offset-0;
+  @apply hx:focus-visible:outline-none hx:focus-visible:ring-inset hx:focus-visible:ring-2 hx:focus-visible:ring-hextra-accent-200 hx:dark:focus-visible:ring-hextra-accent-800 hx:focus-visible:ring-offset-0;
 }
 
 @layer base {
@@ -65,6 +104,20 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /*
+   * Exempt SVG subtrees from the near-zero transition duration above.
+   *
+   * Zero preserves the reduced-motion intent, no animation, while letting
+   * geometry changes apply immediately so measurements stay correct.
+   * Mermaid sizes a diagram by reading the rendered SVG back, and a 0.01ms
+   * transition is long enough that it measures the pre-transition geometry
+   * and scales the diagram wrong.
+   */
+  svg,
+  svg * {
+    transition-duration: 0s !important;
   }
 }
 
@@ -91,3 +144,30 @@ body {
 @import "./components/toc.css";
 @import "./components/archives.css";
 @import "./components/gallery.css";
+@import "./components/blog.css";
+@import "./components/nav-active.css";
+@import "./components/tags.css";
+@import "./components/lead.css";
+@import "./components/keyword.css";
+@import "./components/stats.css";
+@import "./components/timeline.css";
+@import "./components/swatches.css";
+@import "./components/direction.css";
+@import "./components/button.css";
+@import "./components/article-card.css";
+@import "./components/list.css";
+@import "./components/video.css";
+@import "./components/youtube-lite.css";
+@import "./components/gist.css";
+@import "./components/chart.css";
+@import "./components/typeit.css";
+@import "./components/repo-card.css";
+@import "./components/accordion.css";
+@import "./components/series.css";
+@import "./components/ads.css";
+@import "./components/page-meta.css";
+/* Must stay after ./typography.css: most of its cell rules only tie the
+   default table styling on specificity and win on source order. */
+@import "./components/borderless-table.css";
+@import "./components/command.css";
+@import "./fonts.css";

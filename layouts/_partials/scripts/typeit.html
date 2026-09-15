@@ -1,0 +1,170 @@
+{{- /*
+  Typewriter effect for the `typeit` shortcode.
+
+  Loaded only on pages that use the shortcode, gated on the "hasTypeIt" store
+  flag in scripts.html.
+
+  Implemented here rather than with the TypeIt library, which is GPL-3.0 and
+  requires a paid licence for commercial use - an obligation an MIT theme
+  should not push onto the sites built with it.
+*/ -}}
+
+<script>
+  (() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    // A person types unevenly, and pauses fractionally on punctuation.
+    const pace = (base, lifeLike, char) => {
+      if (!lifeLike) return base;
+      const jitter = base * (0.5 + Math.random());
+      return ".,!?;:".includes(char) ? jitter + base * 2 : jitter;
+    };
+
+    const run = async (el) => {
+      // Boolean() would drop a line whose only content is "0".
+      const strings = (el.dataset.typeitStrings || "").split("\n").filter((s) => s !== "");
+      if (!strings.length) return;
+
+      // `||` would substitute the fallback for a deliberate 0.
+      const num = (value, fallback) => {
+        const parsed = parseInt(value, 10);
+        return Number.isFinite(parsed) ? parsed : fallback;
+      };
+
+      const speed = num(el.dataset.typeitSpeed, 100);
+      const startDelay = num(el.dataset.typeitStartDelay, 0);
+      const lifeLike = el.dataset.typeitLifelike === "true";
+      const breakLines = el.dataset.typeitBreakLines === "true";
+      const loop = el.dataset.typeitLoop === "true";
+      const initial = el.dataset.typeitInitial || "";
+
+      // A looping animation never stops on its own, so WCAG 2.2.2 asks for a
+      // way to pause it. Every wait passes through the gate below, so pausing
+      // takes effect within one character rather than at the end of a string.
+      let paused = false;
+      let waiting = [];
+      const gate = () => (paused ? new Promise((resolve) => waiting.push(resolve)) : Promise.resolve());
+      const setPaused = (value) => {
+        paused = value;
+        if (!paused) {
+          const pending = waiting;
+          waiting = [];
+          pending.forEach((resolve) => resolve());
+        }
+      };
+
+      if (loop) {
+        const pauseLabel = el.dataset.typeitPauseLabel || "Pause animation";
+        const resumeLabel = el.dataset.typeitResumeLabel || "Resume animation";
+
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "hextra-typeit__toggle hx:hextra-focus-visible";
+        toggle.setAttribute("aria-pressed", "false");
+        toggle.textContent = pauseLabel;
+        toggle.addEventListener("click", () => {
+          setPaused(!paused);
+          toggle.setAttribute("aria-pressed", String(paused));
+          toggle.textContent = paused ? resumeLabel : pauseLabel;
+        });
+        el.after(toggle);
+      }
+
+      const caret = document.createElement("span");
+      caret.className = "hextra-typeit__caret";
+      caret.setAttribute("aria-hidden", "true");
+
+      // The finished text is already in the element and has been announced, so
+      // the animation is decoration: hide the live churn from screen readers.
+      const text = document.createElement("span");
+      text.setAttribute("aria-hidden", "true");
+
+      el.textContent = "";
+      el.append(text, caret);
+
+      const type = async (value) => {
+        for (const char of value) {
+          await gate();
+          text.append(char);
+          await sleep(pace(speed, lifeLike, char));
+        }
+      };
+
+      // Held in a local rather than read back from the node each character:
+      // textContent on an element walks its subtree to build the string, so
+      // reading it once per deleted character made erasing quadratic in the
+      // length of the string.
+      const erase = async () => {
+        let value = text.textContent;
+        while (value.length) {
+          await gate();
+          value = value.slice(0, -1);
+          text.textContent = value;
+          await sleep(speed / 3);
+        }
+      };
+
+      await sleep(startDelay);
+
+      do {
+        if (initial) {
+          await type(initial);
+          await sleep(speed * 6);
+          await erase();
+        }
+
+        for (let i = 0; i < strings.length; i++) {
+          await type(strings[i]);
+          const last = i === strings.length - 1;
+
+          if (breakLines) {
+            if (!last) text.append(document.createElement("br"));
+          } else if (!last || loop) {
+            await sleep(speed * 12);
+            await erase();
+          }
+        }
+
+        if (loop) {
+          await sleep(speed * 12);
+          await erase();
+        }
+      } while (loop);
+
+      caret.remove();
+    };
+
+    const init = () => {
+      // With reduced motion the element keeps its server-rendered text, which
+      // is the finished result - nothing to do.
+      if (reduceMotion) return;
+
+      document.querySelectorAll("[data-typeit]").forEach((el) => {
+        if (el.dataset.typeitInited === "1") return;
+        el.dataset.typeitInited = "1";
+
+        if (el.dataset.typeitWaitVisible !== "true" || !("IntersectionObserver" in window)) {
+          run(el);
+          return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            observer.disconnect();
+            run(el);
+          }
+        }, { threshold: 0.25 });
+        observer.observe(el);
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+</script>

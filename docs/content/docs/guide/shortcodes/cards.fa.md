@@ -6,15 +6,15 @@ linkTitle: کارت‌ها
 ## مثال
 
 {{< cards >}}
-  {{< card link="../callout" title="کال‌اوت" icon="warning" >}}
-  {{< card link="../callout" title="کارت با تگ" icon="tag" tag="تگ سفارشی">}}
-  {{< card link="/" title="بدون آیکون" >}}
+{{< card link="../callout" title="کال‌اوت" icon="warning" >}}
+{{< card link="../callout" title="کارت با تگ" icon="tag" tag="تگ سفارشی">}}
+{{< card link="/" title="بدون آیکون" >}}
 {{< /cards >}}
 
 {{< cards >}}
-  {{< card link="/" title="کارت تصویری" image="https://github.com/user-attachments/assets/71b7e3ec-1a8d-4582-b600-5425c6cc0407" subtitle="تصویر اینترنتی" >}}
-  {{< card link="/" title="تصویر محلی" image="/images/card-image-unprocessed.jpg" subtitle="تصویر خام در دایرکتوری استاتیک." >}}
-  {{< card link="/" title="تصویر محلی" image="images/space.jpg" subtitle="تصویر در دایرکتوری assets، پردازش شده توسط هوگو." method="Resize" options="600x q80 webp" >}}
+{{< card link="/" title="کارت تصویری" image="https://github.com/user-attachments/assets/71b7e3ec-1a8d-4582-b600-5425c6cc0407" subtitle="تصویر اینترنتی" >}}
+{{< card link="/" title="تصویر محلی" image="/images/card-image-unprocessed.jpg" subtitle="تصویر خام در دایرکتوری استاتیک." >}}
+{{< card link="/" title="تصویر محلی" image="images/space.jpg" subtitle="تصویر در دایرکتوری assets، پردازش شده توسط هوگو." method="Resize" options="600x q80 webp" >}}
 {{< /cards >}}
 
 ## نحوه استفاده
@@ -38,20 +38,20 @@ linkTitle: کارت‌ها
 ## پارامترهای کارت
 
 | پارامتر    | توضیحات                                                   |
-|------------|-----------------------------------------------------------|
+| ---------- | --------------------------------------------------------- |
 | `link`     | URL (داخلی یا خارجی).                                     |
 | `title`    | عنوان کارت.                                               |
 | `subtitle` | زیرعنوان (پشتیبانی از Markdown).                          |
 | `icon`     | نام آیکون.                                                |
 | `tag`      | متن تگ.                                                   |
 | `tagType`  | نوع العلامة: default (رمادي)، `info`، `warning` و`error`. |
-  
+
 ## کارت تصویری
 
 علاوه بر این، کارت از افزودن تصویر و پردازش آن از طریق این پارامترها پشتیبانی می‌کند:
 
 | پارامتر      | توضیحات                                           |
-|--------------|---------------------------------------------------|
+| ------------ | ------------------------------------------------- |
 | `image`      | آدرس تصویر کارت را مشخص می‌کند.                   |
 | `method`     | روش پردازش تصویر هوگو را تنظیم می‌کند.            |
 | `options`    | تنظیمات پردازش تصویر هوگو را پیکربندی می‌کند.     |
@@ -73,11 +73,11 @@ Hextra به صورت خودکار تشخیص می‌دهد که آیا پردا�
 کارت از افزودن تگ‌ها پشتیبانی می‌کند که می‌تواند برای نمایش اطلاعات وضعیت اضافی مفید باشد.
 
 {{< cards >}}
-  {{< card link="../callout" title="کارت با تگ پیش‌فرض" tag="متن تگ" >}}
-  {{< card link="../callout" title="کارت با تگ خطا" tag="متن تگ" tagType="error" >}}
-  {{< card link="../callout" title="کارت با تگ اطلاعات" tag="متن تگ" tagType="info" >}}
-  {{< card link="../callout" title="کارت با تگ هشدار" tag="متن تگ" tagType="warning" >}}
-  {{< card link="/" title="کارت تصویری" image="https://github.com/user-attachments/assets/71b7e3ec-1a8d-4582-b600-5425c6cc0407" subtitle="تصویر اینترنتی" tag="متن تگ" tagType="error" >}}
+{{< card link="../callout" title="کارت با تگ پیش‌فرض" tag="متن تگ" >}}
+{{< card link="../callout" title="کارت با تگ خطا" tag="متن تگ" tagType="error" >}}
+{{< card link="../callout" title="کارت با تگ اطلاعات" tag="متن تگ" tagType="info" >}}
+{{< card link="../callout" title="کارت با تگ هشدار" tag="متن تگ" tagType="warning" >}}
+{{< card link="/" title="کارت تصویری" image="https://github.com/user-attachments/assets/71b7e3ec-1a8d-4582-b600-5425c6cc0407" subtitle="تصویر اینترنتی" tag="متن تگ" tagType="error" >}}
 {{< /cards >}}
 
 ```
@@ -94,13 +94,13 @@ Hextra به صورت خودکار تشخیص می‌دهد که آیا پردا�
 می‌توانید حداکثر تعداد ستون‌هایی که کارت‌ها می‌توانند در آن قرار بگیرند را با ارسال پارامتر `cols` به شورت‌کد `cards` مشخص کنید. توجه داشته باشید که ستون‌ها در صفحه‌های کوچکتر همچنان جمع می‌شوند.
 
 {{< cards cols="1" >}}
-  {{< card link="/" title="کارت بالا" >}}
-  {{< card link="/" title="کارت پایین" >}}
+{{< card link="/" title="کارت بالا" >}}
+{{< card link="/" title="کارت پایین" >}}
 {{< /cards >}}
 
 {{< cards cols="2" >}}
-  {{< card link="/" title="کارت چپ" >}}
-  {{< card link="/" title="کارت راست" >}}
+{{< card link="/" title="کارت چپ" >}}
+{{< card link="/" title="کارت راست" >}}
 {{< /cards >}}
 
 ```

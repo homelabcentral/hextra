@@ -127,6 +127,20 @@ params:
 
 It will load the KaTeX CSS file from `assets/css/katex.min.css` instead of downloading from CDN.
 
+Listing every font file by hand is tedious, so each `assets` entry may also be a
+directory path ending in `/` (published recursively) or a glob containing `*`:
+
+```yaml {filename="hugo.yaml"}
+params:
+  math:
+    engine: katex
+    katex:
+      css: "css/katex.min.css"
+      assets:
+        - "fonts/" # publishes every file under assets/fonts/
+        # or: "fonts/KaTeX_Main-*.woff2"
+```
+
 #### MathJax
 
 Alternatively, you can use [MathJax][mathjax] to render math expressions:

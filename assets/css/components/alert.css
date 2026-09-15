@@ -1,26 +1,26 @@
 .hextra-alert {
   @apply hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current;
-  @apply hx:border-green-200 hx:bg-green-100 hx:text-green-900 hx:dark:border-green-200/30 hx:dark:bg-green-900/30 hx:dark:text-green-200;
+  @apply hx:border-orange-400 hx:bg-orange-50 hx:text-orange-700 hx:dark:border-orange-500/70 hx:dark:bg-orange-950/60 hx:dark:text-orange-400;
 }
 
 .hextra-alert[data-alert="note"] {
-  @apply hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200;
+  @apply hx:border-blue-400 hx:bg-blue-50 hx:text-blue-700 hx:dark:border-blue-500/70 hx:dark:bg-blue-950/60 hx:dark:text-blue-400;
 }
 
 .hextra-alert[data-alert="tip"] {
-  @apply hx:border-green-200 hx:bg-green-100 hx:text-green-900 hx:dark:border-green-200/30 hx:dark:bg-green-900/30 hx:dark:text-green-200;
+  @apply hx:border-green-400 hx:bg-green-50 hx:text-green-700 hx:dark:border-green-500/70 hx:dark:bg-green-950/60 hx:dark:text-green-400;
 }
 
 .hextra-alert[data-alert="important"] {
-  @apply hx:border-purple-200 hx:bg-purple-100 hx:text-purple-900 hx:dark:border-purple-200/30 hx:dark:bg-purple-900/30 hx:dark:text-purple-200;
+  @apply hx:border-purple-400 hx:bg-purple-50 hx:text-purple-700 hx:dark:border-purple-500/70 hx:dark:bg-purple-950/60 hx:dark:text-purple-400;
 }
 
 .hextra-alert[data-alert="warning"] {
-  @apply hx:border-amber-200 hx:bg-amber-100 hx:text-amber-900 hx:dark:border-amber-200/30 hx:dark:bg-amber-900/30 hx:dark:text-amber-200;
+  @apply hx:border-amber-400 hx:bg-amber-50 hx:text-amber-700 hx:dark:border-amber-500/70 hx:dark:bg-amber-950/60 hx:dark:text-amber-400;
 }
 
 .hextra-alert[data-alert="caution"] {
-  @apply hx:border-red-200 hx:bg-red-100 hx:text-red-900 hx:dark:border-red-200/30 hx:dark:bg-red-900/30 hx:dark:text-red-200;
+  @apply hx:border-red-400 hx:bg-red-50 hx:text-red-700 hx:dark:border-red-500/70 hx:dark:bg-red-950/60 hx:dark:text-red-400;
 }
 
 .hextra-alert-title {

@@ -1,8 +1,18 @@
-<h{{ .Level }} data-hextra-search-id="{{ .Anchor | safeURL }}" {{- with .Attributes.class }} class="{{ . }}" {{- end }}>
-  {{- .Text | safeHTML -}}
-  {{- if gt .Level 1 -}}
-    <span class="hx:absolute hx:-mt-20" id="{{ .Anchor | safeURL }}"></span>
-    <a href="#{{ .Anchor | safeURL }}" class="subheading-anchor" aria-label="{{ (T "permalinkLabel") | default "Permalink for this section" }}"></a>
-  {{- end -}}
-</h{{ .Level }}>
+{{/* Heading render hook.
+
+  Only the tag name goes through printf and safeHTML: prettier-plugin-go-template
+  has no node for a tag whose name is an expression (`<h{{ .Level
+}}>`)
+and aborts on the file. The anchor markup below stays literal so Hugo still URL-escapes the href; building it as a string bypasses that escaping. */}}
+{{- $class := "" -}}
+{{- with .Attributes.class -}}
+  {{- $class = printf " class=\"%s\"" . -}}
+{{- end -}}
+{{- printf "<h%d data-hextra-search-id=\"%s\"%s>" .Level (.Anchor | safeURL) $class | safeHTML -}}
+{{- .Text | safeHTML -}}
+{{- if gt .Level 1 -}}
+  <span class="hx:absolute hx:-mt-20" id="{{ .Anchor | safeURL }}"></span>
+  <a href="#{{ .Anchor | safeURL }}" class="subheading-anchor" aria-label="{{ (T "permalinkLabel") | default "Permalink for this section" }}"></a>
+{{- end -}}
+{{- printf "</h%d>" .Level | safeHTML -}}
 {{- /* Drop trailing newlines */ -}}
