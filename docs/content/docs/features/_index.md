@@ -3,6 +3,7 @@ linkTitle: Features
 title: Features
 weight: 10
 ---
+
 Hextra ships a set of features beyond a plain documentation theme. This section documents each one — how it works internally, and how to configure it.
 
 <!--more-->
@@ -17,4 +18,3 @@ Hextra ships a set of features beyond a plain documentation theme. This section 
 {{< card link="dev-tooling" title="Dev Tooling" icon="terminal" subtitle="Makefile, devcontainer, and local CI" >}}
 {{< card link="vscode-snippets" title="VS Code Snippets" icon="cursor-click" subtitle="Tab-completion for every shortcode, front matter key, and code fence attribute" >}}
 {{< /cards >}}
-

@@ -3,6 +3,7 @@ linkTitle: ویژگی‌ها
 title: ویژگی‌ها
 weight: 10
 ---
+
 Hextra مجموعه‌ای از ویژگی‌ها را فراتر از یک پوسته‌ی مستندات ساده ارائه می‌دهد. این بخش هر ویژگی، نحوه کارکرد داخلی آن و روش پیکربندی‌اش را مستند می‌کند.
 
 <!--more-->
@@ -17,4 +18,3 @@ Hextra مجموعه‌ای از ویژگی‌ها را فراتر از یک پو
 {{< card link="dev-tooling" title="ابزارهای توسعه" icon="terminal" subtitle="Makefile، devcontainer و CI محلی" >}}
 {{< card link="vscode-snippets" title="اسنیپت‌های VS Code" icon="cursor-click" subtitle="تکمیل با Tab برای هر Shortcode، کلید Front matter و ویژگی بلوک کد" >}}
 {{< /cards >}}
-

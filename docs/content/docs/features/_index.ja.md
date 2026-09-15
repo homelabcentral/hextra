@@ -3,6 +3,7 @@ linkTitle: 機能
 title: 機能
 weight: 10
 ---
+
 Hextra は、単純なドキュメントテーマにとどまらない機能セットを備えています。このセクションでは、それぞれの機能、内部的な仕組み、および設定方法を解説します。
 
 <!--more-->
@@ -17,4 +18,3 @@ Hextra は、単純なドキュメントテーマにとどまらない機能セ�
 {{< card link="dev-tooling" title="開発ツール" icon="terminal" subtitle="Makefile、devcontainer、ローカル CI" >}}
 {{< card link="vscode-snippets" title="VS Code スニペット" icon="cursor-click" subtitle="すべてのショートコード・フロントマターキー・コードフェンス属性の Tab 補完" >}}
 {{< /cards >}}
-

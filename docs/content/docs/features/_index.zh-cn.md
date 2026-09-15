@@ -3,6 +3,7 @@ linkTitle: 特性
 title: 特性
 weight: 10
 ---
+
 Hextra 提供了一系列超出普通文档主题的功能。本章节记录每个功能、其内部工作原理以及配置方法。
 
 <!--more-->
@@ -17,4 +18,3 @@ Hextra 提供了一系列超出普通文档主题的功能。本章节记录每�
 {{< card link="dev-tooling" title="开发工具" icon="terminal" subtitle="Makefile、devcontainer 和本地 CI" >}}
 {{< card link="vscode-snippets" title="VS Code 代码片段" icon="cursor-click" subtitle="为每个 shortcode、front matter 键和代码围栏属性提供 Tab 补全" >}}
 {{< /cards >}}
-
