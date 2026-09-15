@@ -27,6 +27,28 @@ services:
     # Desktop for macOS), replaces the socket with a socat proxy owned by
     # vscode. If that ever stops working, `group_add: ["0"]` is the fallback.
     user: vscode
+    environment:
+      # GitHub API token for `gh`, taken from HEXTRA_GH_TOKEN on the host and
+      # renamed on the way in. The rename is the point: `gh` prefers GH_TOKEN
+      # over its own stored credentials, so exporting GH_TOKEN on the host would
+      # silently re-authenticate every host terminal as this account. Under a
+      # different name the host keyring is untouched and only the container sees
+      # GH_TOKEN.
+      #
+      # Populate it from the macOS Keychain in ~/.zshrc:
+      #
+      #   export HEXTRA_GH_TOKEN="$(security find-generic-password \
+      #     -a homelabcentral -s gh-token-hextra -w 2>/dev/null)"
+      #
+      # VS Code resolves .zshrc in a spawned shell at startup, so this reaches
+      # the container however VS Code was launched - Dock and Spotlight included,
+      # not just `code .` from a terminal. Nothing is written to disk: no .env,
+      # and unlike containerEnv no plaintext copy lands in the generated compose
+      # override under globalStorage.
+      #
+      # The `:-` default keeps compose quiet when the variable is unset; `gh` is
+      # simply unauthenticated then.
+      - GH_TOKEN=${HEXTRA_GH_TOKEN:-}
     volumes:
       - ..:/workspaces/hextra:cached
       # Named volume masks node_modules so the container keeps its own

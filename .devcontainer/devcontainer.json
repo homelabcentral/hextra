@@ -75,7 +75,12 @@
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": false
     },
-    "ghcr.io/devcontainers-extra/features/act:1": {}
+    "ghcr.io/devcontainers-extra/features/act:1": {},
+    // GitHub CLI, authenticated as whoever owns the token in GH_TOKEN (see the
+    // environment block in docker-compose.yml). Needed because git over SSH and
+    // the GitHub API authenticate separately: the forwarded agent covers pushes,
+    // but `gh pr create` is a REST call and needs a token of its own.
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   "customizations": {
     "vscode": {
