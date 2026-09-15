@@ -3,6 +3,63 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "dev",
   "workspaceFolder": "/workspaces/hextra",
+
+  // SSH: git over SSH inside the container needs two separate things, and only
+  // one of them is configuration.
+  //
+  // 1. Signing. VS Code forwards the host ssh-agent automatically - it starts a
+  //    helper in the container, creates a fresh socket there, proxies the agent
+  //    protocol back to the host and sets SSH_AUTH_SOCK. Nothing to declare,
+  //    and no way to opt out. The host socket is never bind-mounted, so the
+  //    macOS launchd socket path is irrelevant. Private keys stay on the host.
+  //
+  // 2. Choosing WHICH key. A forwarded agent offers every key it holds, in
+  //    agent order, and GitHub accepts the first one that maps to an account,
+  //    then stops - so a host with more than one GitHub key authenticates as
+  //    whichever it happened to offer first. ssh's only selection mechanism is
+  //    IdentityFile + IdentitiesOnly (ssh_config(5)); there is no way to pick
+  //    by fingerprint or comment. That means ssh has to be able to READ the
+  //    host's ~/.ssh/config, which is a file, which needs a mount.
+  //
+  // The mount is declared in docker-compose.yml, NOT here, and deliberately so.
+  // The equivalent for this file is written out below, commented; uncommenting
+  // it works, but the `readonly` would be silently discarded, giving the
+  // read-write access to the host's real private keys. The reason is that the
+  // two orchestrators take different paths through the devcontainers CLI:
+  //
+  //   - image/Dockerfile containers (spec-node/singleContainer.ts) pass the
+  //     mount string through verbatim as `--mount <string>`, so Docker itself
+  //     parses `readonly` and it works.
+  //   - compose containers (spec-node/dockerCompose.ts) parse it into a Mount
+  //     object first and re-emit it into a generated override file via
+  //     convertMountToVolume(), which builds `${source}:${target}` and nothing
+  //     else. The Mount interface is { type, source, target, external } - it
+  //     has no readonly field, so the flag is gone before the volume string is
+  //     built. No warning is issued.
+  //
+  // This repo is compose-based ("dockerComposeFile" above), so the mount lives
+  // in docker-compose.yml where long syntax supports read_only: true.
+  //
+  // Read-only costs nothing here: ssh only wants to WRITE to ~/.ssh to append
+  // to known_hosts, which fails with a non-fatal "Failed to add the host to the
+  // list of known hosts" warning and connects anyway - and only for a host the
+  // Mac has never connected to. In exchange, nothing running in this container
+  // (npm lifecycle scripts, Playwright, act, go install) can modify or delete
+  // the host's keys.
+  //
+  // Requires `IgnoreUnknown UseKeychain` in a LEADING `Host *` block on the
+  // host: UseKeychain is macOS-only and Linux OpenSSH aborts the entire file on
+  // it ("Bad configuration option: usekeychain"). It has to be in a block that
+  // matches every host, not inside a narrower one, or the other blocks still
+  // abort the parse.
+  //
+  // Ready to uncomment. If you do, DELETE the bind entry from
+  // docker-compose.yml first - two mounts on the same target is an error - and
+  // accept that this one is read-write.
+  //
+  // "mounts": [
+  //   "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,readonly"
+  // ],
   "features": {
     "ghcr.io/devcontainers/features/hugo:1": {
       "extended": true,

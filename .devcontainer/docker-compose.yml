@@ -37,6 +37,22 @@ services:
       # Those run as SIBLINGS of this container on the host daemon, not
       # inside it - paths act mounts must exist on the host.
       - /var/run/docker.sock:/var/run/docker.sock
+      # Host SSH config and keys, read-only, so git inside the container picks
+      # the same per-host identity the host does - `git@github-homelabcentral:`
+      # uses the homelabcentral key, everything else the default.
+      #
+      # The keys are never unlocked here: VS Code forwards the host ssh-agent
+      # automatically and the agent does the signing. This mount exists only so
+      # ssh can read ~/.ssh/config and the IdentityFile paths it names, which is
+      # the only way to pick one identity out of a multi-key agent.
+      #
+      # Requires `IgnoreUnknown UseKeychain` in a leading `Host *` block on the
+      # host: UseKeychain is macOS-only and Linux OpenSSH aborts the whole file
+      # on it ("Bad configuration option: usekeychain").
+      - type: bind
+        source: ${HOME}/.ssh
+        target: /home/vscode/.ssh
+        read_only: true
     # Keep the container alive; the dev container attaches to it.
     command: sleep infinity
 
