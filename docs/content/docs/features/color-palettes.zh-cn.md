@@ -1,0 +1,70 @@
+---
+title: 调色板
+weight: 3
+---
+
+Hextra 只用一个中性色系——**Tailwind 的 `neutral`**——来处理所有背景、边框和文字，而不是扁平的 `bg-white` / `#111` 背景加上带蓝色调的 `gray` 和 `slate`。
+
+<!--more-->
+
+## 一个色系，两种模式
+
+主题中的所有中性色都是 `neutral-*` 工具类。浅色模式用低段，深色模式用高段，在元素上成对出现：
+
+```html
+<div class="hx:bg-neutral-100 hx:dark:bg-neutral-900">…</div>
+```
+
+与带蓝色调的 `gray` 和 `slate` 不同，`neutral` 是真正的无彩色。这一点在正文文字上最为明显：读者停留在页面上的整段时间都在看它，暖色强调色配冷灰文字即使没有明显问题，读起来也会觉得不协调。
+
+## 层级
+
+主题把各个表面固定在既定层级上，使某个表面相对页面的位置始终符合预期：
+
+| 用途                   | 浅色          | 深色          |
+| ---------------------- | ------------- | ------------- |
+| 页面——`--hextra-bg`    | `#f7f7f7`     | `#111111`     |
+| 抬升表面——代码块、卡片 | `neutral-50`  | `neutral-950` |
+| 面板——折叠块、系列盒   | `neutral-50`  | `neutral-900` |
+| 浮层——下拉框、菜单     | `neutral-100` | `neutral-900` |
+| 外框——文件名栏、悬停   | `neutral-200` | `neutral-800` |
+| 边框                   | `neutral-400` | `neutral-800` |
+
+注意方向在两种模式之间是相反的：浅色模式下抬升表面比页面 _更亮_，深色模式下则 _更暗_。
+
+页面本身是个例外：它根本不是 `neutral` 的某一色阶，而是自己的令牌 `--hextra-bg`，两个取值刻意落在 Tailwind 的色阶之间。这也是为什么凡是延续页面的元素——导航栏模糊层、侧边栏抽屉、吸底页脚——都只用 `hx:bg-hextra-bg` 而没有 `dark:` 搭档：该令牌本身会在 `.dark` 下切换。
+
+## 自定义
+
+Tailwind v4 会把自身的主题颜色暴露为 CSS 自定义属性，因此覆盖某一色阶只需一行。写在 `assets/css/custom.css` 里即可，该文件会在主题样式表之后加载。
+
+有两个名字需要注意。页面是 `--hextra-bg`，浅色模式设一次，`.dark` 下再设一次。其余表面都是 Tailwind 的色阶，而 Hextra 以 `@import "tailwindcss" prefix(hx)` 引入 Tailwind，连同输出的自定义属性一起加了前缀——所以要覆盖的名字是 `--hx-color-neutral-50`，而不是 `--color-neutral-50`。（强调色是唯一没有前缀的名字，因为 `styles.css` 自己定义了 `--color-accent-color-*` 并做了映射；参见[强调色](accent-color)。）
+
+```css {filename="assets/css/custom.css"}
+:root {
+  /* 更暖的页面背景 */
+  --hextra-bg: oklch(97.3% 0.005 85);
+
+  /* 高它一级的抬升表面 */
+  --hx-color-neutral-50: oklch(98.5% 0.002 85);
+}
+
+.dark {
+  /* 略带蓝调的深色页面 */
+  --hextra-bg: oklch(17.6% 0.01 250);
+}
+```
+
+只需覆盖想改的色阶，其余保持 Tailwind 的默认值。
+
+{{< callout type="warning" >}}
+请保持色阶的顺序——像默认值一样，每一级都比相邻级更亮或更暗。组件假定色阶是单调的，颠倒顺序会导致边框不可见、文字对比度过低。
+{{< /callout >}}
+
+## 为什么用 `neutral` 而不是自定义色阶？
+
+早期版本的主题自带四套色阶——`hextra-light-*`、`hextra-dark-*`、`hextra-white-*` 和 `hextra-black-*`——与 `gray`、`slate`、`neutral` 并存。同一件事有七个色系，且没有选用规则；更麻烦的是两套模式专用色阶的编号方向相反：`hextra-light-100` 接近白色，而 `hextra-dark-100` 接近黑色。
+
+统一之后不仅消除了歧义，也顺带修掉了一个缺陷。深色色阶的 `oklch` 明度值是用 `byte / 255` 算出来的，而不是真正转换得到的，于是十一级全部挤在 `#000000`–`#262626` 区间内，前四级彼此相差不到两点。`neutral` 在整个范围内都有真实的间距。
+
+`hextra-accent-*` 不受影响，强调色调色板仍然是主题自己的。参见[强调色](accent-color)。
