@@ -170,6 +170,81 @@ npm run changelog
 - Development server runs with `--disableFastRender -D` for better development experience
 - Theme development uses `--logLevel=debug` for detailed logging
 
+### Devcontainer
+
+Open the repo in VS Code and choose **Reopen in Container**. Everything below
+is already wired; the only thing that needs setting up once per machine is the
+GitHub token, and only if you intend to use `gh`.
+
+Compose-based, two services (`.devcontainer/docker-compose.yml`):
+
+| Service   | What                                                                    |
+| --------- | ----------------------------------------------------------------------- |
+| `dev`     | the container the editor attaches to, repo at `/workspaces/hextra`      |
+| `preview` | static server for `docs/public`, stays up, re-serves after `make build` |
+
+Features installed: Hugo Extended (pinned), Node 22, Docker CLI against the
+host daemon (so `make ci*` can run act), act, and the GitHub CLI. Ports 1313
+(dev server), 8043 (preview) and 9323 (Playwright report) are forwarded.
+`node_modules` is a named volume, so the container keeps Linux-native binaries
+while the host keeps its own - running `npm install` on one side no longer
+breaks the other.
+
+#### Git and GitHub authentication
+
+These are two separate mechanisms, and it is worth knowing which is which when
+one of them fails.
+
+**Pushing** uses SSH. VS Code forwards the host ssh-agent automatically, so the
+private key never enters the container. `~/.ssh` is mounted read-only purely so
+ssh can read `~/.ssh/config` - a forwarded agent offers every key it holds and
+GitHub accepts the first that maps to an account, so the config is the only way
+to pin which one. That requires `IgnoreUnknown UseKeychain` in a leading
+`Host *` block on the host: `UseKeychain` is macOS-only and Linux OpenSSH
+aborts the whole file on it.
+
+**The GitHub API** (`gh`) uses a token, because `gh pr create` is a REST call
+and the agent cannot sign for it. Set up once per machine:
+
+```bash
+security add-generic-password -a <account> -s gh-token-hextra -w   # prompts, no echo
+```
+
+then in `~/.zshrc`:
+
+```bash
+export HEXTRA_GH_TOKEN="$(security find-generic-password -a <account> -s gh-token-hextra -w 2>/dev/null)"
+```
+
+Compose renames it to `GH_TOKEN` on the way in. The rename is the point: `gh`
+prefers `GH_TOKEN` over its own stored credentials, so exporting that name on
+the host would silently re-authenticate every host terminal as this account.
+Nothing is written to disk - no `.env`, and no plaintext copy in the generated
+compose override, because compose interpolates at `up` time.
+
+Use a fine-grained token scoped to this repository (Pull requests: write,
+Contents: read, Metadata: read), not a classic `repo` token.
+
+#### Three things that will waste your time
+
+- **VS Code resolves `~/.zshrc` once, at startup.** A running instance will not
+  see a newly added export. Quit it fully (Cmd-Q) and relaunch.
+- **Container environment is fixed at create time.** After changing the token,
+  rebuild the container - reopening only starts the existing one, which keeps
+  the old value.
+- **`docker exec` sessions do not get the forwarded agent.** VS Code injects
+  `SSH_AUTH_SOCK` only into processes it spawns, so git-over-SSH fails from
+  `docker exec` while working fine in a VS Code terminal. `gh` is unaffected;
+  `GH_TOKEN` is in the container environment proper.
+
+Verify all of it from a container terminal:
+
+```bash
+echo ${#GH_TOKEN}   # non-zero
+gh auth status      # should name the account, and say (GH_TOKEN)
+ssh -T git@github-homelabcentral
+```
+
 ### Multi-language Support
 
 - Configure languages in `hugo.yaml` (supports 20+ languages including RTL)

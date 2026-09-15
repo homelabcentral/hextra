@@ -134,7 +134,7 @@
   // The apt-get update is deliberate even though `playwright install
   // --with-deps` directly above runs one of its own; depending on that as an
   // implicit side effect would break the moment the Playwright step moves.
-  "postCreateCommand": "sudo chown -R \"$(id -u):$(id -g)\" node_modules && npm install && npx playwright install --with-deps chromium || exit 1; { sudo apt-get update && sudo apt-get install -y --no-install-recommends asciinema; } || echo 'devcontainer: asciinema unavailable (optional, docs casts only)'; go install github.com/charmbracelet/freeze@v0.2.2 || echo 'devcontainer: freeze unavailable (optional, snippet SVGs only)';",
+  "postCreateCommand": "sudo chown -R \"$(id -u):$(id -g)\" node_modules && npm install && npx playwright install --with-deps chromium || exit 1; { sudo apt-get update && sudo apt-get install -y --no-install-recommends asciinema; } || echo 'devcontainer: asciinema unavailable (optional, docs casts only)'; go install github.com/charmbracelet/freeze@v0.2.2 || echo 'devcontainer: freeze unavailable (optional, snippet SVGs only)'; gh repo set-default homelabcentral/hextra 2>/dev/null || true;",
   // Docker Desktop's VirtioFS periodically serves uid 0 for the *root inode* of
   // a bind mount. Measured in this container: 32 of 300 reads (~11%), in ~1s
   // windows roughly every 25s. Children are never affected - 0 of 300 on both
