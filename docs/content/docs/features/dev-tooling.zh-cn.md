@@ -88,12 +88,20 @@ Hextra 在 npm 脚本之上提供了一套完整的开发工作流：自带文�
 
 devcontainer 不使用普通镜像，而是通过 **Docker Compose**（`.devcontainer/docker-compose.yml`）运行，包含两个服务：
 
-- **`dev`** —— 编辑器附加到的 Go devcontainer 镜像，仓库挂载在 `/workspaces/hextra`。Devcontainer features 会安装 Hugo Extended（固定版本）和 Node 22；`postCreateCommand` 运行 `npm install`，容器首次打开即可直接构建。一组精选的 VS Code 扩展（Tailwind、Hugo、Prettier、Git Graph 等）已预先配置好。
+- **`dev`** —— 编辑器附加到的 Go devcontainer 镜像，仓库挂载在 `/workspaces/hextra`。Devcontainer features 会安装 Hugo Extended（固定版本）、Node 22、连接宿主机守护进程的 Docker CLI、act 和 GitHub CLI；`postCreateCommand` 运行 `npm install`，容器首次打开即可直接构建。一组精选的 VS Code 扩展（Tailwind、Hugo、Prettier、Git Graph 等）已预先配置好。
 - **`preview`** —— 一个极小（约 258 kB）的静态文件服务器（`pierrezemb/gostatic`），以只读方式提供 `docs/public` 的内容，并设置 `Cache-Control: no-store`，让你永远不会调试到过期页面。它随开发容器一起启动并保持运行：重新执行 `make build`（或 `make preview`）即可更新所服务的站点，无需重启容器。
 
 `devcontainer-lock.json` 已纳入版本控制以保证工具版本可复现。`.vscode/hextra.code-snippets` 在容器内和普通宿主机检出中都会被自动加载——参见 [VS Code 代码片段](vscode-snippets)。
 
 一个命名卷会在容器内遮蔽 `node_modules`，让容器保留自己的 Linux 原生 npm 二进制文件（例如 `lightningcss`），而宿主机保留 macOS 的版本——在任意一侧运行 `npm install` 都不会再破坏另一侧。
+
+### 凭据
+
+Git 和 GitHub API 走的是两条不同的认证路径。当其中一条失效而另一条正常时，了解这个区别很有用。
+
+**推送**使用 SSH。编辑器会把宿主机的 ssh-agent 转发进容器，因此私钥本身从不进入容器，签名由 agent 完成。`~/.ssh` 以只读方式挂载只有一个原因：转发的 agent 会提供它持有的每一个密钥，而 GitHub 会接受第一个能对应到账户的密钥，所以 `~/.ssh/config` 是唯一能指定提供哪个身份的地方。在 macOS 上，该配置文件需要在开头的 `Host *` 块中加上 `IgnoreUnknown UseKeychain`——`UseKeychain` 是 macOS 专有的，Linux 的 OpenSSH 会因此拒绝解析整个文件。
+
+**GitHub API**（`gh`）则使用令牌，因为 REST 调用无法由 ssh-agent 签名。令牌通过 compose 的 `environment` 块以 `GH_TOKEN` 传入，来源是宿主机上的一个环境变量——不会向磁盘写入任何内容。有两点容易让人踩坑：编辑器只在启动时解析一次 shell 配置文件，因此正在运行的实例永远看不到新加的 export；容器环境在创建时就已固定，所以修改取值后需要重建容器，而不是重新打开。
 
 ### 端口
 

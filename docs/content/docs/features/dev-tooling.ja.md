@@ -88,12 +88,20 @@ npm 派の人向けに、`make css-watch` と同等の `npm run watch:css` ス�
 
 devcontainer はプレーンなイメージではなく、**Docker Compose**（`.devcontainer/docker-compose.yml`）で 2 つのサービスとして動きます：
 
-- **`dev`** — エディタが接続する Go の devcontainer イメージで、リポジトリは `/workspaces/hextra` にマウントされます。devcontainer features が Hugo Extended（バージョン固定）と Node 22 をインストールし、`postCreateCommand` が `npm install` を実行するので、初回オープン時からビルド可能な状態になります。厳選された VS Code 拡張機能一式（Tailwind、Hugo、Prettier、Git Graph など）が事前設定されています。
+- **`dev`** — エディタが接続する Go の devcontainer イメージで、リポジトリは `/workspaces/hextra` にマウントされます。devcontainer features が Hugo Extended（バージョン固定）、Node 22、ホストのデーモンに接続する Docker CLI、act、GitHub CLI をインストールし、`postCreateCommand` が `npm install` を実行するので、初回オープン時からビルド可能な状態になります。厳選された VS Code 拡張機能一式（Tailwind、Hugo、Prettier、Git Graph など）が事前設定されています。
 - **`preview`** — `docs/public` を読み取り専用で配信する小さな（約 258 kB）静的ファイルサーバー（`pierrezemb/gostatic`）。`Cache-Control: no-store` を付けるので、古いページをデバッグしてしまうことがありません。dev コンテナと一緒に起動して稼働し続けます。`make build`（または `make preview`）を再実行すると、コンテナの再起動なしに配信サイトが更新されます。
 
 再現可能なツールバージョンのために `devcontainer-lock.json` が追跡されています。`.vscode/hextra.code-snippets` はコンテナ内でもプレーンなホストのチェックアウトでも自動的に読み込まれます — [VS Code スニペット](vscode-snippets)を参照してください。
 
 名前付きボリュームがコンテナ内の `node_modules` をマスクするため、コンテナは Linux ネイティブの npm バイナリ（例：`lightningcss`）を、ホストは macOS のバイナリをそれぞれ保持します。片方で `npm install` を実行してももう片方が壊れることはありません。
+
+### 認証情報
+
+Git と GitHub API は別々の経路で認証します。片方だけが失敗したときに、この違いを知っているかどうかが効いてきます。
+
+**push** は SSH を使います。エディタがホストの ssh-agent をコンテナへ転送するため、秘密鍵そのものはコンテナに入らず、署名は agent が行います。`~/.ssh` を読み取り専用でマウントしている理由はただ一つ、転送された agent は保持するすべての鍵を提示し、GitHub はアカウントに対応する最初の鍵を受け入れてしまうため、どの ID を提示するかを固定できるのは `~/.ssh/config` だけだからです。macOS ではその設定ファイルの先頭の `Host *` ブロックに `IgnoreUnknown UseKeychain` が必要です。`UseKeychain` は macOS 専用で、Linux の OpenSSH はこれを見るとファイル全体を読み込めなくなります。
+
+**GitHub API**（`gh`）は代わりにトークンを使います。REST 呼び出しは ssh-agent では署名できないからです。トークンは compose の `environment` ブロックを通じて `GH_TOKEN` として渡され、ホスト側の環境変数から取られます。ディスクには何も書き込まれません。つまずきやすい点が 2 つあります。エディタはシェルのプロファイルを起動時に一度だけ解決するため、起動中のインスタンスは新しく追加した export を認識しません。またコンテナの環境は作成時に固定されるため、値を変更したら再オープンではなくリビルドが必要です。
 
 ### ポート
 
