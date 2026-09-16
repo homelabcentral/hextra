@@ -28,7 +28,7 @@
 
   syncGroups.forEach((group) => {
     const key = encodeURIComponent(group.dataset.tabGroup);
-    const saved = localStorage.getItem("hextra-tab-" + key);
+    const saved = window.hextraStorage.get("hextra-tab-" + key);
     if (saved !== null) {
       updateGroup(group, parseInt(saved, 10));
     }
@@ -45,7 +45,7 @@
         const tabGroupValue = container.dataset.tabGroup;
         const key = encodeURIComponent(tabGroupValue);
         document.querySelectorAll('[data-tab-group="' + tabGroupValue + '"]').forEach((grp) => updateGroup(grp, index));
-        localStorage.setItem("hextra-tab-" + key, index.toString());
+        window.hextraStorage.set("hextra-tab-" + key, index.toString());
       } else {
         // Non-sync behavior: update only this specific tab group
         updateGroup(container, index);
@@ -86,7 +86,7 @@
         const tabGroupValue = container.dataset.tabGroup;
         const key = encodeURIComponent(tabGroupValue);
         document.querySelectorAll('[data-tab-group="' + tabGroupValue + '"]').forEach((grp) => updateGroup(grp, newIndex));
-        localStorage.setItem("hextra-tab-" + key, newIndex.toString());
+        window.hextraStorage.set("hextra-tab-" + key, newIndex.toString());
       } else {
         updateGroup(container, newIndex);
       }

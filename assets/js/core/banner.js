@@ -10,7 +10,7 @@
     document.documentElement.style.setProperty("--hextra-banner-height", "0px");
     document.documentElement.dataset.hextraBanner = "hidden";
 
-    localStorage.setItem("{{ site.Params.banner.key | default `banner-closed` }}", "0");
+    window.hextraStorage.set("{{ site.Params.banner.key | default `banner-closed` }}", "0");
   });
 })();
 // {{- end -}}

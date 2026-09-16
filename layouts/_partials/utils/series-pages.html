@@ -63,13 +63,14 @@
       {{- if and $type (ne .Type $type) -}}
         {{- continue -}}
       {{- end -}}
+      {{- $page := . -}}
       {{- with .Params.series -}}
         {{- $names := . -}}
         {{- if not (reflect.IsSlice $names) -}}
           {{- $names = slice $names -}}
         {{- end -}}
         {{- if in $names $target -}}
-          {{- $candidates = $candidates | append $ -}}
+          {{- $candidates = $candidates | append $page -}}
         {{- end -}}
       {{- end -}}
     {{- end -}}

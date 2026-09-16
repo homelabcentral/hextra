@@ -5,8 +5,15 @@
 // {{ $noResultsFound := (T "noResultsFound") | default "No results found." }}
 
 (function () {
-  const resultsFoundTemplate = '{{ (T "resultsFound") | default "%d results found" }}';
-  const noResultsText = "{{ $noResultsFound }}";
+  // Escaped through jsonify, which supplies its own surrounding quotes: Hugo
+  // applies no contextual escaping to a .js template, so a translation carrying
+  // an apostrophe or a double quote used to terminate a hand-written literal
+  // and leave this whole file unparseable. Writing the action bare is what
+  // makes it safe, and is why this file is in .prettierignore - Prettier parses
+  // it as JavaScript and a template action in expression position is a syntax
+  // error to it.
+  const resultsFoundTemplate = {{ (T "resultsFound") | default "%d results found" | jsonify }};
+  const noResultsText = {{ $noResultsFound | jsonify }};
 
   const EDITABLE_TAGS = ["INPUT", "SELECT", "BUTTON", "TEXTAREA"];
   const isMac = /iPad|iPhone|Macintosh/.test(navigator.userAgent);

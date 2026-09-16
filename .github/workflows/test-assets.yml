@@ -23,9 +23,9 @@ on:
     branches: [main]
 
 # The event is part of the group on purpose: push and pull_request both fire
-# for a same-repo push with an open PR, and without it they share a group and
-# cancel each other - leaving the push run cancelled and the pull_request run
-# skipped by the guard below, so nothing runs at all.
+# for a same-repo push with an open PR, and they build different commits - the
+# branch head and refs/pull/N/merge. Sharing a group would make them cancel each
+# other, so one of the two commits would go untested.
 concurrency:
   group: assets-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
@@ -37,18 +37,34 @@ defaults:
 jobs:
   assets:
     runs-on: ubuntu-latest
-    # Push covers every branch in this repository; pull_request is kept only for
-    # PRs opened from a fork, whose pushes land in the fork and never fire here.
-    # Without this guard both events fire for a same-repo push with an open PR,
-    # running the check twice.
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    # Both events run, and they are not redundant: a push builds the branch head,
+    # while a pull_request builds refs/pull/N/merge - the branch merged into the
+    # current main. Only the second catches a change that is green on its own
+    # branch and breaks once main has moved. A guard that skipped pull_request
+    # for same-repo PRs left nothing testing the merge commit, and because a job
+    # skipped by a job-level `if` reports as satisfied, the required check went
+    # green without running.
     env:
       HUGO_VERSION: 0.166.0
+      # Pinned so the cache step below has a fixed path to save and restore;
+      # Hugo's default location depends on XDG_CACHE_HOME and the user.
+      HUGO_CACHEDIR: ${{ github.workspace }}/.hugo_cache
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           submodules: recursive
+
+      # `make css` builds docs/, whose hugo.yaml declares module.imports and
+      # whose hugo.work pins go 1.26. Hugo shells out to `go` to resolve those,
+      # and fails outright with `binary with name "go" not found in PATH` if it
+      # is absent. This job was the only Hugo workflow relying on whatever the
+      # runner image happened to ship.
+      - name: Setup Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: "1.26"
+          cache: false
 
       - name: Setup Node
         uses: actions/setup-node@v7
@@ -70,7 +86,30 @@ jobs:
           npm ci
           touch node_modules
 
+      # This job compares generated output byte for byte, and `make css` builds
+      # docs/, where 14 content files fetch over the network through the github,
+      # gitlab, gitea, gist, codeimporter and jupyter shortcodes. A throttled or
+      # failed fetch changes the emitted markup, which changes hugo_stats.json,
+      # which fails the diff below on a tree that is perfectly current.
+      #
+      # Two things keep that from happening. HUGO_GITHUB_TOKEN raises the
+      # GitHub API limit from 60 requests/hour per shared CI egress IP to 5000,
+      # and the resources cache - gitignored, so otherwise cold on every run -
+      # is restored so most runs make no requests at all. Neither is a
+      # guarantee, which is why the diff names `make css` in its error.
+      - name: Restore Hugo resource cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            docs/resources
+            ${{ github.workspace }}/.hugo_cache
+          key: hugo-resources-${{ runner.os }}-${{ hashFiles('docs/content/**', 'layouts/**') }}
+          restore-keys: |
+            hugo-resources-${{ runner.os }}-
+
       - name: Regenerate stats and CSS
+        env:
+          HUGO_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: make css
 
       - name: Check the committed output matches

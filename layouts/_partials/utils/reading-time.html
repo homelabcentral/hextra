@@ -1,10 +1,37 @@
 {{/* Localized reading time for a page.
 
+  `readingTime` is a printf format string, not a label, and its name gives no
+  hint of that. It exists only in i18n/en.yaml, so the first translator to add
+  the obvious `readingTime: "Lesezeit"` would have put `Lesezeit%!(EXTRA int=7)`
+  in the byline of every post - Hugo does not error on a printf verb mismatch,
+  so nothing else would have caught it.
+
+  The format is therefore checked before it is used: exactly one verb, and that
+  verb an integer one. Anything else warns once and falls back to English,
+  which is wrong in the reader's language but is at least a reading time.
+
   @param {page} . The page to measure.
   @returns {string} e.g. "7 min read"
 
   @example {{ partial "utils/reading-time.html" .
 }}
 */}}
-{{- $format := (T "readingTime") | default "%d min read" -}}
+{{- $fallback := "%d min read" -}}
+{{- $format := (T "readingTime") | default $fallback -}}
+
+{{- $verbs := slice -}}
+{{- range findRE `%[-+ #0-9.*]*[a-zA-Z%]` $format -}}
+  {{- if ne . "%%" -}}{{- $verbs = $verbs | append . -}}{{- end -}}
+{{- end -}}
+
+{{- $valid := false -}}
+{{- if eq (len $verbs) 1 -}}
+  {{- $valid = hasSuffix (index $verbs 0) "d" -}}
+{{- end -}}
+
+{{- if not $valid -}}
+  {{- warnidf "i18n-reading-time-format" `i18n: readingTime must be a format string with exactly one integer verb, e.g. "%%d min read"; got %q. Falling back to %q.` $format $fallback -}}
+  {{- $format = $fallback -}}
+{{- end -}}
+
 {{- return (printf $format .ReadingTime) -}}

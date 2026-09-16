@@ -14,7 +14,7 @@
       option.setAttribute("aria-checked", option.dataset.item === theme ? "true" : "false");
     });
 
-    localStorage.setItem("color-theme", theme);
+    window.hextraStorage.set("color-theme", theme);
   }
 
   function switchTheme(theme) {
@@ -22,7 +22,7 @@
     applyTheme(theme);
   }
 
-  const colorTheme = "color-theme" in localStorage ? localStorage.getItem("color-theme") : defaultTheme;
+  const colorTheme = window.hextraStorage.get("color-theme") ?? defaultTheme;
   switchTheme(colorTheme);
 
   // Add click event handler to the menu items.
@@ -105,7 +105,7 @@
 
   // Listen for system theme changes
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-    if (localStorage.getItem("color-theme") === "system") {
+    if (window.hextraStorage.get("color-theme") === "system") {
       setTheme("system");
     }
   });

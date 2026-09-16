@@ -1,5 +1,6 @@
 {{ define "main" }}
   {{- $cfg := partial "blog/config.html" . -}}
+  {{- $widgetSection := partial "utils/taxonomy-section.html" . -}}
   <div class="hx:mx-auto hx:flex hextra-max-page-width">
     {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" (not $cfg.rail.enable)) }}{{ partial "blog/rail.html" (dict "context" . "config" $cfg) }}
     <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--hextra-navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">
@@ -28,10 +29,10 @@
         {{- else }}
           <p class="hx:text-neutral-500 hx:dark:text-neutral-400">{{ (T "noResultsFound") | default "No results found." }}</p>
         {{- end }}
-        {{- partial "blog/widgets.html" (dict "context" . "config" $cfg "layout" "inline" "section" "blog") -}}
+        {{- partial "blog/widgets.html" (dict "context" . "config" $cfg "layout" "inline" "section" $widgetSection) -}}
         {{ partial "custom/page-end.html" . }}
       </main>
     </article>
-    {{ if $cfg.widgets.enable }}{{- partial "blog/widgets.html" (dict "context" . "config" $cfg "layout" "rail" "section" "blog") -}}{{ else }}<div class="hx:max-xl:hidden hx:h-0 hx:w-64 hx:shrink-0"></div>{{ end }}
+    {{ if $cfg.widgets.enable }}{{- partial "blog/widgets.html" (dict "context" . "config" $cfg "layout" "rail" "section" $widgetSection) -}}{{ else }}<div class="hx:max-xl:hidden hx:h-0 hx:w-64 hx:shrink-0"></div>{{ end }}
   </div>
 {{- end -}}
