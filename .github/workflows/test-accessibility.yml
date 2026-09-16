@@ -6,9 +6,9 @@ on:
     branches: [main]
 
 # The event is part of the group on purpose: push and pull_request both fire
-# for a same-repo push with an open PR, and without it they share a group and
-# cancel each other - leaving the push run cancelled and the pull_request run
-# skipped by the guard below, so nothing runs at all.
+# for a same-repo push with an open PR, and they build different commits - the
+# branch head and refs/pull/N/merge. Sharing a group would make them cancel each
+# other, so one of the two commits would go untested.
 concurrency:
   group: accessibility-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
@@ -20,11 +20,13 @@ defaults:
 jobs:
   a11y:
     runs-on: ubuntu-latest
-    # Push covers every branch in this repository; pull_request is kept only for
-    # PRs opened from a fork, whose pushes land in the fork and never fire here.
-    # Without this guard both events fire for a same-repo push with an open PR,
-    # running the suite twice.
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    # Both events run, and they are not redundant: a push builds the branch head,
+    # while a pull_request builds refs/pull/N/merge - the branch merged into the
+    # current main. Only the second catches a change that is green on its own
+    # branch and breaks once main has moved. A guard that skipped pull_request
+    # for same-repo PRs left nothing testing the merge commit, and because a job
+    # skipped by a job-level `if` reports as satisfied, the required check went
+    # green without running.
     environment: accessibility
     env:
       HUGO_VERSION: 0.166.0
