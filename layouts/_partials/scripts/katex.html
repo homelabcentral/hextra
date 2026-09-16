@@ -31,10 +31,10 @@
   {{- $katexBase = . -}}
 {{- else -}}
   {{- if not site.Params.math.katex.css -}}
-    {{- /* KaTeX 0.18 renamed CSS classes, so the stylesheet must match Hugo's embedded renderer: 0.16 before Hugo 0.166.0, 0.18.4 from 0.166.0 on. See https://github.com/gohugoio/hugo/pull/15259 */ -}}
+    {{- /* KaTeX 0.18 renamed CSS classes, so the stylesheet must match Hugo's embedded renderer: the 0.16 line before Hugo 0.166.0, the 0.18 line from 0.166.0 on (it embeds 0.18.4). Pinning the floating line rather than an exact patch lets updates self-heal. The "-DEV" threshold also matches source-built 0.166.0 snapshots, which Hugo sorts below the 0.166.0 release. See https://github.com/gohugoio/hugo/pull/15259 */ -}}
     {{- $katexVersion := "0.16" -}}
-    {{- if ge hugo.Version "0.166.0" -}}
-      {{- $katexVersion = "0.18.4" -}}
+    {{- if ge hugo.Version "0.166.0-DEV" -}}
+      {{- $katexVersion = "0.18" -}}
     {{- end -}}
     {{- $katexBase = printf "https://cdn.jsdelivr.net/npm/katex@%s/dist" $katexVersion -}}
   {{- end -}}
