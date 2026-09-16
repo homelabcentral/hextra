@@ -32,10 +32,14 @@ test("mobile sidebar exposes main menu dropdown children", async ({ page }) => {
 
   await page.getByRole("button", { name: "Menu" }).click();
 
+  // Children of the "More" dropdown. Only entries whose names are unique within
+  // the sidebar are asserted on: both "More" itself and "About" appear twice,
+  // so matching them is a strict-mode violation rather than a useful signal.
+  // Archives and Glossary are reachable only as children of a dropdown parent,
+  // so their presence is what this test is actually about.
   const sidebar = page.locator("aside.hextra-sidebar-container");
-  await expect(sidebar.getByRole("link", { name: "Development ↗" })).toBeVisible();
-  await expect(sidebar.getByRole("link", { name: "v0.10 ↗" })).toBeVisible();
-  await expect(sidebar.getByRole("link", { name: "v0.11 ↗" })).toBeVisible();
+  await expect(sidebar.getByRole("link", { name: "Archives" })).toBeVisible();
+  await expect(sidebar.getByRole("link", { name: "Glossary" })).toBeVisible();
 });
 
 test("mobile sidebar uses localized page titles for zh-cn docs navigation", async ({ page }) => {
