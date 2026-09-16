@@ -51,7 +51,15 @@
   {{- if and $named $text -}}
     {{- $verify = true -}}
   {{- end -}}
-  {{- $process := cond $hero "Resize 1600x webp q80" "Resize 800x webp q80" -}}
+  {{/* One width for both variants. A card is not a thumbnail: it stretches to
+    the full content column, which reaches ~672px, and every display worth
+    optimising for is 2x or 3x - a 390px phone at DPR 3 wants ~1170 device
+    pixels, a 672px card at DPR 2 wants ~1344. The 800px copy this used to
+    emit was upscaled by the browser in both cases, which is what turned
+    screenshot text to mush. Sharing the spec with the hero also means one
+    processed file per cover instead of two.
+  */}}
+  {{- $process := "Resize 1600x webp q80" -}}
   {{- $cover = partial "utils/page-image.html" (dict "page" .page "process" $process "verify" $verify) -}}
 {{- end -}}
 
