@@ -183,7 +183,7 @@ Compose-based, two services (`.devcontainer/docker-compose.yml`):
 | `dev`     | the container the editor attaches to, repo at `/workspaces/hextra`      |
 | `preview` | static server for `docs/public`, stays up, re-serves after `make build` |
 
-Features installed: Hugo Extended (pinned), Node 22, Docker CLI against the
+Features installed: Hugo Extended (pinned), Node 24, Docker CLI against the
 host daemon (so `make ci*` can run act), act, and the GitHub CLI. Ports 1313
 (dev server), 8043 (preview) and 9323 (Playwright report) are forwarded.
 `node_modules` is a named volume, so the container keeps Linux-native binaries

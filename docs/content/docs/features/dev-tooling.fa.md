@@ -88,7 +88,7 @@ Hextra یک گردش‌کار توسعه بر روی اسکریپت‌های npm
 
 devcontainer به‌جای یک ایمیج ساده، با **Docker Compose** ‏(`.devcontainer/docker-compose.yml`) و دو سرویس اجرا می‌شود:
 
-- **`dev`** — ایمیج devcontainer مبتنی بر Go که ویرایشگر شما به آن متصل می‌شود، با مخزن سوارشده در `/workspaces/hextra`. قابلیت‌های devcontainer نسخه Hugo Extended (با نسخه ثابت)، Node 22، Docker CLI متصل به دیمن میزبان، act و GitHub CLI را نصب می‌کنند؛ `postCreateCommand` دستور `npm install` را اجرا می‌کند تا کانتینر از اولین باز شدن آماده بیلد باشد. مجموعه‌ای گزیده از افزونه‌های VS Code (Tailwind، Hugo، Prettier، Git Graph، …) از پیش پیکربندی شده است.
+- **`dev`** — ایمیج devcontainer مبتنی بر Go که ویرایشگر شما به آن متصل می‌شود، با مخزن سوارشده در `/workspaces/hextra`. قابلیت‌های devcontainer نسخه Hugo Extended (با نسخه ثابت)، Node 24، Docker CLI متصل به دیمن میزبان، act و GitHub CLI را نصب می‌کنند؛ `postCreateCommand` دستور `npm install` را اجرا می‌کند تا کانتینر از اولین باز شدن آماده بیلد باشد. مجموعه‌ای گزیده از افزونه‌های VS Code (Tailwind، Hugo، Prettier، Git Graph، …) از پیش پیکربندی شده است.
 - **`preview`** — یک سرور فایل استاتیک بسیار کوچک (~258 kB) به نام (`pierrezemb/gostatic`) که `docs/public` را فقط‌خواندنی ارائه می‌کند، با `Cache-Control: no-store` تا هرگز صفحه کهنه‌ای را عیب‌یابی نکنید. همراه با کانتینر توسعه راه‌اندازی می‌شود و روشن می‌ماند: اجرای مجدد `make build` (یا `make preview`) سایت ارائه‌شده را بدون راه‌اندازی مجدد کانتینر به‌روز می‌کند.
 
 `devcontainer-lock.json` برای نسخه‌های تکرارپذیر ابزارها در مخزن نگه‌داری می‌شود. `.vscode/hextra.code-snippets` هم در کانتینر و هم در یک نسخه معمولی روی میزبان به‌طور خودکار شناسایی می‌شود — [اسنیپت‌های VS Code](vscode-snippets) را ببینید.
