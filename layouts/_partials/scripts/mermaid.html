@@ -58,27 +58,49 @@
 
     // Mermaid draws its own SVG text and would otherwise use its built-in
     // font, ignoring params.fonts. The variable already carries its fallbacks.
+    // startOnLoad stays false here: renderVisible() drives every render.
     const config = () => {
       const theme = document.documentElement.classList.contains("dark") ? "dark" : "default";
       const fontFamily = getComputedStyle(document.documentElement).getPropertyValue("--font-body").trim();
-      const opts = { startOnLoad: true, theme: theme };
+      const opts = { startOnLoad: false, theme: theme };
       if (fontFamily) opts.fontFamily = fontFamily;
       return opts;
     };
 
-    mermaid.initialize(config());
+    // Disable auto-start before mermaid's own load handler runs
+    mermaid.initialize({ startOnLoad: false });
 
+    // Render only visible diagrams; hidden ones render truncated
+    let queue = Promise.resolve();
+    const renderVisible = () => {
+      queue = queue.then(() => {
+        mermaid.initialize(config());
+        const nodes = Array.from(document.querySelectorAll(".mermaid:not([data-processed])")).filter((el) => el.offsetParent !== null);
+        if (nodes.length) return mermaid.run({ nodes }).catch(console.error);
+      });
+    };
+
+    renderVisible();
+
+    // Render diagrams when revealed (e.g. tab switch, details toggle)
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting && !e.target.dataset.processed)) {
+        renderVisible();
+      }
+    });
+    document.querySelectorAll(".mermaid").forEach((el) => observer.observe(el));
+
+    // Re-render diagrams on theme change
     let timeout;
     new MutationObserver(() => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        document.querySelectorAll(".mermaid").forEach((el) => {
+        document.querySelectorAll(".mermaid[data-processed]").forEach((el) => {
           // Reset to original content, preserving HTML
           el.innerHTML = el.dataset.original;
           el.removeAttribute("data-processed");
         });
-        mermaid.initialize(config());
-        mermaid.init();
+        renderVisible();
       }, 150);
     }).observe(document.documentElement, {
       attributes: true,
