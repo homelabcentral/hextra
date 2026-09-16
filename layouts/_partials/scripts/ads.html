@@ -7,20 +7,39 @@
   Carbon is absent on purpose. It writes its ad at the position of its own
   script element, so `ads/slot.html` emits that inline at the slot instead.
 
-  AdSense is skipped when `verifyAllPages` is on, because `ads/verify.html` has
-  already put the loader in the head of every page and two loaders for one
-  publisher id is a configuration Google warns about.
+  When `verifyAllPages` is on, `ads/verify.html` has already put a loader in the
+  head of every page - but only for the site-level `adsense.client`. Skipping
+  this block outright therefore left every other publisher id on the page with
+  no loader at all, so a slot or an ad shortcode naming a second client
+  rendered an ad unit that nothing could fill. Only the id the head already
+  covers is dropped here; two loaders for one publisher id is the configuration
+  Google warns about, one loader per id is not.
 */}}
 
 {{- $providers := .Store.Get "hextraAdProviders" | default slice -}}
 {{- $ads := partialCached "ads/config.html" . .RelPermalink -}}
 {{- $inHead := false -}}
-{{- with index $ads.providers "adsense" }}{{ $inHead = index . "verifyallpages" }}{{ end -}}
+{{- $headClient := "" -}}
+{{- with index $ads.providers "adsense" -}}
+  {{- $inHead = index . "verifyallpages" -}}
+  {{- if $inHead -}}{{- $headClient = index . "client" | default "" -}}{{- end -}}
+{{- end -}}
 
-{{- if and (in $providers "adsense") (not $inHead) -}}
-  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+{{- $clients := .Store.Get "hextraAdClients" | default slice -}}
+{{- if $inHead -}}
+  {{- $pending := slice -}}
+  {{- range $clients -}}
+    {{- if ne . $headClient -}}{{- $pending = $pending | append . -}}{{- end -}}
+  {{- end -}}
+  {{- $clients = $pending -}}
+{{- end -}}
+
+{{- if in $providers "adsense" -}}
+  {{- if not $inHead -}}
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+  {{- end -}}
   {{- /* One loader per publisher id in use; see ads/slot.html. */ -}}
-  {{- range $client := (.Store.Get "hextraAdClients" | default slice) -}}
+  {{- range $client := $clients -}}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $client }}" crossorigin="anonymous"></script>
   {{- end -}}
 {{- end -}}
