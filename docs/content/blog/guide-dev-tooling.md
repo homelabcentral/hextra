@@ -68,7 +68,7 @@ Blog posts start as drafts (`draft: true`): visible on the dev server and previe
 
 The devcontainer runs under Docker Compose with two services:
 
-- **`dev`** — the Go devcontainer image your editor attaches to. Devcontainer features install Hugo Extended (pinned) and Node 22; `postCreateCommand` runs `npm install`, so the container is build-ready on first open.
+- **`dev`** — the Go devcontainer image your editor attaches to. Devcontainer features install Hugo Extended (pinned) and Node 24; `postCreateCommand` runs `npm install`, so the container is build-ready on first open.
 - **`preview`** — a tiny (~258 kB) static file server that serves `docs/public` read-only with `Cache-Control: no-store`, so you never debug a stale page. It starts with the dev container and stays up: re-running `make build` or `make preview` updates the served site with no restart.
 
 A named volume masks `node_modules` inside the container, so the container keeps Linux-native npm binaries while your host keeps macOS ones — running `npm install` on one side no longer breaks the other.

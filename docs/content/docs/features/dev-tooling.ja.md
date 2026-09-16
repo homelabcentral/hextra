@@ -88,7 +88,7 @@ npm 派の人向けに、`make css-watch` と同等の `npm run watch:css` ス�
 
 devcontainer はプレーンなイメージではなく、**Docker Compose**（`.devcontainer/docker-compose.yml`）で 2 つのサービスとして動きます：
 
-- **`dev`** — エディタが接続する Go の devcontainer イメージで、リポジトリは `/workspaces/hextra` にマウントされます。devcontainer features が Hugo Extended（バージョン固定）、Node 22、ホストのデーモンに接続する Docker CLI、act、GitHub CLI をインストールし、`postCreateCommand` が `npm install` を実行するので、初回オープン時からビルド可能な状態になります。厳選された VS Code 拡張機能一式（Tailwind、Hugo、Prettier、Git Graph など）が事前設定されています。
+- **`dev`** — エディタが接続する Go の devcontainer イメージで、リポジトリは `/workspaces/hextra` にマウントされます。devcontainer features が Hugo Extended（バージョン固定）、Node 24、ホストのデーモンに接続する Docker CLI、act、GitHub CLI をインストールし、`postCreateCommand` が `npm install` を実行するので、初回オープン時からビルド可能な状態になります。厳選された VS Code 拡張機能一式（Tailwind、Hugo、Prettier、Git Graph など）が事前設定されています。
 - **`preview`** — `docs/public` を読み取り専用で配信する小さな（約 258 kB）静的ファイルサーバー（`pierrezemb/gostatic`）。`Cache-Control: no-store` を付けるので、古いページをデバッグしてしまうことがありません。dev コンテナと一緒に起動して稼働し続けます。`make build`（または `make preview`）を再実行すると、コンテナの再起動なしに配信サイトが更新されます。
 
 再現可能なツールバージョンのために `devcontainer-lock.json` が追跡されています。`.vscode/hextra.code-snippets` はコンテナ内でもプレーンなホストのチェックアウトでも自動的に読み込まれます — [VS Code スニペット](vscode-snippets)を参照してください。

@@ -88,7 +88,7 @@ Hextra 在 npm 脚本之上提供了一套完整的开发工作流：自带文�
 
 devcontainer 不使用普通镜像，而是通过 **Docker Compose**（`.devcontainer/docker-compose.yml`）运行，包含两个服务：
 
-- **`dev`** —— 编辑器附加到的 Go devcontainer 镜像，仓库挂载在 `/workspaces/hextra`。Devcontainer features 会安装 Hugo Extended（固定版本）、Node 22、连接宿主机守护进程的 Docker CLI、act 和 GitHub CLI；`postCreateCommand` 运行 `npm install`，容器首次打开即可直接构建。一组精选的 VS Code 扩展（Tailwind、Hugo、Prettier、Git Graph 等）已预先配置好。
+- **`dev`** —— 编辑器附加到的 Go devcontainer 镜像，仓库挂载在 `/workspaces/hextra`。Devcontainer features 会安装 Hugo Extended（固定版本）、Node 24、连接宿主机守护进程的 Docker CLI、act 和 GitHub CLI；`postCreateCommand` 运行 `npm install`，容器首次打开即可直接构建。一组精选的 VS Code 扩展（Tailwind、Hugo、Prettier、Git Graph 等）已预先配置好。
 - **`preview`** —— 一个极小（约 258 kB）的静态文件服务器（`pierrezemb/gostatic`），以只读方式提供 `docs/public` 的内容，并设置 `Cache-Control: no-store`，让你永远不会调试到过期页面。它随开发容器一起启动并保持运行：重新执行 `make build`（或 `make preview`）即可更新所服务的站点，无需重启容器。
 
 `devcontainer-lock.json` 已纳入版本控制以保证工具版本可复现。`.vscode/hextra.code-snippets` 在容器内和普通宿主机检出中都会被自动加载——参见 [VS Code 代码片段](vscode-snippets)。
