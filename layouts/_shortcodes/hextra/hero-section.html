@@ -7,11 +7,11 @@
 */}}
 {{- $style := .Get "style" -}}
 {{- $heading := int (strings.TrimPrefix "h" (.Get "heading" | default "h2")) -}}
-{{- $size := cond (ge $heading 4) "xl" (cond (eq $heading 3) "2xl" "4xl") -}}{{/* The tag name is built with printf and emitted through safeHTML rather than written as `<h{{ $heading }}>`: prettier-plugin-go-template has no node for a tag whose name is an expression and aborts on the file. */}}
+{{- $size := cond (ge $heading 4) "xl" (cond (eq $heading 3) "2xl" "4xl") -}}{{/* The tag name is built with printf and emitted through safeHTML rather than written as `<h{{ $heading }}>`: prettier-plugin-go-template has no node for a tag whose name is an expression and aborts on the file. Being outside Go's contextual escaping, every value interpolated into that tag has to be escaped by hand with htmlEscape - safeCSS marks a value as trusted CSS and does no escaping at all, so it cannot hold the attribute boundary here. */}}
 {{- $classes := printf "not-prose hx:text-%s hx:font-bold hx:leading-none hx:tracking-tighter hx:md:text-3xl hx:py-2 hx:bg-clip-text hx:text-transparent hx:bg-gradient-to-r hx:from-neutral-900 hx:to-neutral-600 hx:dark:from-neutral-100 hx:dark:to-neutral-400" $size -}}
 {{- $styleAttr := "" -}}
 {{- with $style -}}
-  {{- $styleAttr = printf "style=\"%s\"" (. | safeCSS) -}}
+  {{- $styleAttr = printf "style=\"%s\"" (. | htmlEscape) -}}
 {{- end -}}
 {{- printf "<h%d\n  class=\"%s\"\n  %s\n>" $heading $classes $styleAttr | safeHTML }}
 {{ .Inner | markdownify }}
