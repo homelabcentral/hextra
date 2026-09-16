@@ -1,6 +1,14 @@
-{{/* Render raw svg icon from site data */}}
+{{/* Render raw svg icon from site data.
+
+  `quiet` makes every failure return an empty string instead of calling errorf,
+  which is what `utils/icon-exists.html` needs in order to answer "would this
+  name render?" without taking the build down while it asks. Anything that can
+  fail a normal call fails a quiet one the same way - unknown name, bad remote
+  provider, remote fetching disabled, fetch error - so the two cannot drift.
+*/}}
 {{- $siteData := partial "utils/hugo-compat/site-data.html" . -}}
 {{- $name := .name -}}
+{{- $quiet := .quiet | default false -}}
 {{- $icon := index $siteData.icons $name -}}
 {{- $isRemoteIcon := false -}}
 
@@ -39,9 +47,11 @@
 
     {{- if $remoteEnabled -}}
       {{- if not (findRE "^[A-Za-z0-9_-]+$" $remoteProvider) -}}
+        {{- if $quiet -}}{{- return "" -}}{{- end -}}
         {{- errorf "invalid remote icon provider %q" $remoteProvider -}}
       {{- end -}}
       {{- if or (in $remoteName "..") (not (findRE "^[A-Za-z0-9._/-]+$" $remoteName)) -}}
+        {{- if $quiet -}}{{- return "" -}}{{- end -}}
         {{- errorf "invalid remote icon name %q" $remoteName -}}
       {{- end -}}
 
@@ -49,6 +59,7 @@
         {{- $remoteUrl := printf .url $remoteName -}}
         {{- with try (resources.GetRemote $remoteUrl) -}}
           {{- with .Err -}}
+            {{- if $quiet -}}{{- return "" -}}{{- end -}}
             {{- errorf "Could not retrieve remote icon %q from %s. Reason: %s." $name $remoteUrl . -}}
           {{- else with .Value -}}
             {{- $icon = .Content -}}
@@ -64,6 +75,7 @@
 {{- end -}}
 
 {{- if not $icon -}}
+  {{- if $quiet -}}{{- return "" -}}{{- end -}}
   {{ errorf "icon %q not found" $name }}
 {{- end -}}
 

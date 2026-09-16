@@ -1,11 +1,19 @@
 {{/* Report whether an icon name can be rendered by `utils/icon.html`.
 
-  `utils/icon.html` calls `errorf` for an unknown name, which fails the build.
-  Use this guard before passing a name that comes from site configuration, so a
-  typo degrades to a missing icon instead of a broken site.
+  `utils/icon.html` calls `errorf` for a name it cannot render, which fails the
+  build. Use this guard before passing a name that comes from site
+  configuration, so a typo degrades to a missing icon instead of a broken site.
 
-  Remote names (`provider:name`) are reported as available; `utils/icon.html`
-  validates the provider and the fetch itself.
+  The answer comes from `utils/icon.html` itself, asked in `quiet` mode, rather
+  than from a reimplementation of its lookup. The previous version reported any
+  name containing a colon as available on the grounds that `utils/icon.html`
+  would validate it - but that validation is an errorf, so the build still
+  failed for an unknown provider, a malformed remote name, or a remote icon on
+  a site with `icons.remote.enable` false. Asking the real implementation also
+  picks up the vendored icons, which the reimplementation did not know about.
+
+  A remote name costs one fetch here, which `utils/icon.html` then reuses from
+  Hugo's resource cache when the caller renders it.
 
   @param {string} name The icon name to check.
   @returns {bool}
@@ -16,11 +24,7 @@
 {{- $name := .name | default "" -}}
 {{- $exists := false -}}
 {{- with $name -}}
-  {{- if strings.Contains . ":" -}}
-    {{- $exists = true -}}
-  {{- else -}}
-    {{- $siteData := partial "utils/hugo-compat/site-data.html" . -}}
-    {{- $exists = ne (index $siteData.icons .) nil -}}
-  {{- end -}}
+  {{- $rendered := partial "utils/icon.html" (dict "name" . "quiet" true) -}}
+  {{- $exists = ne (printf "%s" $rendered) "" -}}
 {{- end -}}
 {{- return $exists -}}
