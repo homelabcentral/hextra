@@ -25,7 +25,14 @@
         {{- $avatar := . -}}
         {{- if not (urls.Parse $avatar).Scheme -}}
           {{- with or ($context.Resources.Get $avatar) (resources.Get $avatar) -}}
-            {{- $avatar = (cond (eq .MediaType.SubType "svg") . (.Process "Resize 160x webp q85")).RelPermalink -}}
+            {{- /* `cond` is a function, so both arms are evaluated: written as a
+            ternary this called .Process on the SVG it was meant to skip, and
+            Hugo refuses to process an SVG, failing the build. */ -}}
+            {{- if eq .MediaType.SubType "svg" -}}
+              {{- $avatar = .RelPermalink -}}
+            {{- else -}}
+              {{- $avatar = (.Process "Resize 160x webp q85").RelPermalink -}}
+            {{- end -}}
           {{- else -}}
             {{- if hasPrefix $avatar "/" -}}{{- $avatar = relURL (strings.TrimPrefix "/" $avatar) -}}{{- end -}}
           {{- end -}}
