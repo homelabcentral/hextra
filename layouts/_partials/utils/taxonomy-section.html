@@ -1,0 +1,51 @@
+{{/* The content section a taxonomy or term page should draw blog widgets from.
+
+  A term page's own `.Section` is the taxonomy's ("tags"), not the section its
+  tagged pages live in, so it cannot be used directly - and `where
+  site.RegularPages "Section" "tags"` matches nothing. The tag layouts used to
+  pass the literal "blog" instead, which is right for the common case and wrong
+  for every site that tags a `news` or `changelog` section.
+
+  The section is taken from the pages the taxonomy actually covers: the most
+  common one wins, ties resolve alphabetically because Hugo ranges a map in key
+  order, and a taxonomy with no pages falls back to "blog".
+
+  Handles both kinds. A term page lists its pages directly; a taxonomy page
+  lists terms, whose pages are one level further down.
+
+  @param {page} context The taxonomy or term page.
+  @returns {string} The section name.
+
+  @example {{ $section := partial "utils/taxonomy-section.html" .
+}}
+*/}}
+{{- $counts := dict -}}
+{{- $pages := slice -}}
+{{- if eq .Kind "term" -}}
+  {{- range .Pages -}}
+    {{- $pages = $pages | append . -}}
+  {{- end -}}
+{{- else -}}
+  {{- range .Pages -}}
+    {{- range .Pages -}}
+      {{- $pages = $pages | append . -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- range $pages -}}
+  {{- with .Section -}}
+    {{- $counts = merge $counts (dict . (add (index $counts . | default 0) 1)) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $best := "" -}}
+{{- $bestCount := 0 -}}
+{{- range $section, $count := $counts -}}
+  {{- if gt $count $bestCount -}}
+    {{- $best = $section -}}
+    {{- $bestCount = $count -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return ($best | default "blog") -}}

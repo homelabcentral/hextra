@@ -8,8 +8,9 @@
   @param {dict} config The dict returned by `blog/config.html`.
   @param {string} layout "rail" (default) or "inline".
   @param {string} [section] Section to draw pages from. Defaults to the
-  context page's own section; pages outside the blog (the tag pages) pass
-  "blog" explicitly.
+  context page's own section. A taxonomy or term page's own section is the
+  taxonomy's, not the one its pages live in, so those layouts pass the result
+  of `utils/taxonomy-section.html` instead.
 
   @example {{ partial "blog/widgets.html" (dict "context" . "config" $cfg "layout" "rail")
 }}
