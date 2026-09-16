@@ -16,9 +16,33 @@
 {{- $monoFont := "ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace" -}}
 
 {{- if site.Params.fonts.enable -}}
-  {{- $headingFont = printf "\"%s\", %s" site.Params.fonts.heading.family site.Params.fonts.fallbacks.heading -}}
-  {{- $bodyFont = printf "\"%s\", %s" site.Params.fonts.body.family site.Params.fonts.fallbacks.body -}}
-  {{- $codeFont = printf "\"%s\", %s" site.Params.fonts.code.family site.Params.fonts.fallbacks.code -}}
+  {{/* Every role is guarded the way `mono` is below: an unconfigured family, or
+    a family with no matching `fallbacks` entry, keeps the default stack rather
+    than printf-ing a nil into it. Unguarded, a config of no more than
+    `fonts: {enable: true}` built without error and emitted
+    `--font-body:"%!s(<nil>)", %!s(<nil>)`, which is not a valid font-family, so
+    the whole site silently fell back to the browser default serif. */}}
+  {{- with site.Params.fonts.heading -}}
+    {{- with .family -}}
+      {{- $headingFont = printf "\"%s\", %s" . (site.Params.fonts.fallbacks.heading | default $headingFont) -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $headingFont = site.Params.fonts.fallbacks.heading | default $headingFont -}}
+  {{- end -}}
+  {{- with site.Params.fonts.body -}}
+    {{- with .family -}}
+      {{- $bodyFont = printf "\"%s\", %s" . (site.Params.fonts.fallbacks.body | default $bodyFont) -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $bodyFont = site.Params.fonts.fallbacks.body | default $bodyFont -}}
+  {{- end -}}
+  {{- with site.Params.fonts.code -}}
+    {{- with .family -}}
+      {{- $codeFont = printf "\"%s\", %s" . (site.Params.fonts.fallbacks.code | default $codeFont) -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $codeFont = site.Params.fonts.fallbacks.code | default $codeFont -}}
+  {{- end -}}
   {{/* `mono` is optional and distinct from `code`: interface chrome — keys,
     badges, counters — rather than code you read. With no family configured it
     keeps the plain fallback stack, which is what those surfaces got before,
