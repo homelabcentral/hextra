@@ -9,7 +9,7 @@ next: /docs/guide/shortcodes/steps
 enableInlineShortcodes: true
 ```
 
-可用图标列表可在 [`data/icons.yaml`](https://github.com/imfing/hextra/blob/main/data/icons.yaml) 中找到。
+可用图标列表可在 [`data/icons.yaml`](https://github.com/homelabcentral/hextra/blob/main/data/icons.yaml) 中找到。
 
 <!--more-->
 

@@ -8,18 +8,10 @@ next: /docs/guide
 prev: /docs
 ---
 
-## Quick Start from Template
-
-{{< icon "github" >}}&nbsp;[imfing/hextra-starter-template](https://github.com/imfing/hextra-starter-template)
-
-You could quickly get started by using the above template repository.
-
-<img src="https://docs.github.com/assets/cb-77734/mw-1440/images/help/repository/use-this-template-button.webp" width="500" alt="GitHub repository page showing the Use this template button">
-
-We have provided a [GitHub Actions workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow) which can help automatically build and deploy your site to GitHub Pages, and host it for free.
-For more options, check out [Deploy Site](../guide/deploy-site).
-
-[🌐 Demo ↗](https://imfing.github.io/hextra-starter-template/)
+Hextra installs as a [Hugo Module](https://gohugo.io/hugo-modules/). Nothing is
+copied into your site: Hugo downloads the theme into its own module cache and
+records the version in your `go.mod`, so upgrading is one deliberate command and
+a one-line diff.
 
 ## Start as New Project
 

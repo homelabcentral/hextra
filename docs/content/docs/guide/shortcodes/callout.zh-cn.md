@@ -11,7 +11,7 @@ prev: /docs/guide/shortcodes
 <!--more-->
 
 > [!NOTE]
-> 自 [v0.9.0](https://github.com/imfing/hextra/releases/tag/v0.9.0) 起支持 [GitHub风格提示框](../../markdown#alerts)。
+> 也支持 [GitHub 风格提示框](../../markdown#alerts) 作为替代语法。
 > 它利用Markdown语法渲染提示框，确保内容具有更好的可移植性和可读性。
 
 ## 示例

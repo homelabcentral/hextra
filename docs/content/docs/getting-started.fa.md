@@ -8,18 +8,10 @@ next: /docs/guide
 prev: /docs
 ---
 
-## شروع سریع با قالب
-
-{{< icon "github" >}}&nbsp;[imfing/hextra-starter-template](https://github.com/imfing/hextra-starter-template)
-
-می‌توانید با استفاده از مخزن قالب فوق به سرعت شروع به کار کنید.
-
-<img src="https://docs.github.com/assets/cb-77734/mw-1440/images/help/repository/use-this-template-button.webp" width="500" alt="صفحه مخزن GitHub که دکمه Use this template را نشان می‌دهد">
-
-ما یک [گردش کار GitHub Actions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow) ارائه کرده‌ایم که می‌تواند به صورت خودکار سایت شما را ساخته و در GitHub Pages مستقر کند و به صورت رایگان میزبانی کند.
-برای گزینه‌های بیشتر، [استقرار سایت](../guide/deploy-site) را بررسی کنید.
-
-[🌐 نسخه نمایشی ↗](https://imfing.github.io/hextra-starter-template/)
+هگزترا به صورت یک [ماژول هیوگو](https://gohugo.io/hugo-modules/) نصب می‌شود. هیچ
+فایلی در سایت شما کپی نمی‌شود: هیوگو تم را در حافظه‌ی نهان ماژول‌های خود دانلود
+می‌کند و نسخه را در `go.mod` ثبت می‌کند، بنابراین ارتقا یک دستور آگاهانه و یک خط
+تغییر است.
 
 ## شروع به عنوان پروژه جدید
 

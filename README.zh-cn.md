@@ -3,7 +3,7 @@
   <sup align="center"><a href="README.md">English</a> | <a href="README.zh-cn.md">简体中文</a> ｜ <a href="README.fa.md">فارسی</a></sup>
   <p align="center">用于创建美观的静态站点的现代化, 响应式, 功能强大的 Hugo 主题.</p>
 
-演示 → [imfing.github.io/hextra](https://imfing.github.io/hextra/)
+演示 → [homelabcentral.github.io/hextra](https://homelabcentral.github.io/hextra/)
 
 </div>
 
@@ -28,15 +28,40 @@
 
 ## 快速开始
 
-### 使用模板
+### 作为 Hugo 模块安装
 
-使用 [Hextra stater template](https://github.com/imfing/hextra-starter-template) 是使用 Hextra 主题的最简单方法. 点击仓库页面上的 `Use this template` 按钮开始使用.
+需要 [Hugo extended](https://gohugo.io/installation/) 0.146.0 或更高版本, 以及 [Go](https://go.dev/dl/) —— Hugo 依赖它来解析模块.
 
-此仓库中包含一个 [GitHub Actions workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow) 来帮助你免费在 GitHub Pages 上自动构建和部署网站.
+```shell
+hugo new site my-site --format=yaml
+cd my-site
+hugo mod init github.com/username/my-site
+hugo mod get github.com/homelabcentral/hextra
+```
+
+然后在 `hugo.yaml` 中添加导入:
+
+```yaml
+module:
+  imports:
+    - path: github.com/homelabcentral/hextra
+
+# 可选: 启用主题的分类法, 包括 `series`. Hugo 只接受项目配置中的合并策略,
+# 因此主题自身无法设置这一项.
+taxonomies:
+  _merge: shallow
+```
+
+不会有任何文件被复制到你的站点中. Hugo 会把主题保存在自己的模块缓存里, 站点使用的版本只在 `go.mod` 中占一行. 升级是显式的:
+
+```shell
+hugo mod get -u github.com/homelabcentral/hextra          # 最新发布版本
+hugo mod get github.com/homelabcentral/hextra@v0.13.0     # 指定版本
+```
 
 ### 使用
 
-转至[文档](https://imfing.github.io/hextra/zh-cn/docs)
+转至[文档](https://homelabcentral.github.io/hextra/zh-cn/docs)
 
 ## 贡献
 

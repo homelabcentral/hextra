@@ -894,7 +894,7 @@ Render a card for a GitHub repository, with its description and current star and
 | `showThumbnail` | bool | Show the repository's social preview image. Default `false`. |
 
 ```markdown
-{{< github repo="imfing/hextra" showThumbnail=false >}}
+{{< github repo="homelabcentral/hextra" showThumbnail=false >}}
 ```
 
 ### gitlab
@@ -1020,7 +1020,7 @@ A shortcode for rendering a badge with a link.
 | `style` | string | The style of the badge. |
 
 ```markdown
-{{< hextra/hero-badge link="https://github.com/imfing/hextra/releases" >}}
+{{< hextra/hero-badge link="https://github.com/homelabcentral/hextra/releases" >}}
   <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-hextra-accent-400"></div>
   <span>New release</span>
 {{< /hextra/hero-badge >}}
@@ -1357,7 +1357,7 @@ code
 Code block whose filename header links to the source, base_url + filename.
 
 ````markdown
-```go {base_url="https://github.com/imfing/hextra/blob/main/",filename="go.mod"}
+```go {base_url="https://github.com/homelabcentral/hextra/blob/main/",filename="go.mod"}
 code
 ```
 ````

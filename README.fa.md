@@ -3,7 +3,7 @@
   <sup align="center"><a href="README.md">English</a> | <a href="README.zh-cn.md">简体中文</a> ｜ <a href="README.fa.md">فارسی</a></sup>
   <p align="center">تم هیوگو مدرن، پاسخگو و دارای امکانات کامل برای ایجاد وب‌سایت‌های استاتیک زیبا.</p>
 
-نسخه‌ی نمایشی → [imfing.github.io/hextra](https://imfing.github.io/hextra/fa)
+نسخه‌ی نمایشی → [homelabcentral.github.io/hextra](https://homelabcentral.github.io/hextra/fa)
 
 </div>
 
@@ -28,17 +28,40 @@
 
 ## شروع کنید
 
-### شروع سریع از طریق Template
+### نصب به عنوان ماژول هیوگو
 
-استفاده از [Hextra Starter Template](https://github.com/imfing/hextra-starter-template) ساده‌ترین روش برای راه‌اندازی سریع یک وب‌سایت جدید با تم هگزترا است. با کلیک بر روی دکمه "Use this template" در بالای صفحه مخزن شروع کنید.
+به [Hugo extended](https://gohugo.io/installation/) نسخه ۰.۱۴۶.۰ یا بالاتر و [Go](https://go.dev/dl/) نیاز دارد — هیوگو برای حل ماژول‌ها از آن استفاده می‌کند.
 
-مخزن تم همچنین شامل یک [گردش کار گیت‌هاب Actions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow) رای به‌کاراندازی وب‌سایت شما در گیت‌هاب Pages است.
+```shell
+hugo new site my-site --format=yaml
+cd my-site
+hugo mod init github.com/username/my-site
+hugo mod get github.com/homelabcentral/hextra
+```
 
-<img alt="Hextra Starter Template" src="https://user-images.githubusercontent.com/5097752/263551418-c403b9a9-a76c-47a6-8466-513d772ef0b7.jpg" width=600/>
+سپس این بخش را به `hugo.yaml` اضافه کنید:
+
+```yaml
+module:
+  imports:
+    - path: github.com/homelabcentral/hextra
+
+# اختیاری: فعال‌سازی طبقه‌بندی‌های تم، از جمله `series`. هیوگو راهبرد ادغام را
+# تنها از پیکربندی پروژه می‌پذیرد، بنابراین تم نمی‌تواند خودش آن را تنظیم کند.
+taxonomies:
+  _merge: shallow
+```
+
+هیچ فایلی در وب‌سایت شما کپی نمی‌شود. هیوگو تم را در حافظه‌ی نهان ماژول‌های خود نگه می‌دارد و نسخه‌ای که سایت شما استفاده می‌کند تنها یک خط در `go.mod` است. ارتقا به‌صورت دستی انجام می‌شود:
+
+```shell
+hugo mod get -u github.com/homelabcentral/hextra          # آخرین نسخه منتشرشده
+hugo mod get github.com/homelabcentral/hextra@v0.13.0     # یک نسخه مشخص
+```
 
 ### استفاده
 
-برای اطلاعات بیشتر به بخش [مستندات](https://imfing.github.io/hextra/fa/docs) مراجعه کنید.
+برای اطلاعات بیشتر به بخش [مستندات](https://homelabcentral.github.io/hextra/fa/docs) مراجعه کنید.
 
 ## مشارکت کردن
 

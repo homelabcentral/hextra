@@ -13,11 +13,11 @@ Hugo وبسایت‌های استاتیک تولید می‌کند که امکا
 
 [GitHub Pages](https://docs.github.com/pages) روش توصیه‌شده برای استقرار و میزبانی رایگان وبسایت شماست.
 
-اگر سایت را با استفاده از [hextra-starter-template](https://github.com/imfing/hextra-starter-template) راه‌اندازی کرده‌اید، این قالب از پیش یک گردش کار GitHub Actions برای استقرار خودکار در GitHub Pages ارائه می‌دهد.
+یک گردش کار GitHub Actions می‌تواند در هر push سایت را بسازد و در GitHub Pages مستقر کند، بدون نیاز به سرور شخصی.
 
 {{% details title="پیکربندی GitHub Actions" closed="true" %}}
 
-در زیر یک نمونه پیکربندی از [hextra-starter-template](https://github.com/imfing/hextra-starter-template) آمده است:
+در زیر یک نمونه پیکربندی آمده است. مخزن تم نیز مستندات خود را با [گردش کاری با همین ساختار](https://github.com/homelabcentral/hextra/blob/main/.github/workflows/pages.yml) مستقر می‌کند:
 
 ```yaml {filename=".github/workflows/pages.yaml"}
 # نمونه گردش کار برای ساخت و استقرار یک سایت Hugo در GitHub Pages
@@ -140,7 +140,7 @@ run: |
 
 1. کد خود را به مخزن Git (GitHub, GitLab و غیره) push کنید.
 2. [پروژه را به Netlify وارد کنید](https://app.netlify.com/start).
-3. اگر از [hextra-starter-template][hextra-starter-template] استفاده نمی‌کنید، موارد زیر را به صورت دستی پیکربندی کنید:
+3. موارد زیر را پیکربندی کنید:
    - دستور ساخت را روی `hugo --gc --minify` تنظیم کنید.
    - دایرکتوری انتشار را روی `public` مشخص کنید.
    - متغیر محیطی `HUGO_VERSION` را اضافه کرده و روی `0.147.7` تنظیم کنید، یا آن را در فایل `netlify.toml` مشخص کنید.

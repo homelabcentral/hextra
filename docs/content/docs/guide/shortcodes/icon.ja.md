@@ -9,7 +9,7 @@ next: /docs/guide/shortcodes/steps
 enableInlineShortcodes: true
 ```
 
-利用可能なアイコンの一覧は [`data/icons.yaml`](https://github.com/imfing/hextra/blob/main/data/icons.yaml) で確認できます。
+利用可能なアイコンの一覧は [`data/icons.yaml`](https://github.com/homelabcentral/hextra/blob/main/data/icons.yaml) で確認できます。
 
 <!--more-->
 

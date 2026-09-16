@@ -7,7 +7,7 @@ tags:
 
 Hugo 从站点根目录的 `hugo.yaml` 读取配置。
 配置文件可用来调整站点的所有方面。
-查看本网站的示例配置文件 [`docs/hugo.yaml`](https://github.com/imfing/hextra/blob/main/docs/hugo.yaml) 以全面了解可用设置和最佳实践。
+查看本网站的示例配置文件 [`docs/hugo.yaml`](https://github.com/homelabcentral/hextra/blob/main/docs/hugo.yaml) 以全面了解可用设置和最佳实践。
 
 <!--more-->
 
@@ -35,7 +35,7 @@ menu:
         type: search
     - name: GitHub
       weight: 5
-      url: "https://github.com/imfing/hextra"
+      url: "https://github.com/homelabcentral/hextra"
       params:
         icon: github
 ```
@@ -215,13 +215,13 @@ editURL: "https://example.com/edit/this/page"
 copyright: "© 2024 你的文本内容"
 ```
 
-可以参考 GitHub 仓库中的示例 [`i18n/en.yaml`](https://github.com/imfing/hextra/blob/main/i18n/en.yaml) 文件。此外，可以在版权文本中使用 Markdown 格式。
+可以参考 GitHub 仓库中的示例 [`i18n/en.yaml`](https://github.com/homelabcentral/hextra/blob/main/i18n/en.yaml) 文件。此外，可以在版权文本中使用 Markdown 格式。
 
 ## 其他
 
 ### 网站图标
 
-要自定义网站的 [favicon](https://en.wikipedia.org/wiki/Favicon)，将图标文件放在 `static/icons` 文件夹下以覆盖[主题默认的网站图标](https://github.com/imfing/hextra/tree/main/static)：
+要自定义网站的 [favicon](https://en.wikipedia.org/wiki/Favicon)，将图标文件放在 `static/icons` 文件夹下以覆盖[主题默认的网站图标](https://github.com/homelabcentral/hextra/tree/main/static)：
 
 {{< filetree/container >}}
 {{< filetree/folder name="static" >}}

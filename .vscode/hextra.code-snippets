@@ -462,7 +462,7 @@
     "scope": "markdown",
     "prefix": "hxgithub",
     "body": [
-      "{{< github repo=\"${1:imfing/hextra}\" showThumbnail=${2|false,true|} >}}"
+      "{{< github repo=\"${1:homelabcentral/hextra}\" showThumbnail=${2|false,true|} >}}"
     ],
     "description": "GitHub repository card. Fetched at build time; needs params.remoteFetch.enable (layouts/_shortcodes/github.html)."
   },
@@ -623,7 +623,7 @@
     "scope": "markdown",
     "prefix": "hxhero",
     "body": [
-      "{{< hextra/hero-badge link=\"${1:https://github.com/imfing/hextra/releases}\" >}}",
+      "{{< hextra/hero-badge link=\"${1:https://github.com/homelabcentral/hextra/releases}\" >}}",
       "  <div class=\"hx:w-2 hx:h-2 hx:rounded-full hx:bg-hextra-accent-400\"></div>",
       "  <span>${2:New release}</span>",
       "{{< /hextra/hero-badge >}}",
@@ -882,7 +882,7 @@
     "scope": "markdown",
     "prefix": "hxcode-baseurl",
     "body": [
-      "```${1:go} {base_url=\"${2:https://github.com/imfing/hextra/blob/main/}\",filename=\"${3:go.mod}\"}",
+      "```${1:go} {base_url=\"${2:https://github.com/homelabcentral/hextra/blob/main/}\",filename=\"${3:go.mod}\"}",
       "${4:code}",
       "```"
     ],

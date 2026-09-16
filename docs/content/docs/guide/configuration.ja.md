@@ -7,7 +7,7 @@ tags:
 
 Hugo はサイトのルートにある `hugo.yaml` から設定を読み込みます。
 この設定ファイルであなたのサイトのあらゆる側面を設定できます。
-利用可能な設定項目とベストプラクティスを網羅的に理解するには、GitHub 上のこのサイトの設定ファイル [`docs/hugo.yaml`](https://github.com/imfing/hextra/blob/main/docs/hugo.yaml) を参照してください。
+利用可能な設定項目とベストプラクティスを網羅的に理解するには、GitHub 上のこのサイトの設定ファイル [`docs/hugo.yaml`](https://github.com/homelabcentral/hextra/blob/main/docs/hugo.yaml) を参照してください。
 
 <!--more-->
 
@@ -35,7 +35,7 @@ menu:
         type: search
     - name: GitHub
       weight: 5
-      url: "https://github.com/imfing/hextra"
+      url: "https://github.com/homelabcentral/hextra"
       params:
         icon: github
 ```
@@ -215,13 +215,13 @@ editURL: "https://example.com/edit/this/page"
 copyright: "© 2024 ここにあなたのテキスト"
 ```
 
-参考までに、GitHub リポジトリに [`i18n/en.yaml`](https://github.com/imfing/hextra/blob/main/i18n/en.yaml) ファイルの例があります。また、著作権テキストには Markdown 形式を使用することもできます。
+参考までに、GitHub リポジトリに [`i18n/en.yaml`](https://github.com/homelabcentral/hextra/blob/main/i18n/en.yaml) ファイルの例があります。また、著作権テキストには Markdown 形式を使用することもできます。
 
 ## その他
 
 ### ファビコン
 
-サイトの [ファビコン](https://ja.wikipedia.org/wiki/Favicon) をカスタマイズするには、[テーマのデフォルトファビコン](https://github.com/imfing/hextra/tree/main/static) を上書きするために `static/icons` フォルダの下にアイコンファイルを配置します：
+サイトの [ファビコン](https://ja.wikipedia.org/wiki/Favicon) をカスタマイズするには、[テーマのデフォルトファビコン](https://github.com/homelabcentral/hextra/tree/main/static) を上書きするために `static/icons` フォルダの下にアイコンファイルを配置します：
 
 {{< filetree/container >}}
 {{< filetree/folder name="static" >}}

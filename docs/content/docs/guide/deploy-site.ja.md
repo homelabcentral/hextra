@@ -13,11 +13,11 @@ Hugo は静的サイトを生成するため、柔軟なホスティングオプ
 
 [GitHub Pages](https://docs.github.com/pages) は無料でサイトをデプロイ・ホストするための推奨方法です。
 
-[hextra-starter-template](https://github.com/imfing/hextra-starter-template) を使用してサイトを構築した場合、GitHub Pages への自動デプロイを支援する GitHub Actions ワークフローが最初から用意されています。
+GitHub Actions ワークフローを使うと、プッシュのたびにサイトをビルドして GitHub Pages にデプロイできます。自前のサーバーは不要です。
 
 {{% details title="GitHub Actions 設定" closed="true" %}}
 
-以下は [hextra-starter-template](https://github.com/imfing/hextra-starter-template) の設定例です:
+以下は設定例です。テーマリポジトリ自身も[同じ構成のワークフロー](https://github.com/homelabcentral/hextra/blob/main/.github/workflows/pages.yml)でドキュメントをデプロイしています:
 
 ```yaml {filename=".github/workflows/pages.yaml"}
 # Hugo サイトをビルドし GitHub Pages にデプロイするサンプルワークフロー
@@ -139,7 +139,7 @@ run: |
 
 1. コードを Git リポジトリ（GitHub, GitLab など）にプッシュ
 2. Netlify に [プロジェクトをインポート](https://app.netlify.com/start)
-3. [hextra-starter-template][hextra-starter-template] を使用していない場合、以下を手動設定:
+3. 以下を設定:
    - Build command を `hugo --gc --minify` に設定
    - Publish directory を `public` に指定
    - 環境変数 `HUGO_VERSION` を追加し `0.147.7` を設定、または `netlify.toml` ファイルで設定

@@ -9,7 +9,7 @@ To use this shortcode inline, inline shortcode needs to be enabled in the config
 enableInlineShortcodes: true
 ```
 
-Built-in icons are listed in [`data/icons.yaml`](https://github.com/imfing/hextra/blob/main/data/icons.yaml).
+Built-in icons are listed in [`data/icons.yaml`](https://github.com/homelabcentral/hextra/blob/main/data/icons.yaml).
 
 <!--more-->
 

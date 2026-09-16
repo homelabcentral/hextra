@@ -84,7 +84,7 @@ menu:
         type: search
     - name: GitHub
       weight: 3
-      url: "https://github.com/imfing/hextra"
+      url: "https://github.com/homelabcentral/hextra"
       params:
         icon: github
 `

@@ -13,11 +13,11 @@ Hugo 生成静态网站，支持灵活的托管方案。
 
 [GitHub Pages](https://docs.github.com/pages) 是推荐的免费部署托管方案。
 
-若使用 [hextra-starter-template](https://github.com/imfing/hextra-starter-template) 初始化项目，已内置 GitHub Actions 工作流，可自动部署至 GitHub Pages。
+GitHub Actions 工作流可以在每次推送时构建并部署站点到 GitHub Pages，无需自己的服务器。
 
 {{% details title="GitHub Actions 配置" closed="true" %}}
 
-以下是 [hextra-starter-template](https://github.com/imfing/hextra-starter-template) 的示例配置：
+以下是一份示例配置。主题仓库本身也用[同样结构的工作流](https://github.com/homelabcentral/hextra/blob/main/.github/workflows/pages.yml)部署它的文档：
 
 ```yaml {filename=".github/workflows/pages.yaml"}
 # 构建并部署 Hugo 站点到 GitHub Pages 的示例工作流
@@ -140,7 +140,7 @@ run: |
 
 1. 将代码推送到 Git 仓库（GitHub/GitLab 等）
 2. 在 Netlify 中[导入项目](https://app.netlify.com/start)
-3. 若未使用 [hextra-starter-template][hextra-starter-template]，需手动配置：
+3. 进行如下配置：
    - 构建命令设为 `hugo --gc --minify`
    - 发布目录设为 `public`
    - 添加环境变量 `HUGO_VERSION` 并设为 `0.147.7`，或在 `netlify.toml` 中配置

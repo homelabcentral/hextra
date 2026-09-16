@@ -9,9 +9,9 @@
   @param {string} repo Required. Repository as "owner/name".
   @param {bool} showThumbnail Show the repository's social preview image. Default false.
 
-  @example {{< github repo="imfing/hextra" >}}
+  @example {{< github repo="homelabcentral/hextra" >}}
 @example
-{{< github repo="imfing/hextra" showThumbnail=true >}}
+{{< github repo="homelabcentral/hextra" showThumbnail=true >}}
 */}}
 {{- $repo := .Get "repo" | default (.Get 0) -}}
 

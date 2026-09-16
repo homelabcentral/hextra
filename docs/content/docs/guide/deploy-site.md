@@ -13,11 +13,11 @@ This page provides guides for deploying your Hextra site on various platforms.
 
 [GitHub Pages](https://docs.github.com/pages) is the recommended way to deploy and host your website for free.
 
-If you bootstrap the site using [hextra-starter-template](https://github.com/imfing/hextra-starter-template), it has provided GitHub Actions workflow out-of-the-box that helps automatically deploy to GitHub Pages.
+A GitHub Actions workflow can build and deploy the site to GitHub Pages on every push, with no server of your own.
 
 {{% details title="GitHub Actions Configuration" closed="true" %}}
 
-Below is an example configuration from [hextra-starter-template](https://github.com/imfing/hextra-starter-template):
+Below is an example configuration. The theme repository deploys its own documentation with [a workflow of the same shape](https://github.com/homelabcentral/hextra/blob/main/.github/workflows/pages.yml):
 
 ```yaml {filename=".github/workflows/pages.yaml"}
 # Sample workflow for building and deploying a Hugo site to GitHub Pages
@@ -140,7 +140,7 @@ For more details, check out:
 
 1. Push your code to your Git repository (GitHub, GitLab, etc.)
 2. [Import the project](https://app.netlify.com/start) to Netlify
-3. If you are not using [hextra-starter-template][hextra-starter-template], configure the following manually:
+3. Configure the following:
    - Configure the Build command to `hugo --gc --minify`
    - Specify the Publish directory to `public`
    - Add Environment variable `HUGO_VERSION` and set to `0.147.7`, or alternatively, set it in `netlify.toml` file

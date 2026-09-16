@@ -9,7 +9,7 @@ next: /docs/guide/shortcodes/steps
 enableInlineShortcodes: true
 ```
 
-لیست آیکون‌های موجود را می‌توانید در [`data/icons.yaml`](https://github.com/imfing/hextra/blob/main/data/icons.yaml) مشاهده کنید.
+لیست آیکون‌های موجود را می‌توانید در [`data/icons.yaml`](https://github.com/homelabcentral/hextra/blob/main/data/icons.yaml) مشاهده کنید.
 
 <!--more-->
 

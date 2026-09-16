@@ -111,9 +111,6 @@ menu:
       name: Documentation
       pageRef: /docs
       weight: 1
-    - identifier: versions
-      name: Versions
-      weight: 5
     - identifier: blog
       name: Blog
       pageRef: /blog
@@ -137,21 +134,6 @@ menu:
       url: "https://github.com/homelabcentral/hextra"
       params:
         icon: github
-    - identifier: development
-      name: Development ↗
-      url: https://imfing.github.io/hextra/versions/latest/
-      parent: versions
-      params:
-        type: link
-        icon: beaker
-    - identifier: v0.10
-      name: v0.10 ↗
-      url: https://imfing.github.io/hextra/versions/v0.10/
-      parent: versions
-    - identifier: v0.11
-      name: v0.11 ↗
-      url: https://imfing.github.io/hextra/versions/v0.11/
-      parent: versions
     - identifier: about
       name: About
       pageRef: /about

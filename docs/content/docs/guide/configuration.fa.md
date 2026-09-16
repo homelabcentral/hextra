@@ -7,7 +7,7 @@ tags:
 
 Hugo تنظیمات خود را از فایل `hugo.yaml` در ریشه سایت شما می‌خواند.
 فایل پیکربندی جایی است که می‌توانید تمام جنبه‌های سایت خود را تنظیم کنید.
-برای آشنایی جامع با تنظیمات موجود و بهترین روش‌ها، فایل پیکربندی این سایت [`docs/hugo.yaml`](https://github.com/imfing/hextra/blob/main/docs/hugo.yaml) را در GitHub بررسی کنید.
+برای آشنایی جامع با تنظیمات موجود و بهترین روش‌ها، فایل پیکربندی این سایت [`docs/hugo.yaml`](https://github.com/homelabcentral/hextra/blob/main/docs/hugo.yaml) را در GitHub بررسی کنید.
 
 <!--more-->
 
@@ -35,7 +35,7 @@ menu:
         type: search
     - name: GitHub
       weight: 5
-      url: "https://github.com/imfing/hextra"
+      url: "https://github.com/homelabcentral/hextra"
       params:
         icon: github
 ```
@@ -215,13 +215,13 @@ editURL: "https://example.com/edit/this/page"
 copyright: "© 2024 متن دلخواه شما"
 ```
 
-برای مرجع، یک فایل نمونه [`i18n/en.yaml`](https://github.com/imfing/hextra/blob/main/i18n/en.yaml) در مخزن GitHub موجود است. همچنین می‌توانید از قالب Markdown در متن کپی رایت استفاده کنید.
+برای مرجع، یک فایل نمونه [`i18n/en.yaml`](https://github.com/homelabcentral/hextra/blob/main/i18n/en.yaml) در مخزن GitHub موجود است. همچنین می‌توانید از قالب Markdown در متن کپی رایت استفاده کنید.
 
 ## سایر موارد
 
 ### فاوآیکون
 
-برای سفارشی کردن [فاوآیکون](https://fa.wikipedia.org/wiki/فاوآیکون) سایت، فایل‌های آیکون را در پوشه `static/icons` قرار دهید تا [فاوآیکون‌های پیش‌فرض قالب](https://github.com/imfing/hextra/tree/main/static) را جایگزین کنید:
+برای سفارشی کردن [فاوآیکون](https://fa.wikipedia.org/wiki/فاوآیکون) سایت، فایل‌های آیکون را در پوشه `static/icons` قرار دهید تا [فاوآیکون‌های پیش‌فرض قالب](https://github.com/homelabcentral/hextra/tree/main/static) را جایگزین کنید:
 
 {{< filetree/container >}}
 {{< filetree/folder name="static" >}}

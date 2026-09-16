@@ -8,18 +8,7 @@ next: /docs/guide
 prev: /docs
 ---
 
-## テンプレートから始める
-
-{{< icon "github" >}}&nbsp;[imfing/hextra-starter-template](https://github.com/imfing/hextra-starter-template)
-
-上記のテンプレートリポジトリを使用して、すぐに始めることができます。
-
-<img src="https://docs.github.com/assets/cb-77734/mw-1440/images/help/repository/use-this-template-button.webp" width="500" alt="Use this template ボタンが表示された GitHub リポジトリページ">
-
-[GitHub Actions ワークフロー](https://docs.github.com/ja/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow)を提供しており、サイトを自動的にビルドして GitHub Pages にデプロイし、無料でホストすることができます。
-その他のオプションについては、[サイトのデプロイ](../guide/deploy-site)を確認してください。
-
-[🌐 デモ ↗](https://imfing.github.io/hextra-starter-template/)
+Hextra は [Hugo モジュール](https://gohugo.io/hugo-modules/)としてインストールします。サイトには何もコピーされません。Hugo がテーマを自身のモジュールキャッシュにダウンロードし、バージョンを `go.mod` に記録するため、アップグレードは意図的なコマンド 1 つと 1 行の差分で済みます。
 
 ## 新規プロジェクトとして始める
 

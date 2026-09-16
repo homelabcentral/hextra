@@ -16,7 +16,7 @@ next: /docs/guide/deploy-site
 {{< badge "default" >}}&nbsp;
 {{< badge content="border" border=false >}}&nbsp;
 {{< badge content="color" color="green" >}}&nbsp;
-{{< badge content="link" link="https://github.com/imfing/hextra/releases" >}}&nbsp;
+{{< badge content="link" link="https://github.com/homelabcentral/hextra/releases" >}}&nbsp;
 {{< badge content="icon" icon="sparkles" >}}&nbsp;
 
 ### 使用
@@ -78,11 +78,11 @@ next: /docs/guide/deploy-site
 #### 变体
 
 {{< badge content="徽章" icon="sparkles" >}}&nbsp;
-{{< badge content="Releases" link="https://github.com/imfing/hextra/releases" icon="github" >}}&nbsp;
+{{< badge content="Releases" link="https://github.com/homelabcentral/hextra/releases" icon="github" >}}&nbsp;
 
 ```
 {{</* badge content="徽章" icon="sparkles" */>}}
-{{</* badge content="Releases" link="https://github.com/imfing/hextra/releases" icon="github" */>}}
+{{</* badge content="Releases" link="https://github.com/homelabcentral/hextra/releases" icon="github" */>}}
 ```
 
 ### 选项

@@ -16,7 +16,7 @@ These shortcodes are considered less stable and may be changed anytime.
 {{< badge "default" >}}&nbsp;
 {{< badge content="border" border=false >}}&nbsp;
 {{< badge content="color" color="green" >}}&nbsp;
-{{< badge content="link" link="https://github.com/imfing/hextra/releases" >}}&nbsp;
+{{< badge content="link" link="https://github.com/homelabcentral/hextra/releases" >}}&nbsp;
 {{< badge content="icon" icon="sparkles" >}}&nbsp;
 
 ### Usage
@@ -78,11 +78,11 @@ These shortcodes are considered less stable and may be changed anytime.
 #### Variants
 
 {{< badge content="Badge" icon="sparkles" >}}&nbsp;
-{{< badge content="Releases" link="https://github.com/imfing/hextra/releases" icon="github" >}}&nbsp;
+{{< badge content="Releases" link="https://github.com/homelabcentral/hextra/releases" icon="github" >}}&nbsp;
 
 ```
 {{</* badge content="Badge" icon="sparkles" */>}}
-{{</* badge content="Releases" link="https://github.com/imfing/hextra/releases" icon="github" */>}}
+{{</* badge content="Releases" link="https://github.com/homelabcentral/hextra/releases" icon="github" */>}}
 ```
 
 ### Options

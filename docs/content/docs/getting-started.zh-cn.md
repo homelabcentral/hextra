@@ -8,18 +8,7 @@ next: /docs/guide
 prev: /docs
 ---
 
-## 从模板快速启动
-
-{{< icon "github" >}}&nbsp;[imfing/hextra-starter-template](https://github.com/imfing/hextra-starter-template)
-
-您可以通过使用上述模板仓库快速开始。
-
-<img src="https://docs.github.com/assets/cb-77734/mw-1440/images/help/repository/use-this-template-button.webp" width="500" alt="显示“Use this template”按钮的 GitHub 仓库页面">
-
-我们提供了一个[GitHub Actions工作流](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow)，可以帮助自动构建并将您的站点部署到GitHub Pages，并免费托管。
-更多选项，请查看[部署站点](../guide/deploy-site)。
-
-[🌐 演示 ↗](https://imfing.github.io/hextra-starter-template/)
+Hextra 以 [Hugo 模块](https://gohugo.io/hugo-modules/)的形式安装。不会有任何文件被复制到你的站点中：Hugo 会把主题下载到自己的模块缓存中，并把版本记录在 `go.mod` 里，因此升级只需要一条明确的命令和一行改动。
 
 ## 作为新项目启动
 
