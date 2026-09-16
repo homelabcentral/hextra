@@ -154,6 +154,11 @@
   {{- end -}}
 
   {{- $useMainMenuEntries := and $useMainMenu (gt (len $mainMenuEntries) 0) -}}
+  {{- /* Upstream checks only for "page" entries, but this fork also builds "group" entries for dropdown menus, and those render their children too. A menu made solely of "url" entries is the only case that leaves mobile navigation with no way into the page tree, so both other types suppress the fallback below. */ -}}
+  {{- $hasTreeEntry := false -}}
+  {{- range $mainMenuEntries -}}
+    {{- if in (slice "page" "group") (index . "type") -}}{{- $hasTreeEntry = true -}}{{- end -}}
+  {{- end -}}
   {{- $hasItems := or (gt (len $items) 0) $useMainMenuEntries -}}
 
   {{- if $hasItems -}}
@@ -203,7 +208,9 @@
             <li>{{ template "sidebar-item-link" dict "active" $active "open" false "title" (index $entry "title") "link" $link }}</li>
           {{- end -}}
         {{- end -}}
-      {{- else -}}
+      {{- end -}}
+      {{- /* Fall back to the page tree when no menu entry renders one, so mobile navigation isn't limited to external menu links (#1024). */ -}}
+      {{- if not $hasTreeEntry -}}
         {{- range $items.ByWeight }}
           {{- if .Params.sidebar.separator -}}
             <li class="hextra-sidebar-separator">
