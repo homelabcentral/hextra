@@ -11,7 +11,7 @@
   {{- $path = .Get 0 -}}
 {{- end -}}
 {{- $showPrompts := eq (printf "%v" (.Get "prompts")) "true" -}}
-{{- $data := "" -}}
+{{- $data := dict -}}
 {{- $page := .Page -}}
 
 {{- if not $path -}}
@@ -23,10 +23,25 @@
 
 {{/* https://gohugo.io/functions/transform/unmarshal/ */}}
 {{- if (not $isLocal) -}}
-  {{- with resources.GetRemote $path -}}
-    {{- with unmarshal .Content -}}{{- $data = . -}}{{- end -}}
+  {{/* A remote notebook is fetched the way every other remote-fetching
+    shortcode in this theme fetches: behind params.remoteFetch.enable, wrapped
+    in `try`, and degrading to a warning. An offline build, a proxy, or a
+    notebook that has moved is a missing figure, not a reason to fail the whole
+    site. $data stays an empty dict, so the render below finds no cells and
+    emits nothing.
+  */}}
+  {{- if not (partial "utils/remote-fetch-enabled.html" .) -}}
+    {{- warnf "jupyter: remote fetching is disabled, skipping %q. See %s" $path .Position -}}
   {{- else -}}
-    {{- errorf "Remote resource not found: %s" $path -}}
+    {{- with try (resources.GetRemote $path) -}}
+      {{- with .Err -}}
+        {{- warnf "jupyter: unable to fetch %q: %s. See %s" $path . $.Position -}}
+      {{- else with .Value -}}
+        {{- with unmarshal .Content -}}{{- $data = . -}}{{- end -}}
+      {{- else -}}
+        {{- warnf "jupyter: no notebook at %q. See %s" $path $.Position -}}
+      {{- end -}}
+    {{- end -}}
   {{- end -}}
 {{- else if (not $isPage) -}}
   {{- with .Page.Resources.Get $path -}}
