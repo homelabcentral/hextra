@@ -123,7 +123,8 @@
         {{- if eq (index $cell "cell_type") "code" -}}
           {{- $execCount := index $cell "execution_count" -}}
           {{- $promptNum := " " -}}
-          {{- if ne $execCount nil -}}{{- $promptNum = printf "%v" $execCount -}}{{- end -}}
+          {{- /* Escaped here, once: the prompt labels below are built with printf and emitted through safeHTML, so notebook JSON reaching them is outside Go's contextual escaping. */ -}}
+          {{- if ne $execCount nil -}}{{- $promptNum = printf "%v" $execCount | htmlEscape -}}{{- end -}}
 
           {{- if not $hideSource -}}
             {{- $source := index $cell "source" -}}
