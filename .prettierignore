@@ -24,6 +24,16 @@ skills/hextra/references/icons.md
 # is no extension or edit that makes this file safe to format.
 assets/css/variables.css
 
+# A Hugo template that carries the search palette's translated strings. They are
+# emitted with jsonify, which supplies its own quotes and escapes what is inside
+# them - Hugo applies no contextual escaping to a .js template, so a translation
+# carrying an apostrophe or a double quote would otherwise terminate a
+# hand-written literal and leave the file unparseable. Prettier reads the file as
+# JavaScript, where a bare template action in expression position is a syntax
+# error, so it cannot format it at all. Wrapping the actions back in quotes to
+# satisfy the formatter is the bug.
+assets/js/search-dialog.js
+
 # A Hugo template that emits the FlexSearch index, so it opens with a template
 # action and is not valid JSON. Renaming it so prettier skips it is not an
 # option either: Hugo derives the media type from the extension, and a non-.json
