@@ -11,7 +11,7 @@ linkTitle: کارت‌ها
 {{< card link="/" title="بدون آیکون" >}}
 {{< /cards >}}
 
-{{< cards >}}
+{{< cards cols="2" >}}
 {{< card link="/" title="کارت تصویری" image="https://github.com/user-attachments/assets/71b7e3ec-1a8d-4582-b600-5425c6cc0407" subtitle="تصویر اینترنتی" >}}
 {{< card link="/" title="تصویر محلی" image="/images/card-image-unprocessed.jpg" subtitle="تصویر خام در دایرکتوری استاتیک." >}}
 {{< card link="/" title="تصویر محلی" image="images/space.jpg" subtitle="تصویر در دایرکتوری assets، پردازش شده توسط هوگو." method="Resize" options="600x q80 webp" >}}
@@ -72,7 +72,7 @@ Hextra به صورت خودکار تشخیص می‌دهد که آیا پردا�
 
 کارت از افزودن تگ‌ها پشتیبانی می‌کند که می‌تواند برای نمایش اطلاعات وضعیت اضافی مفید باشد.
 
-{{< cards >}}
+{{< cards cols="2" >}}
 {{< card link="../callout" title="کارت با تگ پیش‌فرض" tag="متن تگ" >}}
 {{< card link="../callout" title="کارت با تگ خطا" tag="متن تگ" tagType="error" >}}
 {{< card link="../callout" title="کارت با تگ اطلاعات" tag="متن تگ" tagType="info" >}}
