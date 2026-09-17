@@ -37,13 +37,13 @@ Every name is listed in [`data/icons.yaml`](https://github.com/homelabcentral/he
 
 Heroicons v1 carries no brand marks, so the bundled list covers only what this site itself needed — no Reddit, no Hacker News, no Docker. Rather than grow a set that ships to every site using the theme, Hextra reaches the upstream packs directly. A name containing a colon names a provider:
 
-| Provider                                     | Prefix           | Name shape               | Example               |
-| -------------------------------------------- | ---------------- | ------------------------ | --------------------- |
-| [Lucide](https://lucide.dev/icons/)          | `lucide:`        | the pack's own file name | `lucide:server`       |
-| [Tabler Icons](https://tabler.io/icons)      | `tabler:`        | the pack's own file name | `tabler:brand-docker` |
+| Provider                                        | Prefix           | Name shape               | Example               |
+| ----------------------------------------------- | ---------------- | ------------------------ | --------------------- |
+| [Lucide](https://lucide.dev/icons/)             | `lucide:`        | the pack's own file name | `lucide:server`       |
+| [Tabler Icons](https://tabler.io/icons)         | `tabler:`        | the pack's own file name | `tabler:brand-docker` |
 | [Tabler Icons](https://tabler.io/icons), filled | `tabler-filled:` | the pack's own file name | `tabler-filled:star`  |
-| [Simple Icons](https://simpleicons.org/)     | `simple:`        | the pack's own file name | `simple:ycombinator`  |
-| [Iconify](https://icon-sets.iconify.design/) | `iconify:`       | `set/icon`               | `iconify:mdi/server`  |
+| [Simple Icons](https://simpleicons.org/)        | `simple:`        | the pack's own file name | `simple:ycombinator`  |
+| [Iconify](https://icon-sets.iconify.design/)    | `iconify:`       | `set/icon`               | `iconify:mdi/server`  |
 
 The first four address one pack's flat namespace. Iconify is the outlier, and the reason the other four rarely run out: its name is a `set/icon` pair, so it reaches every set on icon-sets.iconify.design.
 
