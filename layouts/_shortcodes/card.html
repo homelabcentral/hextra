@@ -55,9 +55,40 @@
       {{- $lqip = printf "data:image/webp;base64,%s" ($tiny.Content | base64Encode) -}}
     {{- end -}}
   {{ else }}
+    {{/* Not a resource, so it is a raw file served from the static directory.
+      Nothing processes it, which used to mean it reached the browser with no
+      dimensions: the card laid out around a zero-height image and reflowed the
+      title and subtitle downwards once the pixels arrived. `images.Config`
+      reads the header off disk, which is enough to reserve the space. It wants
+      a path relative to the project root, so the static mount goes back on
+      front, and `try` swallows the miss for a path that is not there or is an
+      SVG (no intrinsic size to read). */}}
+    {{- $staticPath := printf "static/%s" (strings.TrimPrefix "/" $image) -}}
+    {{- with try (images.Config $staticPath) -}}
+      {{- if not .Err -}}
+        {{- $width = .Value.Width -}}
+        {{- $height = .Value.Height -}}
+      {{- end -}}
+    {{- end -}}
     {{/* Otherwise, use relative link of the image */}}
     {{- if hasPrefix $image "/" -}}
       {{- $image = relURL (strings.TrimPrefix "/" $image) -}}
+    {{- end -}}
+  {{- end -}}
+{{- else if $image -}}
+  {{/* A remote image, for the same reason: fetch it at build time purely to
+    read its width and height, and leave the URL pointing at the origin. Hugo
+    caches the download, so this costs one request per image per cache
+    lifetime. `try` keeps an unreachable host or an offline build from failing
+    it - the card then renders exactly as it did before, dimensions absent. */}}
+  {{- with try (resources.GetRemote $image) -}}
+    {{- if not .Err -}}
+      {{- with .Value -}}
+        {{- if and (hasPrefix .MediaType.Type "image/") (ne .MediaType.SubType "svg") -}}
+          {{- $width = .Width -}}
+          {{- $height = .Height -}}
+        {{- end -}}
+      {{- end -}}
     {{- end -}}
   {{- end -}}
 {{- end -}}

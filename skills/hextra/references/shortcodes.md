@@ -211,7 +211,7 @@ A shortcode for creating cards.
 
 ### card
 
-{{< >}} · self-closing
+{{< >}} · self-closing · fetches at build time
 
 A shortcode to create a card.
 
