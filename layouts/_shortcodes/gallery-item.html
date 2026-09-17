@@ -96,11 +96,9 @@
       {{- $full = relURL $src -}}
     {{- end -}}
     {{- $thumbURL = $full -}}
-    {{- $staticPath := printf "static/%s" (strings.TrimPrefix "/" $src) -}}
-    {{- with (try (images.Config $staticPath)).Value -}}
-      {{- $width = .Width -}}
-      {{- $height = .Height -}}
-    {{- end -}}
+    {{- $config := partial "utils/static-image-config.html" $src -}}
+    {{- $width = $config.width -}}
+    {{- $height = $config.height -}}
   {{- end -}}
 {{- end -}}
 

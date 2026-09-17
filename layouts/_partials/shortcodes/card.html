@@ -60,6 +60,13 @@
     image and the title, and on a text-only card it offsets the content from its
     neighbours for no reason. Title and subtitle follow whatever precedes them,
     and any slack in the row collects at the bottom of the card.
+
+    The trade-off is deliberate, so do not put it back: with `mt-auto`, a row of
+    images of differing aspect ratios aligned its titles with each other; without
+    it, each title sits directly under its own image and the row reads ragged.
+    Tying the title to its image beats tying it to the row - `.hextra-card img`
+    sets no `aspect-ratio`, so anyone wanting the aligned look should give the
+    images a common ratio rather than reinstate the gap.
   */}}
   <div>
     <span class="hextra-card-icon hx:flex hx:font-semibold hx:items-start hx:gap-2 {{ $padding }} hx:text-neutral-700 hx:hover:text-neutral-900 hx:dark:text-neutral-200 hx:dark:hover:text-neutral-50">
