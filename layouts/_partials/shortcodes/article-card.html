@@ -45,13 +45,15 @@
       {{- if and $named $text -}}
         {{- $verify = true -}}
       {{- end -}}
-      {{/* 800 rather than the 288 CSS pixels of `__cover` at its widest: the
-        column is `w-72` from `sm` up and the image is `object-cover`, so a 2x
-        display draws it at 576 device pixels and a 3x one at 864. At 400 the
-        card was upscaling a lossy webp by half again. 800 also reuses the
-        derivative `utils/page-image.html` already defaults to, so a cover used
-        elsewhere on the site costs nothing extra here. */}}
-      {{- $cover = partial "utils/page-image.html" (dict "page" . "process" "Resize 800x webp q80" "verify" $verify) -}}
+      {{/* The same spec as `blog/cover.html`, deliberately. `__cover` is 288
+        CSS pixels at its widest (`w-72` from `sm` up, `object-cover`), so a 2x
+        display wants 576 device pixels and a 3x one 864 - 400 was upscaling a
+        lossy webp by half again, and 800 still falls short at 3x. Matching the
+        blog card is what makes it free: a post shown in both places processes
+        one derivative rather than two, and 1600 is already on disk for any
+        cover that has appeared on a blog card or hero.
+      */}}
+      {{- $cover = partial "utils/page-image.html" (dict "page" . "process" "Resize 1600x webp q80" "verify" $verify) -}}
     {{- end -}}
     {{/* Read out here rather than inside the markup: `with $cover.url` rebinds
       the context to the URL string, and the page is gone by then.
