@@ -1,0 +1,29 @@
+{{/* Width and height of an image served from the static directory.
+
+  Nothing processes a static file, so it reaches the browser with no dimensions
+  unless they are read off disk first: the layout collapses around a zero-height
+  image and reflows once the pixels arrive. `images.Config` reads the header,
+  which is enough to reserve the space.
+
+  It wants a path relative to the project root, so the static mount goes back on
+  front. That is also the limit of what it can see: `images.Config` reads through
+  the working directory, not Hugo's mount union, so a file that is published from
+  a theme's own `static/`, from a custom `staticDir`, or through `module.mounts`
+  is not found here. The caller gets zeroes and should say so rather than emit a
+  card or a thumbnail that silently keeps reflowing.
+
+  Returns zeroes for a missing path and for an SVG, which has no intrinsic size
+  to read.
+
+  @param {string} . The image path, with or without a leading slash.
+  @returns {dict} width and height, both 0 when they could not be read.
+
+  @example {{ $config := partial "utils/static-image-config.html" $image
+}}
+*/}}
+{{- $path := printf "static/%s" (strings.TrimPrefix "/" .) -}}
+{{- $config := dict "width" 0 "height" 0 -}}
+{{- with (try (images.Config $path)).Value -}}
+  {{- $config = dict "width" .Width "height" .Height -}}
+{{- end -}}
+{{- return $config -}}

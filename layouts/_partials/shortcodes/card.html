@@ -54,8 +54,21 @@
     {{- $padding = "hx:pt-4 hx:px-4" -}}
   {{- end -}}
 
+  {{/* No `mt-auto` here. A card is a flex column stretched to the height of the
+    tallest card in its grid row, so pushing this block down pins the title and
+    subtitle to that row's baseline: under an image it opens a gap between the
+    image and the title, and on a text-only card it offsets the content from its
+    neighbours for no reason. Title and subtitle follow whatever precedes them,
+    and any slack in the row collects at the bottom of the card.
 
-  <div class="hx:mt-auto">
+    The trade-off is deliberate, so do not put it back: with `mt-auto`, a row of
+    images of differing aspect ratios aligned its titles with each other; without
+    it, each title sits directly under its own image and the row reads ragged.
+    Tying the title to its image beats tying it to the row - `.hextra-card img`
+    sets no `aspect-ratio`, so anyone wanting the aligned look should give the
+    images a common ratio rather than reinstate the gap.
+  */}}
+  <div>
     <span class="hextra-card-icon hx:flex hx:font-semibold hx:items-start hx:gap-2 {{ $padding }} hx:text-neutral-700 hx:hover:text-neutral-900 hx:dark:text-neutral-200 hx:dark:hover:text-neutral-50">
       {{- with $icon }}{{ partial "utils/icon.html" (dict "name" $icon) -}}{{- end -}}
       {{- $title -}}
