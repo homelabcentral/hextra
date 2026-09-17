@@ -445,10 +445,16 @@ function paramTable(shortcode, enums) {
   return [...out, ""];
 }
 
+// A snippet placeholder normally offers the whole value a parameter takes, so
+// its choices render as "One of ...". `icon`'s `name` is the exception: the
+// choices there are remote provider *prefixes*, and listing them as the
+// parameter's values claims a bundled name like `github` is invalid.
+const ENUM_IS_A_PREFIX = new Set(["icon.name"]);
+
 function renderShortcode(shortcode, snippets) {
   const mine = snippets.filter((s) => s.owner === shortcode.name);
   const enums = new Map();
-  for (const s of mine) for (const [k, v] of s.enums) if (!enums.has(k)) enums.set(k, v);
+  for (const s of mine) for (const [k, v] of s.enums) if (!enums.has(k) && !ENUM_IS_A_PREFIX.has(`${shortcode.name}.${k}`)) enums.set(k, v);
 
   const notation = shortcode.percentNotation ? "{{% %}}" : "{{< >}}";
   const facts = [notation, shortcode.paired ? "paired" : "self-closing"];
@@ -510,7 +516,7 @@ function buildShortcodes(shortcodes, snippets) {
         .join(", ") +
       ".",
     "- **A paired shortcode needs a closing tag.** Self-closing ones must not have one.",
-    "- **Icon names are a closed set.** Any `icon`, `tagIcon`, or `badgeIcon` value must appear in `icons.md`. An unknown name renders nothing and raises no error.",
+    '- **Icon names are a closed set.** Any `icon`, `tagIcon`, or `badgeIcon` value must appear in `icons.md`, or carry a remote provider prefix (`lucide:`, `tabler:`, `tabler-filled:`, `simple:`, `iconify:`). An unknown name is not silent: it fails the build with `icon "name" not found`.',
     "- **Build-time fetching can be switched off.** The shortcodes marked _fetches at build time_ all go quiet when `params.remoteFetch.enable` is `false`.",
     "",
   ];
@@ -573,7 +579,7 @@ function buildIcons(yaml) {
     "",
     "# Icon names",
     "",
-    `The ${names.length} icons bundled with the theme. Use a name from this list verbatim — an unknown name renders nothing, silently.`,
+    `The ${names.length} icons bundled with the theme. Use a name from this list verbatim — an unknown name fails the build with \`icon "name" not found\`, so never guess one.`,
     "",
     "Valid wherever the theme takes an icon: the `icon` shortcode, and the `icon` parameter on `callout`, `card`, `cta`, `button`, `badge`, `accordion-item`, `timeline-item`, `stat`, `keyword`, `article`, `feature-card`, and the repository cards. Also `tagIcon` on `card`, `badgeIcon` on `timeline-item`, and `params.icon` on a `hugo.yaml` menu entry.",
     "",
@@ -582,7 +588,7 @@ function buildIcons(yaml) {
     '{{< callout type="info" icon="lightning-bolt" >}}Heads up.{{< /callout >}}',
     "```",
     "",
-    "Icons from an external provider are a separate path needing `params.icons.remote.enable`; see the `icon` entry in `shortcodes.md`.",
+    "A name containing a colon is fetched from a remote provider instead — `lucide:`, `tabler:`, `tabler-filled:` and `simple:` take that pack's own name, `iconify:` takes a `set/icon` pair, as in `iconify:simple-icons/reddit`. Remote fetching needs no configuration; it is on by default. Set `params.icons.remote.enable: false` to turn it off, or `params.icons.remote.providers` to add a provider or repin an existing one. See the `icon` entry in `shortcodes.md`.",
     "",
     "## Available names",
     "",

@@ -3,7 +3,7 @@
 
 # Icon names
 
-The 272 icons bundled with the theme. Use a name from this list verbatim — an unknown name renders nothing, silently.
+The 272 icons bundled with the theme. Use a name from this list verbatim — an unknown name fails the build with `icon "name" not found`, so never guess one.
 
 Valid wherever the theme takes an icon: the `icon` shortcode, and the `icon` parameter on `callout`, `card`, `cta`, `button`, `badge`, `accordion-item`, `timeline-item`, `stat`, `keyword`, `article`, `feature-card`, and the repository cards. Also `tagIcon` on `card`, `badgeIcon` on `timeline-item`, and `params.icon` on a `hugo.yaml` menu entry.
 
@@ -12,7 +12,7 @@ Valid wherever the theme takes an icon: the `icon` shortcode, and the `icon` par
 {{< callout type="info" icon="lightning-bolt" >}}Heads up.{{< /callout >}}
 ```
 
-Icons from an external provider are a separate path needing `params.icons.remote.enable`; see the `icon` entry in `shortcodes.md`.
+A name containing a colon is fetched from a remote provider instead — `lucide:`, `tabler:`, `tabler-filled:` and `simple:` take that pack's own name, `iconify:` takes a `set/icon` pair, as in `iconify:simple-icons/reddit`. Remote fetching needs no configuration; it is on by default. Set `params.icons.remote.enable: false` to turn it off, or `params.icons.remote.providers` to add a provider or repin an existing one. See the `icon` entry in `shortcodes.md`.
 
 ## Available names
 

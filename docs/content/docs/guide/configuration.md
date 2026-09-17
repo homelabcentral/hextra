@@ -611,6 +611,39 @@ params:
 > [!NOTE]
 > To customize MathJax source loading, override `layouts/_partials/scripts/mathjax.html` in your site.
 
+### Remote Icons
+
+An icon name carrying a provider prefix — `lucide:`, `tabler:`, `tabler-filled:`, `simple:` or `iconify:` — is fetched from that provider at build time. See [Icon](/docs/guide/shortcodes/icon#remote-icon-packs) for the provider list and the naming rules.
+
+Remote fetching is **enabled by default**. This parameter exists to switch it off, or to extend it. To switch it off, so that only bundled names resolve:
+
+```yaml {filename="hugo.yaml"}
+params:
+  icons:
+    remote:
+      enable: false
+```
+
+To add a provider — or repin one of the built-ins — give it a URL template whose `%s` is replaced by the icon name:
+
+```yaml {filename="hugo.yaml"}
+params:
+  icons:
+    remote:
+      providers:
+        myicons:
+          url: "https://example.com/icons/%s.svg"
+        lucide:
+          url: "https://mirror.example.com/lucide-static/1.2.3/icons/%s.svg"
+```
+
+Your providers are merged over the built-in ones, so redefining `lucide`, `tabler`, `tabler-filled`, `simple` or `iconify` repins that prefix to an exact version or to an internal mirror.
+
+A provider name must match `^[A-Za-z0-9_-]+$`, and an icon name `^[A-Za-z0-9._/-]+$` with no `..` in it. Anything else is rejected before a request is made.
+
+> [!NOTE]
+> Fetching happens during the build, through `resources.GetRemote`, and the results land in Hugo's file cache. A build machine with no network access fails on the first remote icon it meets. To build offline, copy the SVG into your site's `data/icons.yaml` and use it under a plain name, or set `enable: false`.
+
 ### Page Width
 
 The layout shell width can be customized by the `params.page.width` parameter in the config file:

@@ -206,9 +206,9 @@
     "scope": "markdown",
     "prefix": "hxicon-remote",
     "body": [
-      "{{< icon name=\"${1|lucide,tabler,simple|}:${2:rocket}\" attributes=\"${3:height=20}\" >}}"
+      "{{< icon name=\"${1|lucide,tabler,tabler-filled,simple,iconify|}:${2:rocket}\" attributes=\"${3:height=20}\" >}}"
     ],
-    "description": "Icon fetched from a remote provider. Requires params.icons.remote.enable in hugo.yaml."
+    "description": "Icon fetched from a remote provider, enabled by default. lucide/tabler/tabler-filled/simple take the pack's own name; iconify takes set/icon. Set params.icons.remote.enable: false to turn it off."
   },
   "Hextra: jupyter": {
     "scope": "markdown",
