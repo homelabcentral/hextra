@@ -54,8 +54,16 @@
     {{- $padding = "hx:pt-4 hx:px-4" -}}
   {{- end -}}
 
+  {{/* An image card bottom-pins its text: the image sets the card's height, and
+    pinning keeps the text under it rather than floating in the middle. A
+    text-only card has nothing to push away from, so in a stretched grid cell
+    `mt-auto` would drop its content to the tallest card's baseline.
+  */}}
+  {{- $contentAlign := "" -}}
+  {{- with $image -}}{{- $contentAlign = "hx:mt-auto" -}}{{- end -}}
 
-  <div class="hx:mt-auto">
+
+  <div class="{{ $contentAlign }}">
     <span class="hextra-card-icon hx:flex hx:font-semibold hx:items-start hx:gap-2 {{ $padding }} hx:text-neutral-700 hx:hover:text-neutral-900 hx:dark:text-neutral-200 hx:dark:hover:text-neutral-50">
       {{- with $icon }}{{ partial "utils/icon.html" (dict "name" $icon) -}}{{- end -}}
       {{- $title -}}
