@@ -45,7 +45,13 @@
       {{- if and $named $text -}}
         {{- $verify = true -}}
       {{- end -}}
-      {{- $cover = partial "utils/page-image.html" (dict "page" . "process" "Resize 400x webp q80" "verify" $verify) -}}
+      {{/* 800 rather than the 288 CSS pixels of `__cover` at its widest: the
+        column is `w-72` from `sm` up and the image is `object-cover`, so a 2x
+        display draws it at 576 device pixels and a 3x one at 864. At 400 the
+        card was upscaling a lossy webp by half again. 800 also reuses the
+        derivative `utils/page-image.html` already defaults to, so a cover used
+        elsewhere on the site costs nothing extra here. */}}
+      {{- $cover = partial "utils/page-image.html" (dict "page" . "process" "Resize 800x webp q80" "verify" $verify) -}}
     {{- end -}}
     {{/* Read out here rather than inside the markup: `with $cover.url` rebinds
       the context to the URL string, and the page is gone by then.

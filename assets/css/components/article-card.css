@@ -1,18 +1,33 @@
+/* The resting and hover palette is `.hextra-blog-card` in components/blog.css,
+   deliberately: the two are the same object seen in two places - a post
+   rendered as a horizontal card - and the tag pages put them one scroll apart.
+   Keep them in step.
+
+   Dark resting fill is the Raised level (`neutral-950`), not `neutral-800`,
+   which is the Chrome level and read as a panel floating over the page rather
+   than a card sitting on it.
+
+   Hover lifts the border to the accent and leaves the fill alone. Moving both
+   at once double-signals the same state, and the fill shift was what made this
+   card feel unlike every other hoverable surface in the theme. */
 .hextra-article-card {
   @apply hx:flex hx:items-stretch hx:my-4 hx:no-underline;
   @apply hx:rounded-lg hx:border hx:overflow-hidden;
   @apply hx:border-neutral-200 hx:bg-neutral-50;
-  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-800;
+  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-950;
   @apply hx:transition-colors hx:ease-in hx:duration-200;
 
   &:hover {
-    @apply hx:no-underline hx:border-neutral-300 hx:bg-neutral-100;
-    @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-800;
+    @apply hx:no-underline hx:border-hextra-accent-400;
   }
 }
 
+/* The Overlay level, matching `.hextra-blog-card-h-cover`: it is what shows
+   through a cover that does not fill its column, so it has to be a real
+   surface rather than the page. */
 .hextra-article-card__cover {
   @apply hx:shrink-0 hx:w-48 hx:sm:w-72;
+  @apply hx:bg-neutral-100 hx:dark:bg-neutral-900;
 
   img {
     @apply hx:size-full hx:object-cover;
@@ -31,9 +46,18 @@
   @apply hx:flex hx:flex-col hx:gap-1 hx:min-w-0 hx:p-4;
 }
 
+/* The title takes the accent on hover as well as the border, the same pair as
+   `.hextra-blog-card:hover .hextra-blog-card-title a`. The whole card is one
+   `<a>` and the title is a span inside it, so this hangs off the card's hover
+   rather than the link's. */
 .hextra-article-card__title {
   @apply hx:font-semibold hx:leading-snug;
   @apply hx:text-neutral-900 hx:dark:text-neutral-100;
+  @apply hx:transition-colors;
+}
+
+.hextra-article-card:hover .hextra-article-card__title {
+  @apply hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
 }
 
 .hextra-article-card__meta {
