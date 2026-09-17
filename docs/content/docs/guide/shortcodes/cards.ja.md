@@ -11,7 +11,7 @@ linkTitle: カード
 {{< card link="/" title="アイコンなし" >}}
 {{< /cards >}}
 
-{{< cards >}}
+{{< cards cols="2" >}}
 {{< card link="/" title="画像カード" image="https://github.com/user-attachments/assets/71b7e3ec-1a8d-4582-b600-5425c6cc0407" subtitle="インターネット画像" >}}
 {{< card link="/" title="ローカル画像" image="/images/card-image-unprocessed.jpg" subtitle="staticディレクトリ下の未加工画像" >}}
 {{< card link="/" title="ローカル画像" image="images/space.jpg" subtitle="assetsディレクトリ下の画像、Hugoで処理済み" method="Resize" options="600x q80 webp" >}}
@@ -72,7 +72,7 @@ Hugoの組み込み画像処理コマンド、方法、オプションの詳細�
 
 カードはタグの追加をサポートしており、追加のステータス情報を表示するのに便利です。
 
-{{< cards >}}
+{{< cards cols="2" >}}
 {{< card link="../callout" title="デフォルトタグ付きカード" tag="タグテキスト" >}}
 {{< card link="../callout" title="エラータグ付きカード" tag="タグテキスト" tagType="error" >}}
 {{< card link="../callout" title="情報タグ付きカード" tag="タグテキスト" tagType="info" >}}

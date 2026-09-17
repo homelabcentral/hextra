@@ -56,14 +56,17 @@
      wrapper instead.
 
      The hairlines are the only structural cue left once the cell grid and the
-     header background are gone, so they are drawn at the same weight as the
-     default table's borders rather than lighter: `border-neutral-200` was
-     1.17:1 on the light body and `dark:border-neutral-800` 1.10:1 on the dark
-     one, which left a four-column reference reading as a block of text. The
-     `contrast-more` pair matches series.css, sidebar.css and blog.css. */
+     header background are gone, and they are deliberately quiet: 200 on the
+     light body is 1.17:1 and 800 on the dark one 1.10:1, below the 3:1 of
+     WCAG 2.2 1.4.11 were these load-bearing rather than decorative. They are
+     not - the header underline and row rhythm are a reading aid, not the only
+     way to tell one cell from another, since the cells carry their own code
+     spans and generous row padding. A four-column reference does read closer
+     to a block of text at this weight; `prefers-contrast: more` is what
+     rescues it, and that pair matches series.css, sidebar.css and blog.css. */
   thead {
     @apply hx:bg-transparent hx:text-start;
-    @apply hx:border-b hx:border-neutral-300 hx:dark:border-neutral-700;
+    @apply hx:border-b hx:border-neutral-200 hx:dark:border-neutral-800;
     @apply hx:contrast-more:border-neutral-400 hx:dark:contrast-more:border-neutral-400;
   }
 
@@ -85,7 +88,7 @@
   }
 
   tbody tr {
-    @apply hx:border-b hx:border-neutral-300 hx:dark:border-neutral-700;
+    @apply hx:border-b hx:border-neutral-200 hx:dark:border-neutral-800;
     @apply hx:contrast-more:border-neutral-400 hx:dark:contrast-more:border-neutral-400;
 
     &:last-child {

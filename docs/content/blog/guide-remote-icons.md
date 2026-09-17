@@ -37,13 +37,17 @@ Every name is listed in [`data/icons.yaml`](https://github.com/homelabcentral/he
 
 Heroicons v1 carries no brand marks, so the bundled list covers only what this site itself needed — no Reddit, no Hacker News, no Docker. Rather than grow a set that ships to every site using the theme, Hextra reaches the upstream packs directly. A name containing a colon names a provider:
 
+{{< borderless-table >}}
+
 | Provider                                        | Prefix           | Name shape               | Example               |
 | ----------------------------------------------- | ---------------- | ------------------------ | --------------------- |
 | [Lucide](https://lucide.dev/icons/)             | `lucide:`        | the pack's own file name | `lucide:server`       |
 | [Tabler Icons](https://tabler.io/icons)         | `tabler:`        | the pack's own file name | `tabler:brand-docker` |
-| [Tabler Icons](https://tabler.io/icons), filled | `tabler-filled:` | the pack's own file name | `tabler-filled:star`  |
+| [Tabler Icons, filled](https://tabler.io/icons) | `tabler-filled:` | the pack's own file name | `tabler-filled:star`  |
 | [Simple Icons](https://simpleicons.org/)        | `simple:`        | the pack's own file name | `simple:ycombinator`  |
 | [Iconify](https://icon-sets.iconify.design/)    | `iconify:`       | `set/icon`               | `iconify:mdi/server`  |
+
+{{< /borderless-table >}}
 
 The first four address one pack's flat namespace. Iconify is the outlier, and the reason the other four rarely run out: its name is a `set/icon` pair, so it reaches every set on icon-sets.iconify.design.
 
@@ -59,12 +63,16 @@ That Reddit icon, then, is one line and nothing else: {{< icon "iconify:simple-i
 
 Here is where they actually come from, and what you are agreeing to when you use one:
 
+{{< borderless-table >}}
+
 | Set                       | Icons | License | Source                                                                    |
 | ------------------------- | ----: | ------- | ------------------------------------------------------------------------- |
 | Heroicons (bundled)       | 1,288 | MIT     | [tailwindlabs/heroicons](https://github.com/tailwindlabs/heroicons)       |
 | Lucide                    | 1,837 | ISC     | [lucide-icons/lucide](https://github.com/lucide-icons/lucide)             |
 | Tabler (outline + filled) | 6,184 | MIT     | [tabler/tabler-icons](https://github.com/tabler/tabler-icons)             |
 | Simple Icons              | 3,460 | CC0 1.0 | [simple-icons/simple-icons](https://github.com/simple-icons/simple-icons) |
+
+{{< /borderless-table >}}
 
 {{< callout type="info" >}}
 Tabler is the reason there are five prefixes and not four. It ships its two variants in separate directories, and a provider URL substitutes only the icon name, never the directory — so one prefix can reach exactly one of them. `tabler:` is the outline set, `tabler-filled:` the filled one. The filled set is much smaller and carries no brand marks: `tabler:brand-docker` resolves, `tabler-filled:brand-docker` is a 404 and a failed build.
@@ -75,6 +83,8 @@ Tabler is the reason there are five prefixes and not four. It ships its two vari
 The `iconify:` prefix is not a fifth pack; it is a door onto **238 icon sets and 371,749 icons**, each maintained by someone else and mirrored by [iconify/icon-sets](https://github.com/iconify/icon-sets). None of the repositories below is wired into Hextra as its own prefix — they are all reached the same way, `iconify:<set>/<icon>`, with no configuration.
 
 ### General purpose
+
+{{< borderless-table >}}
 
 | Prefix                   |        Icons | License      | Source                                                                                                 |
 | ------------------------ | -----------: | ------------ | ------------------------------------------------------------------------------------------------------ |
@@ -107,9 +117,13 @@ The `iconify:` prefix is not a fifth pack; it is a door onto **238 icon sets and
 | `radix-icons`            |          332 | MIT          | [radix-ui/icons](https://github.com/radix-ui/icons)                                                    |
 | `feather`                |          286 | MIT          | [feathericons/feather](https://github.com/feathericons/feather)                                        |
 
+{{< /borderless-table >}}
+
 ### Developer and documentation sets
 
 The ones that actually earn their place in a docs theme — logos, file-type marks, and the icons a self-hosting write-up needs.
+
+{{< borderless-table >}}
 
 | Prefix                     |      Icons | License   | Source                                                                                                              |
 | -------------------------- | ---------: | --------- | ------------------------------------------------------------------------------------------------------------------- |
@@ -127,6 +141,8 @@ The ones that actually earn their place in a docs theme — logos, file-type mar
 | `skill-icons`              |        400 | MIT       | [tandpfun/skill-icons](https://github.com/tandpfun/skill-icons)                                                     |
 | `eos-icons`                |        253 | MIT       | [SUSE-UIUX/eos-icons](https://gitlab.com/SUSE-UIUX/eos-icons) (GitLab)                                              |
 | `svg-spinners`             |         46 | MIT       | [n3r4zzurr0/svg-spinners](https://github.com/n3r4zzurr0/svg-spinners)                                               |
+
+{{< /borderless-table >}}
 
 A handful of those, live:
 

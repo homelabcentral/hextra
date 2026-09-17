@@ -11,7 +11,7 @@ linkTitle: Cards
 {{< card link="/" title="No Icon" >}}
 {{< /cards >}}
 
-{{< cards >}}
+{{< cards cols="2" >}}
 {{< card link="/" title="Image Card" image="https://github.com/user-attachments/assets/71b7e3ec-1a8d-4582-b600-5425c6cc0407" subtitle="Internet Image" >}}
 {{< card link="/" title="Local Image" image="/images/card-image-unprocessed.jpg" subtitle="Raw image under static directory." >}}
 {{< card link="/" title="Local Image" image="images/space.jpg" subtitle="Image under assets directory, processed by Hugo." method="Resize" options="600x q80 webp" >}}
@@ -79,7 +79,7 @@ Card supports adding tags which could be useful to show extra status information
 | `tagIcon`   | Icon of the tag. See [badges]({{% relRef "others/#badges" %}}) for more information.   |
 | `tagBorder` | Border of the tag. See [badges]({{% relRef "others/#badges" %}}) for more information. |
 
-{{< cards >}}
+{{< cards cols="2" >}}
 {{< card link="../callout" title="Card with default tag" tag="tag text" >}}
 {{< card link="../callout" title="Card with red tag" tag="tag text" tagColor="red" >}}
 {{< card link="../callout" title="Card with blue tag" tag="tag text" tagColor="blue" >}}

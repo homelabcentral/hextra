@@ -11,7 +11,7 @@ linkTitle: 卡片
 {{< card link="/" title="无图标" >}}
 {{< /cards >}}
 
-{{< cards >}}
+{{< cards cols="2" >}}
 {{< card link="/" title="图片卡片" image="https://github.com/user-attachments/assets/71b7e3ec-1a8d-4582-b600-5425c6cc0407" subtitle="网络图片" >}}
 {{< card link="/" title="本地图片" image="/images/card-image-unprocessed.jpg" subtitle="静态目录下的原始图片。" >}}
 {{< card link="/" title="本地图片" image="images/space.jpg" subtitle="资源目录下的图片，经过Hugo处理。" method="Resize" options="600x q80 webp" >}}
@@ -72,7 +72,7 @@ Hextra在构建时会自动检测是否需要图片处理，并应用`options`�
 
 卡片支持添加标签，可用于显示额外的状态信息。
 
-{{< cards >}}
+{{< cards cols="2" >}}
 {{< card link="../callout" title="带默认标签的卡片" tag="标签文本" >}}
 {{< card link="../callout" title="带错误标签的卡片" tag="标签文本" tagType="error" >}}
 {{< card link="../callout" title="带信息标签的卡片" tag="标签文本" tagType="info" >}}
