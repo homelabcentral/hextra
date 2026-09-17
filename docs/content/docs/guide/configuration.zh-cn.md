@@ -443,6 +443,39 @@ params:
 > [!NOTE]
 > 如需自定义 MathJax 的加载来源，请在项目中覆盖 `layouts/_partials/scripts/mathjax.html`。
 
+### 远程图标
+
+带有提供商前缀的图标名称 —— `lucide:`、`tabler:`、`tabler-filled:`、`simple:` 或 `iconify:` —— 会在构建时从该提供商获取。提供商列表与命名规则见[图标]({{% relref "docs/guide/shortcodes/icon" %}})页面。
+
+远程获取**默认开启**。此参数用于关闭它，或对其进行扩展。若要关闭，使其只解析主题内置的名称：
+
+```yaml {filename="hugo.yaml"}
+params:
+  icons:
+    remote:
+      enable: false
+```
+
+若要添加提供商 —— 或为内置提供商重新固定版本 —— 请提供一个 URL 模板，其中的 `%s` 会被替换为图标名称：
+
+```yaml {filename="hugo.yaml"}
+params:
+  icons:
+    remote:
+      providers:
+        myicons:
+          url: "https://example.com/icons/%s.svg"
+        lucide:
+          url: "https://mirror.example.com/lucide-static/1.2.3/icons/%s.svg"
+```
+
+你配置的提供商会合并覆盖内置提供商，因此重新定义 `lucide`、`tabler`、`tabler-filled`、`simple` 或 `iconify` 即可把该前缀指向某个精确版本或内部镜像。
+
+提供商名称必须匹配 `^[A-Za-z0-9_-]+$`，图标名称必须匹配 `^[A-Za-z0-9._/-]+$` 且不含 `..`。其他内容在发出请求之前就会被拒绝。
+
+> [!NOTE]
+> 获取发生在构建期间，通过 `resources.GetRemote` 完成，结果会写入 Hugo 的文件缓存。没有网络的构建机器会在遇到第一个远程图标时失败。若要离线构建，请把 SVG 复制到站点的 `data/icons.yaml` 并以普通名称使用，或设置 `enable: false`。
+
 ### 页面宽度
 
 页面整体布局宽度可通过 `params.page.width` 配置：

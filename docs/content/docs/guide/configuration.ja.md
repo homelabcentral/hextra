@@ -443,6 +443,39 @@ params:
 > [!NOTE]
 > MathJax の読み込み元をカスタマイズするには、プロジェクト内で `layouts/_partials/scripts/mathjax.html` を上書きしてください。
 
+### リモートアイコン
+
+プロバイダープレフィックス — `lucide:`、`tabler:`、`tabler-filled:`、`simple:`、`iconify:` — を持つアイコン名は、ビルド時にそのプロバイダーから取得されます。プロバイダーの一覧と命名規則は[アイコン]({{% relref "docs/guide/shortcodes/icon" %}})ページを参照してください。
+
+リモート取得は**デフォルトで有効**です。このパラメーターは、それを無効にするか、拡張するために存在します。テーマ同梱の名前だけを解決させたい場合は次のように無効化します:
+
+```yaml {filename="hugo.yaml"}
+params:
+  icons:
+    remote:
+      enable: false
+```
+
+プロバイダーを追加する場合 — あるいは組み込みプロバイダーのバージョンを固定し直す場合 — `%s` がアイコン名に置き換えられる URL テンプレートを指定します:
+
+```yaml {filename="hugo.yaml"}
+params:
+  icons:
+    remote:
+      providers:
+        myicons:
+          url: "https://example.com/icons/%s.svg"
+        lucide:
+          url: "https://mirror.example.com/lucide-static/1.2.3/icons/%s.svg"
+```
+
+指定したプロバイダーは組み込みのものへマージされるため、`lucide`、`tabler`、`tabler-filled`、`simple`、`iconify` を再定義すると、そのプレフィックスを特定バージョンや社内ミラーに向け直せます。
+
+プロバイダー名は `^[A-Za-z0-9_-]+$`、アイコン名は `^[A-Za-z0-9._/-]+$` に一致し、かつ `..` を含まない必要があります。それ以外はリクエストを送る前に拒否されます。
+
+> [!NOTE]
+> 取得はビルド中に `resources.GetRemote` を通じて行われ、結果は Hugo のファイルキャッシュに入ります。ネットワークのないビルドマシンは、最初のリモートアイコンで失敗します。オフラインでビルドするには、SVG をサイトの `data/icons.yaml` にコピーして通常の名前で使うか、`enable: false` を設定してください。
+
 ### ページ幅
 
 レイアウト全体の幅は `params.page.width` で設定できます：
