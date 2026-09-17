@@ -21,7 +21,7 @@ Hextra ships `skills/hextra/` to close that gap: a skill package that tells an a
 
 ## The failure mode it fixes
 
-Hextra's surface is large and mostly invisible to a model: 59 shortcode templates, 272 icon names, a few hundred `hugo.yaml` parameters. Four things about it break agents specifically, and all four fail _silently_.
+Hextra's surface is large and mostly invisible to a model: 59 shortcode templates, 272 icon names, a few hundred `hugo.yaml` parameters. Four things about it break agents specifically. Three fail _silently_; the fourth takes the build down.
 
 **Notation is not interchangeable.** Most shortcodes take the angle-bracket notation. Five take the percent notation, because they render their body as Markdown: `details`, `include`, `steps`, `ltr`, `rtl`. Get it wrong in one direction and the Markdown inside never renders; get it wrong in the other and you emit literal text.
 
@@ -29,9 +29,9 @@ Hextra's surface is large and mostly invisible to a model: 59 shortcode template
 
 **Child shortcodes only work inside their parent.** `card` inside `cards`, `tab` inside `tabs`, `stat` inside `stats`, and so on down a list of eight pairs. Outside, they produce nothing.
 
-**Icon names are a closed set.** Every `icon=`, `tagIcon=` and `badgeIcon=` must name one of the 272 bundled icons. A plausible guess — `github-logo`, say — renders nothing and raises no error.
+**Icon names are a closed set.** Every `icon=`, `tagIcon=` and `badgeIcon=` must name one of the 272 bundled icons, or carry a remote provider prefix. A plausible guess — `github-logo`, say — is the one failure here that is loud: the build stops with `icon "github-logo" not found`.
 
-None of these produce a build failure. They produce a page that is quietly wrong, which is the expensive kind.
+Only the last of these produces a build failure. The rest produce a page that is quietly wrong, which is the expensive kind.
 
 ## Installing it
 

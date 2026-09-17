@@ -9,7 +9,7 @@ Every shortcode the theme ships: 60 of them, with parameters taken from the temp
 
 - **Notation is not interchangeable.** A shortcode listed as `{{% %}}` renders its body as Markdown and breaks when written with angle brackets. The `{{% %}}` shortcodes are: `details`, `include`, `ltr`, `rtl`, `steps`.
 - **A paired shortcode needs a closing tag.** Self-closing ones must not have one.
-- **Icon names are a closed set.** Any `icon`, `tagIcon`, or `badgeIcon` value must appear in `icons.md`. An unknown name renders nothing and raises no error.
+- **Icon names are a closed set.** Any `icon`, `tagIcon`, or `badgeIcon` value must appear in `icons.md`, or carry a remote provider prefix (`lucide:`, `tabler:`, `tabler-filled:`, `simple:`, `iconify:`). An unknown name is not silent: it fails the build with `icon "name" not found`.
 - **Build-time fetching can be switched off.** The shortcodes marked _fetches at build time_ all go quiet when `params.remoteFetch.enable` is `false`.
 
 ## Callouts and text
@@ -162,7 +162,7 @@ Create an icon.
 | Parameter | Type | Notes |
 | --- | --- | --- |
 | `attributes` | string | The attributes of the icon. Default `height=1em`. |
-| `name` | string | The name of the icon. One of `lucide`, `tabler`, `simple`. Also accepted as the first positional argument. |
+| `name` | string | The name of the icon: a bundled name from data/icons.yaml, or a remote name carrying a provider prefix - `lucide:`, `tabler:`, `tabler-filled:`, `simple:`, or `iconify:`, the last taking a `set/icon` pair. An unknown name fails the build. Also accepted as the first positional argument. |
 
 Positional: The name of the icon.
 
