@@ -13,7 +13,9 @@ seriesOrder: 10
 coverText: gh repo edit --enable-discussions
 ---
 
-A comment box is the one piece of a static site that isn't static. The usual answers ask you to run a server, rent a database, or hand your readers to an ad network. Hextra's answer is [giscus](https://giscus.app): comments stored as **GitHub Discussions**, rendered in an iframe, with nothing to host and nothing to pay for.
+{{< lead >}}A comment section is a great way for the users to ask questions about the blog. Hextra supports this out of the box with [giscus](https://giscus.app).{{< /lead >}}
+
+A comment box is the one piece of a static site that isn't static. The usual answers ask you to run a server, rent a database, or hand your readers to an ad network. Hextra's answer is [giscus][giscus]: comments stored as **[GitHub Discussions][github-discussions]**, rendered in an iframe, with nothing to host and nothing to pay for.
 
 The theme ships the integration already — two partials, wired into both the blog and docs single-page layouts. Turning it on is configuration, not code. This guide covers the setup, the one category setting that is a correctness issue rather than a preference, how to scope comments to just your blog, and what to do when the box doesn't appear.
 
@@ -40,13 +42,17 @@ The first time anyone comments on a page, **the giscus bot creates that page's d
 
 ## Setting it up
 
+Four steps, in this order — the configurator in step four validates the first three, so doing them out of order just means going back.
+
 {{% steps %}}
 
 ### Enable Discussions on a public repository
 
-Open the repository on GitHub, go to **Settings → General**, and tick **Discussions** in the **Features** section. A **Discussions** tab appears in the repository's tab row.
+Open the repository on GitHub and go to **Settings** → **General**. Scroll to the **Features** section and tick **Discussions**.
 
-The repository must be **public**. giscus reads and writes it through a public API path, and a private repository simply will not validate in the next steps.
+A **Set up discussions** button appears next to the checkbox. It drafts a welcome post; it is entirely optional and giscus does not care either way. Skip it.
+
+A **Discussions** tab now sits in the repository's top tab row, and GitHub has seeded six default categories — Announcements, General, Ideas, Polls, Q&A, Show and tell. Leave them; the next step adds a seventh.
 
 The same thing from a terminal, if you would rather not click:
 
@@ -54,31 +60,93 @@ The same thing from a terminal, if you would rather not click:
 gh repo edit owner/repo --enable-discussions
 ```
 
+{{< callout type="warning" >}}
+**The repository must be public.** giscus reads and writes it through a public API path, and a private repository will not validate in step four. It does not have to be the repository that builds your site — see [Choosing the host repository](#choosing-the-host-repository) below.
+{{< /callout >}}
+
 ### Create a category for the comments
 
-Go to the new **Discussions** tab, open **Categories** in the left sidebar, and click **New category**.
+Open the **Discussions** tab, find **Categories** in the left sidebar, and click the pencil icon beside it, then **New category**.
 
-Name it something obvious — `Comments` works. For **Discussion format**, choose **Announcement**. That restriction matters more than it looks; there is a section on it below.
+Three fields, and only the third one really matters:
+
+{{< borderless-table >}}
+| Field | What to put |
+| --- | --- |
+| **Category name** | `Comments` — anything works, this is the name you will put in `hugo.yaml` |
+| **Description** | Optional. Something like `Blog page comments, created automatically by giscus` reminds future you not to post here by hand |
+| **Discussion format** | **Announcement**. Not Open, not Q&A, not Poll |
+{{< /borderless-table >}}
+
+Leave the emoji picker at whatever it defaults to. Click **Create**.
+
+You could reuse the seeded **Announcements** category instead of making one — it is already the right format. A dedicated category is worth the thirty seconds, because it keeps your own announcements separate from a few hundred machine-created threads.
+
+{{< callout type="error" >}}
+**Announcement is not a style preference.** It is the setting that stops a stranger hijacking a page's comment thread, for reasons covered in [Why the category must be Announcement-format](#why-the-category-must-be-announcement-format). If you take one thing from this guide, take this.
+{{< /callout >}}
 
 ### Install the giscus app on the repository
 
-Visit [github.com/apps/giscus](https://github.com/apps/giscus) and click **Install**. Choose **Only select repositories** and pick the one repository that will hold the comments.
+Go to the [giscus app page][giscus-app] and click **Install** — it reads **Configure** instead if you have installed it somewhere before.
 
-This is what lets the bot open discussions on your behalf. Without it the comment box renders but every post fails.
+If you belong to organizations, GitHub asks which account to install under. Pick the one that owns the repository.
+
+Then the important choice:
+
+{{< borderless-table >}}
+| Option | Pick |
+| --- | --- |
+| **All repositories** | No |
+| **Only select repositories** | **Yes** — then choose the single repository holding the comments |
+{{< /borderless-table >}}
+
+Click **Install**. This is what lets the bot open discussions on your behalf; without it the comment box renders and every attempt to post fails.
 
 ### Generate the repository and category IDs
 
-Go to [giscus.app](https://giscus.app) and enter your repository as `owner/repo`. The page validates it live and needs a green check on all of: the repository exists, it is public, Discussions are enabled, and the app is installed.
+Open [giscus.app][giscus] and work down the page. Most of it you leave alone — the theme overrides the parts that matter.
 
-Pick your category, set **Page ↔ Discussions Mapping** to **Discussion title contains page pathname**, and scroll to the generated `<script>` block at the bottom. Two values there are not derivable from the repository name and must be copied:
+**Language.** Leave it. The theme sets `data-lang` from your site's own language configuration and this field's value never reaches your site.
+
+**Repository.** Type `owner/repo`. The page checks it live and must show a check on all three lines:
+
+{{< borderless-table >}}
+| Check | If it fails |
+| --- | --- |
+| _The repository is public_ | Step one — a private repository cannot be used |
+| _The giscus app is installed_ | Step three did not take, or you installed it on the wrong repository |
+| _The Discussions feature is turned on_ | Step one's checkbox |
+{{< /borderless-table >}}
+
+**Page ↔ Discussions Mapping.** Select **Discussion title contains page `pathname`**. Leave the other five alone; [Mapping modes](#mapping-modes) explains why this one. Leave **Use strict title matching** unchecked — see the aside under the Announcement section.
+
+**Discussion Category.** Select **Comments**. Leave **Only search for discussions in this category** unchecked; it narrows the lookup but the category is already dedicated to this.
+
+**Features.** Four checkboxes:
+
+{{< borderless-table >}}
+| Checkbox | Set it to | Why |
+| --- | --- | --- |
+| **Enable reactions for the main post** | Checked | Gives readers a one-click response without writing a comment |
+| **Emit discussion metadata** | Unchecked | Posts thread metadata to the parent page for scripts to read. Nothing in Hextra consumes it |
+| **Place the comment box above the comments** | Your call | Checked puts the box first, which suits short threads. It maps to `inputPosition` |
+| **Load the comments lazily** | Unchecked | The theme injects the script itself on `DOMContentLoaded`; this flag is not among the attributes it passes |
+{{< /borderless-table >}}
+
+**Theme.** Leave it at the default. The theme computes the value and keeps it in sync with your site's light/dark toggle, as described in [How theming works](#how-theming-works). Anything chosen here is discarded.
+
+Now scroll to the **Enable giscus** block at the bottom. You want exactly two lines out of that `<script>` tag:
 
 ```html
 data-repo-id="R_kgDO..."
 data-category-id="DIC_kwDO..."
 ```
 
+Ignore the rest of the block — Hextra generates the script itself from your configuration. If the block shows no `data-category-id`, you did not pick a category.
+
 {{< callout type="info" >}}
-These are GitHub **node IDs**. Renaming the repository or the category does not change them, which is a feature — a rename won't orphan your existing comments.
+These two are GitHub **node IDs**, not derivable from the repository or category name. The upside is that renaming either one does not change them, so a rename never orphans your existing comments.
 {{< /callout >}}
 
 {{% /steps %}}
@@ -352,3 +420,7 @@ For a technical site the exchange is usually a good one. The audience is already
 Full reference: [Comments System](/docs/advanced/comments) in the docs.
 
 {{< cta url="https://giscus.app" label="Configure giscus" style="primary" icon="arrow-right" target="_blank" >}}
+
+[giscus]: https://giscus.app
+[giscus-app]: https://github.com/apps/giscus
+[github-discussions]: https://docs.github.com/en/discussions
