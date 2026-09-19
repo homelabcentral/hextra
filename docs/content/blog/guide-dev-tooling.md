@@ -67,11 +67,18 @@ Landing a change means a pull request — `main` takes no direct pushes, and the
 | `make pr TITLE="..."`                    | Open a PR for the current branch against `main`                     |
 | `make pr-close [PR=9]`                   | Close a PR without merging; `DELETE_BRANCH=1` removes its branch    |
 | `make pr-list` / `pr-view` / `pr-checks` | List, show, or watch checks to completion                           |
-| `make gh-runs` / `gh-watch`              | List recent Actions runs for this branch, or follow the latest      |
+| `make gh-runs` / `gh-watch`              | List recent Actions runs, or follow the latest                      |
 | `make gh-rerun`                          | Re-run the failed jobs of the latest run                            |
 | `make gh-dispatch WORKFLOW=pages.yml`    | Trigger a `workflow_dispatch` workflow                              |
 
 `make pr` accepts `BODY_FILE=notes.md` or `BODY="..."` and falls back to `--fill` from your commits, plus `BASE=` for a different target branch and `DRAFT=1`. It refuses to run on `main`, on a branch that was never pushed, with unpushed local commits, or when a PR is already open for the branch — four failure modes that otherwise produce a confusing error from `gh` itself.
+
+The run targets default to the checked-out branch and take `BRANCH=` for any other ref, so `main`'s state is visible without checking it out. `gh-runs` also takes `STATUS=` — `queued`, `in_progress`, `completed`, `failure`, `success` — and `LIMIT=`:
+
+```shell
+make gh-runs BRANCH=main STATUS=in_progress
+make gh-watch BRANCH=main
+```
 
 **Everything destructive prompts, and the default is no.** `YES=1` bypasses it, as do `YES=true` and `YES=yes`; nothing else does, so a mistyped `YES=maybe` still asks. Without a terminal and without `YES` the target aborts rather than blocking on a prompt nobody can answer, which keeps them usable from a script without making them dangerous in one.
 

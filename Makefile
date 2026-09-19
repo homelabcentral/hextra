@@ -624,26 +624,31 @@ pr-checks: gh-preflight ## Watch a PR's checks to completion: make pr-checks [PR
 # release.yml carry workflow_dispatch, and both act on main, which is why
 # gh-dispatch is guarded as hard as it is.
 
+# BRANCH defaults to the checked-out branch and takes any ref name, so main's
+# runs are visible without checking main out. STATUS filters by gh's own run
+# states - queued, in_progress, completed, failure, success - and LIMIT sets
+# how many rows `gh-runs` prints.
+GH_BRANCH = $(if $(BRANCH),$(BRANCH),$$(git rev-parse --abbrev-ref HEAD))
+GH_LATEST = gh run list --branch "$(GH_BRANCH)" --limit 1 --json databaseId --jq '.[0].databaseId'
+
 .PHONY: gh-runs
-gh-runs: gh-preflight ## List recent Actions runs for the current branch
-	@gh run list --branch "$$(git rev-parse --abbrev-ref HEAD)" --limit 10
+gh-runs: gh-preflight ## List recent Actions runs: make gh-runs [BRANCH=main] [STATUS=in_progress] [LIMIT=10]
+	@gh run list --branch "$(GH_BRANCH)" --limit $(if $(LIMIT),$(LIMIT),10) \
+	  $(if $(STATUS),--status "$(STATUS)",)
 
 .PHONY: gh-watch
-gh-watch: gh-preflight ## Watch the latest Actions run for the current branch
-	@id="$$(gh run list --branch "$$(git rev-parse --abbrev-ref HEAD)" --limit 1 \
-	   --json databaseId --jq '.[0].databaseId')"; \
-	 if [ -z "$$id" ]; then $(WARN) "no runs for this branch yet"; exit 1; fi; \
+gh-watch: gh-preflight ## Watch the latest Actions run: make gh-watch [BRANCH=main]
+	@id="$$($(GH_LATEST))"; \
+	 if [ -z "$$id" ]; then $(WARN) "no runs for $(GH_BRANCH) yet"; exit 1; fi; \
 	 gh run watch "$$id"
 
 .PHONY: gh-rerun
-gh-rerun: gh-preflight ## Re-run failed jobs of the latest run: make gh-rerun [YES=1]
-	@id="$$(gh run list --branch "$$(git rev-parse --abbrev-ref HEAD)" --limit 1 \
-	   --json databaseId --jq '.[0].databaseId')"; \
-	 if [ -z "$$id" ]; then $(WARN) "no runs for this branch yet"; exit 1; fi; \
-	 $(SAY) "latest run $$id"
+gh-rerun: gh-preflight ## Re-run failed jobs of the latest run: make gh-rerun [BRANCH=main] [YES=1]
+	@id="$$($(GH_LATEST))"; \
+	 if [ -z "$$id" ]; then $(WARN) "no runs for $(GH_BRANCH) yet"; exit 1; fi; \
+	 $(SAY) "latest run on $(GH_BRANCH): $$id"
 	$(call CONFIRM,Re-run the failed jobs of that run?)
-	@gh run rerun "$$(gh run list --branch "$$(git rev-parse --abbrev-ref HEAD)" --limit 1 \
-	  --json databaseId --jq '.[0].databaseId')" --failed
+	@gh run rerun "$$($(GH_LATEST))" --failed
 	@$(OK) "re-run queued - make gh-watch to follow it"
 
 .PHONY: gh-dispatch
