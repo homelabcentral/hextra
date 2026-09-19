@@ -56,6 +56,33 @@ Blog posts start as drafts (`draft: true`): visible on the dev server and previe
 | `make fmt`          | Prettier over templates, CSS, and JS                                                                            |
 | `make doctor`       | Diagnose toolchain problems (Hugo/Node versions, stale binaries)                                                |
 
+### Pull requests and remote CI
+
+Landing a change means a pull request — `main` takes no direct pushes, and the test workflows only fire on `push` and `pull_request`. These wrap `gh` so the flow does not live in shell history:
+
+| Target                                   | What it does                                                        |
+| ---------------------------------------- | ------------------------------------------------------------------- |
+| `make gh-auth`                           | Check `gh` is authenticated as the account that owns the repository |
+| `make git-auth`                          | Check git identity and that `origin` is reachable for pushing       |
+| `make pr TITLE="..."`                    | Open a PR for the current branch against `main`                     |
+| `make pr-close [PR=9]`                   | Close a PR without merging; `DELETE_BRANCH=1` removes its branch    |
+| `make pr-list` / `pr-view` / `pr-checks` | List, show, or watch checks to completion                           |
+| `make gh-runs` / `gh-watch`              | List recent Actions runs for this branch, or follow the latest      |
+| `make gh-rerun`                          | Re-run the failed jobs of the latest run                            |
+| `make gh-dispatch WORKFLOW=pages.yml`    | Trigger a `workflow_dispatch` workflow                              |
+
+`make pr` accepts `BODY_FILE=notes.md` or `BODY="..."` and falls back to `--fill` from your commits, plus `BASE=` for a different target branch and `DRAFT=1`. It refuses to run on `main`, on a branch that was never pushed, with unpushed local commits, or when a PR is already open for the branch — four failure modes that otherwise produce a confusing error from `gh` itself.
+
+**Everything destructive prompts, and the default is no.** `YES=1` bypasses it, as do `YES=true` and `YES=yes`; nothing else does, so a mistyped `YES=maybe` still asks. Without a terminal and without `YES` the target aborts rather than blocking on a prompt nobody can answer, which keeps them usable from a script without making them dangerous in one.
+
+{{< callout type="warning" >}}
+`gh-dispatch` is the one to read twice. Only `pages.yml` and `release.yml` carry a `workflow_dispatch` trigger, and both act on `main` — publishing the live site, or cutting a release tag. The five test workflows have no dispatch trigger at all; pushing the branch is how those run.
+{{< /callout >}}
+
+The two `*-auth` targets exist because the failure they diagnose is otherwise baffling. `gh` inside the devcontainer is authenticated as the account that owns the repository, via a `GH_TOKEN` the container reads from the host environment. On the host it is usually a _different_ account, and `gh pr create` there fails with `must be a collaborator` — accurate, and useless if you do not already know why. `make gh-auth` separates the three real cases: no token, a token GitHub rejects, and a token belonging to the wrong account.
+
+Neither target prints the token — not its value, not its length, not a masked form. Presence is tested, and identity is asked of GitHub, which answers with a username.
+
 ### Releasing
 
 | Target                     | What it does                                               |

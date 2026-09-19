@@ -108,6 +108,7 @@ Reach for `callout` for a note, `cards` for a set of links, `tabs` for alternati
 
 - **Section landing pages are `_index.md`.** A section with `index.md` instead loses its sidebar children. See `references/content-structure.md`.
 - **Eleven shortcodes fetch over the network at build time** — the repository cards, `gist`, `codeimporter`, `youtube-lite`, and `include` with a URL. They all go quiet when `params.remoteFetch.enable` is `false`, and `github` hits an unauthenticated rate limit of 60 requests/hour without `HUGO_GITHUB_TOKEN` in the environment.
+- **Link reference definitions die at the shortcode boundary.** `[text][slug]` resolves in ordinary body text but renders literally inside a `callout`, `lead`, `details` or any other shortcode that markdownifies its body. Write those URLs inline, or read them from a data file. See `references/markdown.md`.
 - **`math: true` is per page.** A LaTeX block on a page without it renders as literal text.
 - **Translations are filename suffixes**, not directories: `page.md`, `page.ja.md`, `page.zh-cn.md`.
 - **`tags` is a taxonomy**, so a typo creates a new tag page rather than an error. Reuse existing tag spellings.

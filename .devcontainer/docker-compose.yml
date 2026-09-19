@@ -49,6 +49,16 @@ services:
       # The `:-` default keeps compose quiet when the variable is unset; `gh` is
       # simply unauthenticated then.
       - GH_TOKEN=${HEXTRA_GH_TOKEN:-}
+      # Container images default to UTC, which puts every timestamp the
+      # container writes - `hugo new` dates, git author times, build logs -
+      # hours away from the host's. HOST_TZ comes from the same guarded block
+      # in ~/.zshrc as the token above, derived there from the host's
+      # /etc/localtime. The image already carries /usr/share/zoneinfo, so a
+      # zone name resolves without installing tzdata.
+      #
+      # TZ is read at process start, so changing it needs a container rebuild,
+      # not a Reload Window.
+      - TZ=${HOST_TZ:-Etc/UTC}
     volumes:
       - ..:/workspaces/hextra:cached
       # Named volume masks node_modules so the container keeps its own
