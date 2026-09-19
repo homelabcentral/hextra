@@ -441,6 +441,220 @@ ci-pages: ci-preflight ## Run the Pages build job locally (deploy is GitHub-only
 	@$(SAY) "Running the pages build job (the deploy job needs GitHub's OIDC token and is skipped)"
 	@act push -W .github/workflows/pages.yml -j build
 
+##@ GitHub (gh)
+
+# Pull requests and remote CI, driven by `gh` from inside the dev container.
+#
+# These deliberately live here rather than in shell history: the host's `gh` is
+# authenticated as a different GitHub account which is not a collaborator on
+# this repository, so a host-side `gh pr create` fails with "must be a
+# collaborator". `gh-preflight` turns that into one clear line instead.
+#
+# Nothing here ever reads, echoes or masks GH_TOKEN. `gh api user` asks GitHub
+# who the credential belongs to and prints only a login; `gh auth status` is
+# silenced because it renders a masked token, and a masked token is still a
+# disclosure. See AGENTS.md > Working conventions > Secrets and the gh CLI.
+#
+# Branch state is read from local tracking refs rather than `git ls-remote`.
+# origin is an SSH remote and a plain `docker exec` carries no forwarded agent,
+# so ls-remote fails there for a reason that has nothing to do with the branch.
+# The cost is that a stale `origin/<branch>` needs a `git fetch` first.
+#
+# Every destructive target prompts and defaults to NO. Pass YES=1 (or true, or
+# yes) to bypass - that is the only accepted spelling set, so a stray YES=maybe
+# still prompts rather than silently proceeding.
+
+GH_OWNER ?= homelabcentral
+BASE     ?= main
+
+# Interactive guard. $(1) is the question; keep it free of commas, which `call`
+# would read as another argument. Without a terminal and without YES it aborts
+# rather than blocking forever on a read that can never be answered.
+define CONFIRM
+	@if [ "$(YES)" = "1" ] || [ "$(YES)" = "true" ] || [ "$(YES)" = "yes" ]; then \
+	  $(WARN) "confirmation bypassed - YES=$(YES)"; \
+	else \
+	  if [ ! -t 0 ]; then \
+	    $(WARN) "no terminal to confirm on - pass YES=1 to proceed"; exit 1; \
+	  fi; \
+	  printf "$(YELLOW)  ??$(RESET) $(BOLD)%s$(RESET) $(DIM)[y/N]$(RESET) " "$(1)"; \
+	  read -r reply; \
+	  case "$$reply" in [yY]|[yY][eE][sS]) ;; *) $(WARN) "aborted"; exit 1 ;; esac; \
+	fi
+endef
+
+# Two read-only diagnostics. Neither reads, echoes, masks or length-checks
+# GH_TOKEN: presence is tested with [ -n ] and identity is asked of GitHub,
+# which answers with a login. `gh auth status` is never shown because it
+# renders a masked token, and a masked token is still a disclosure.
+
+.PHONY: gh-auth
+gh-auth: ## Check gh is authenticated as the account that owns this repository
+	@$(SAY) "gh authentication"
+	@if ! command -v gh >/dev/null 2>&1; then \
+	  printf "  %-14s $(RED)%s$(RESET)\n" "gh" "not installed"; \
+	  $(WARN) "these targets run inside the dev container - reopen the repo in it"; exit 1; fi
+	@printf "  %-14s %s\n" "gh" "$$(gh --version | head -1)"
+	@if [ -z "$${GH_TOKEN:-}" ]; then \
+	  printf "  %-14s $(YELLOW)%s$(RESET)\n" "GH_TOKEN" "unset or empty"; \
+	  printf "  %-14s %s\n" "" "the container reads it from HEXTRA_GH_TOKEN on the host"; \
+	  printf "  %-14s %s\n" "" "exported from the VSCODE_RESOLVING_ENVIRONMENT guard in ~/.zshrc"; \
+	  printf "  %-14s %s\n" "" "if that export exists: quit VS Code fully and relaunch - Reload"; \
+	  printf "  %-14s %s\n" "" "Window and Rebuild Container both reuse the cached shell env"; \
+	else \
+	  printf "  %-14s $(GREEN)%s$(RESET)\n" "GH_TOKEN" "present"; \
+	fi
+	@login=""; \
+	 if out="$$(gh api user --jq .login 2>/dev/null)"; then login="$$(printf '%s' "$$out" | head -1)"; fi; \
+	 case "$$login" in *[!A-Za-z0-9-]*) login="" ;; esac; \
+	 if [ -z "$$login" ]; then \
+	   printf "  %-14s $(RED)%s$(RESET)\n" "identity" "not authenticated"; \
+	   if [ -n "$${GH_TOKEN:-}" ]; then \
+	     $(WARN) "GH_TOKEN is set but GitHub rejected it - expired or revoked. Reissue it"; \
+	   else \
+	     $(WARN) "no credential at all - see GH_TOKEN above"; \
+	   fi; \
+	   exit 1; \
+	 elif [ "$$login" != "$(GH_OWNER)" ]; then \
+	   printf "  %-14s $(RED)%s$(RESET)\n" "identity" "$$login"; \
+	   $(WARN) "this repository belongs to $(GH_OWNER) - $$login is not a collaborator"; \
+	   $(WARN) "gh pr create would fail with 'must be a collaborator'"; \
+	   $(WARN) "run make inside the dev container - the host gh is a different account"; \
+	   exit 1; \
+	 else \
+	   printf "  %-14s $(GREEN)%s$(RESET)\n" "identity" "$$login"; \
+	 fi
+	@$(OK) "gh can write to $(GH_OWNER)"
+
+.PHONY: git-auth
+git-auth: ## Check git identity and that origin is reachable for pushing
+	@$(SAY) "git authentication"
+	@printf "  %-14s %s\n" "user.name" "$$(git config user.name || echo '(unset)')"
+	@printf "  %-14s %s\n" "user.email" "$$(git config user.email || echo '(unset)')"
+	@if [ -z "$$(git config user.name)" ] || [ -z "$$(git config user.email)" ]; then \
+	  $(WARN) "set them repo-locally so commits carry the right author:"; \
+	  $(WARN) "  git config user.name  '<name>'"; \
+	  $(WARN) "  git config user.email '<email>'"; \
+	fi
+	@url="$$(git remote get-url origin 2>/dev/null || true)"; \
+	 if [ -z "$$url" ]; then \
+	   printf "  %-14s $(RED)%s$(RESET)\n" "origin" "no remote"; exit 1; fi; \
+	 printf "  %-14s %s\n" "origin" "$$url"
+	@if [ -n "$${SSH_AUTH_SOCK:-}" ] && [ -S "$${SSH_AUTH_SOCK:-}" ]; then \
+	   printf "  %-14s $(GREEN)%s$(RESET)\n" "ssh-agent" "forwarded"; \
+	 else \
+	   printf "  %-14s $(YELLOW)%s$(RESET)\n" "ssh-agent" "not forwarded"; \
+	   printf "  %-14s %s\n" "" "VS Code forwards it to terminals it opens; a plain"; \
+	   printf "  %-14s %s\n" "" "'docker exec' does not - push from a VS Code terminal"; \
+	 fi
+	@if git ls-remote --exit-code --heads origin >/dev/null 2>&1; then \
+	   printf "  %-14s $(GREEN)%s$(RESET)\n" "push access" "origin reachable"; \
+	   $(OK) "git can push to origin"; \
+	 else \
+	   printf "  %-14s $(RED)%s$(RESET)\n" "push access" "origin unreachable"; \
+	   $(WARN) "the host keys are mounted read-only and the agent does the signing"; \
+	   $(WARN) "so this usually means the agent is missing rather than a bad key"; \
+	   $(WARN) "check: ssh -T $$(git remote get-url origin | sed 's|:.*||')"; \
+	   exit 1; \
+	 fi
+
+.PHONY: gh-preflight
+gh-preflight:
+	@command -v gh >/dev/null 2>&1 || { \
+	  $(WARN) "gh is not installed - these targets run inside the dev container"; exit 1; }
+	@gh auth status >/dev/null 2>&1 || { \
+	  $(WARN) "gh is not authenticated - GH_TOKEN is empty in this shell"; \
+	  $(WARN) "on the host that is expected; run make inside the dev container"; exit 1; }
+	@login="$$(gh api user --jq .login)"; \
+	 if [ "$$login" != "$(GH_OWNER)" ]; then \
+	   $(WARN) "gh is authenticated as $$login but this repository belongs to $(GH_OWNER)"; \
+	   $(WARN) "run make inside the dev container - the host gh is a different account"; \
+	   exit 1; \
+	 fi
+
+.PHONY: pr
+pr: gh-preflight ## Open a PR for the current branch: make pr TITLE="..." [BODY_FILE=f] [BASE=main] [DRAFT=1] [YES=1]
+	@if [ -z "$(TITLE)" ]; then \
+	  $(WARN) 'TITLE required, e.g. make pr TITLE="docs(blog): add the giscus guide"'; exit 1; fi
+	@branch="$$(git rev-parse --abbrev-ref HEAD)"; \
+	 if [ "$$branch" = "$(BASE)" ]; then \
+	   $(WARN) "on $(BASE) - branch first, then open the PR"; exit 1; fi; \
+	 if ! git rev-parse --verify --quiet "refs/remotes/origin/$$branch" >/dev/null; then \
+	   $(WARN) "$$branch has never been pushed - git push -u origin $$branch"; exit 1; fi; \
+	 ahead="$$(git rev-list --count "refs/remotes/origin/$$branch..HEAD")"; \
+	 if [ "$$ahead" != "0" ]; then \
+	   $(WARN) "$$ahead local commit(s) not on origin - push before opening the PR"; exit 1; fi; \
+	 if [ -n "$$(gh pr list --head "$$branch" --state open --json number --jq '.[].number')" ]; then \
+	   $(WARN) "a PR is already open for $$branch - push to it instead"; exit 1; fi
+	$(call CONFIRM,Open a pull request from $$(git rev-parse --abbrev-ref HEAD) into $(BASE)?)
+	@$(SAY) "Opening the pull request"
+	@gh pr create --base "$(BASE)" --head "$$(git rev-parse --abbrev-ref HEAD)" \
+	  --title "$(TITLE)" \
+	  $(if $(BODY_FILE),--body-file "$(BODY_FILE)",$(if $(BODY),--body "$(BODY)",--fill)) \
+	  $(if $(DRAFT),--draft,)
+	@$(OK) "opened - make pr-checks to watch it"
+
+.PHONY: pr-close
+pr-close: gh-preflight ## Close a PR without merging: make pr-close [PR=9] [DELETE_BRANCH=1] [YES=1]
+	@num="$(PR)"; [ -n "$$num" ] || num="$$(gh pr view --json number --jq .number 2>/dev/null)"; \
+	 if [ -z "$$num" ]; then $(WARN) "no open PR for this branch - pass PR=<number>"; exit 1; fi; \
+	 $(SAY) "$$(gh pr view "$$num" --json number,title,headRefName \
+	   --jq '"#\(.number) \(.title)  [\(.headRefName)]"')"
+	$(call CONFIRM,Close this pull request without merging?)
+	@num="$(PR)"; [ -n "$$num" ] || num="$$(gh pr view --json number --jq .number)"; \
+	 gh pr close "$$num" $(if $(DELETE_BRANCH),--delete-branch,); \
+	 $(OK) "closed #$$num$(if $(DELETE_BRANCH), and deleted its branch,)"
+
+.PHONY: pr-list
+pr-list: gh-preflight ## List open pull requests
+	@gh pr list --state open
+
+.PHONY: pr-view
+pr-view: gh-preflight ## Show a PR: make pr-view [PR=9]
+	@gh pr view $(PR)
+
+.PHONY: pr-checks
+pr-checks: gh-preflight ## Watch a PR's checks to completion: make pr-checks [PR=9]
+	@gh pr checks $(PR) --watch
+
+##@ Remote CI (GitHub Actions)
+
+# The five test workflows trigger on push and pull_request only, so there is
+# nothing to dispatch for them - pushing is how they run. Only pages.yml and
+# release.yml carry workflow_dispatch, and both act on main, which is why
+# gh-dispatch is guarded as hard as it is.
+
+.PHONY: gh-runs
+gh-runs: gh-preflight ## List recent Actions runs for the current branch
+	@gh run list --branch "$$(git rev-parse --abbrev-ref HEAD)" --limit 10
+
+.PHONY: gh-watch
+gh-watch: gh-preflight ## Watch the latest Actions run for the current branch
+	@id="$$(gh run list --branch "$$(git rev-parse --abbrev-ref HEAD)" --limit 1 \
+	   --json databaseId --jq '.[0].databaseId')"; \
+	 if [ -z "$$id" ]; then $(WARN) "no runs for this branch yet"; exit 1; fi; \
+	 gh run watch "$$id"
+
+.PHONY: gh-rerun
+gh-rerun: gh-preflight ## Re-run failed jobs of the latest run: make gh-rerun [YES=1]
+	@id="$$(gh run list --branch "$$(git rev-parse --abbrev-ref HEAD)" --limit 1 \
+	   --json databaseId --jq '.[0].databaseId')"; \
+	 if [ -z "$$id" ]; then $(WARN) "no runs for this branch yet"; exit 1; fi; \
+	 $(SAY) "latest run $$id"
+	$(call CONFIRM,Re-run the failed jobs of that run?)
+	@gh run rerun "$$(gh run list --branch "$$(git rev-parse --abbrev-ref HEAD)" --limit 1 \
+	  --json databaseId --jq '.[0].databaseId')" --failed
+	@$(OK) "re-run queued - make gh-watch to follow it"
+
+.PHONY: gh-dispatch
+gh-dispatch: gh-preflight ## Trigger a workflow_dispatch workflow: make gh-dispatch WORKFLOW=pages.yml [REF=main] [YES=1]
+	@if [ -z "$(WORKFLOW)" ]; then \
+	  $(WARN) "WORKFLOW required - only pages.yml and release.yml accept a dispatch"; exit 1; fi
+	@$(WARN) "$(WORKFLOW) on $(if $(REF),$(REF),main) acts on the live site or the release tags"
+	$(call CONFIRM,Really dispatch $(WORKFLOW) against $(if $(REF),$(REF),main)?)
+	@gh workflow run "$(WORKFLOW)" --ref "$(if $(REF),$(REF),main)"
+	@$(OK) "dispatched - make gh-watch to follow it"
+
 ##@ Housekeeping
 
 .PHONY: clean
