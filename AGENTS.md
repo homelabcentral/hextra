@@ -462,6 +462,39 @@ with `claude plugin validate ./ --strict` before releasing.
 How changes land in this repo. These are the rules, not suggestions — a change
 that skips them is a change that has to be redone.
 
+### Secrets and the `gh` CLI
+
+- **Never print `GH_TOKEN`, `HEXTRA_GH_TOKEN`, or any other credential.** Not
+  its value, not its length, not a masked or truncated form, not "is it set".
+  Not to a terminal, a log, a commit, a PR body, or an agent transcript.
+  Anything printed in a session is disclosed and the token must then be
+  revoked and reissued.
+- **Do not inspect a token to check whether it works.** Run the real command
+  and read its exit status. `gh` already reports `must be a collaborator`,
+  `HTTP 401` or `gh auth login` when the credential is missing or wrong — a
+  precondition check adds nothing and is where leaks come from.
+- Shell forms that leak by construction: `${VAR:-fallback}` and
+  `${VAR:+set}${VAR:-unset}` both expand to the value whenever it is set.
+  `echo "$VAR" | cut -c1-4` still prints part of it. If presence genuinely has
+  to be tested, `[ -n "$VAR" ] && echo set || echo unset` is the only form that
+  cannot print it.
+- **`gh` write operations run inside the dev container**, which holds the
+  account that owns this repository:
+
+  ```shell
+  docker exec -w /workspaces/hextra hextra-dev-1 gh pr create --base main ...
+  ```
+
+  Run it directly; do not preflight the auth. The host's `gh` is a different
+  GitHub account and is not a collaborator here, so a host-side `gh pr create`
+  fails with `must be a collaborator`. Read operations against public data work
+  from either.
+
+- The container reads `GH_TOKEN` from `HEXTRA_GH_TOKEN` on the host, exported
+  from a `VSCODE_RESOLVING_ENVIRONMENT` guard in `~/.zshrc`. That is the whole
+  supply chain — never copy a token anywhere else, including into `.env`,
+  `devcontainer.json`, or a shell invocation.
+
 ### Branches and pull requests
 
 - **One branch per change**, named for what it does: `feat/`, `fix/`, `chore/`,
