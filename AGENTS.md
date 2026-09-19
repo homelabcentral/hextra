@@ -479,16 +479,28 @@ that skips them is a change that has to be redone.
   to be tested, `[ -n "$VAR" ] && echo set || echo unset` is the only form that
   cannot print it.
 - **`gh` write operations run inside the dev container**, which holds the
-  account that owns this repository:
+  account that owns this repository. Prefer the Makefile wrappers, which carry
+  the guards and the branch checks:
 
   ```shell
-  docker exec -w /workspaces/hextra hextra-dev-1 gh pr create --base main ...
+  make pr TITLE="docs(blog): add the giscus guide"   # inside the container
+  make pr-close PR=9 DELETE_BRANCH=1
+  make gh-dispatch WORKFLOW=pages.yml
   ```
 
-  Run it directly; do not preflight the auth. The host's `gh` is a different
-  GitHub account and is not a collaborator here, so a host-side `gh pr create`
-  fails with `must be a collaborator`. Read operations against public data work
-  from either.
+  All three prompt before acting and default to no; `YES=1` bypasses. From
+  outside the container, wrap the same command:
+
+  ```shell
+  docker exec -w /workspaces/hextra hextra-dev-1 make pr TITLE="..." YES=1
+  ```
+
+  Run it directly; do not preflight the auth. `make gh-auth` and
+  `make git-auth` exist when a credential problem needs diagnosing — neither
+  prints a token. The host's `gh` is a different GitHub account and is not a
+  collaborator here, so a host-side `gh pr create` fails with
+  `must be a collaborator`. Read operations against public data work from
+  either.
 
 - The container reads `GH_TOKEN` from `HEXTRA_GH_TOKEN` on the host, exported
   from a `VSCODE_RESOLVING_ENVIRONMENT` guard in `~/.zshrc`. That is the whole
@@ -507,6 +519,9 @@ that skips them is a change that has to be redone.
   to `main` runs _none_ of them, including the `build-skill --check` gate.
 - Stack branches when a change genuinely depends on an unmerged one, and say so
   in the PR. Otherwise branch from `main`.
+- `make pr TITLE="..."` opens the PR and refuses the four states that make `gh`
+  error confusingly: on `main`, branch never pushed, unpushed local commits, or
+  a PR already open for the branch. `make pr-checks` follows the result.
 
 ### Commits
 
