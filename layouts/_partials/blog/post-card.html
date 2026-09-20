@@ -45,6 +45,6 @@
       <a class="hextra-blog-card-link" href="{{ $page.RelPermalink }}">{{ $page.Title }}</a>
     </h2>
     {{- partial "blog/post-meta.html" (dict "page" $page "readingTime" $card.readingTime "tags" $displayTags) -}}
-    <p class="hextra-blog-card-excerpt">{{ partial "utils/page-description" $page }}</p>
+    <p class="hextra-blog-card-excerpt">{{ partial "utils/card-description" $page }}</p>
   </div>
 </article>

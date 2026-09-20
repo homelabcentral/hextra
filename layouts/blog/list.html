@@ -41,7 +41,7 @@
                   {{ partial "tags.html" (dict "context" .) }}
                 </div>
               {{ end }}
-              <p class="hx:opacity-80 hx:mt-4 hx:leading-7">{{- partial "utils/page-description" . -}}</p>
+              <p class="hx:opacity-80 hx:mt-4 hx:leading-7">{{- partial "utils/card-description" . -}}</p>
               <p class="hx:opacity-80 hx:mt-1 hx:leading-7">
                 <a class="hx:text-hextra-accent-500 hx:underline hx:underline-offset-2 hx:decoration-from-font" href="{{ .RelPermalink }}" aria-label="{{ printf "%s %s" $readMore .Title }}">
                   {{- $readMore -}}

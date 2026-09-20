@@ -1,0 +1,38 @@
+{{/* The blurb a card shows for a page.
+
+  Deliberately not `utils/page-description.html`, which resolves the text for
+  `<meta name="description">` and `og:description` and takes `.Description`
+  first. The two answer different questions — a card is read by a person
+  deciding whether to click, a meta description by a crawler — so a post can
+  set both keys and keep them apart:
+
+    summary      wins here, ignored by the meta tags
+    description  wins in the meta tags, used here only as a fallback
+    neither      Hugo's own summary, from `<!--more-->` or the opening words
+
+  Set only one and both surfaces use it, which is what every existing site
+  already gets.
+
+  `.Params.summary` rather than `.Summary`: the latter is never empty, so it
+  cannot distinguish a summary the author wrote from one Hugo generated, and
+  the fallback chain would stop at the first step every time.
+
+  @param {page} . The page to describe.
+  @returns {string} Plain text, no markup.
+
+  @example {{ partial "utils/card-description.html" $page
+}}
+*/}}
+{{- $text := "" -}}
+{{- with .Params.summary -}}
+  {{- $text = . -}}
+{{- end -}}
+{{- if not $text -}}
+  {{- with .Description -}}
+    {{- $text = . -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $text -}}
+  {{- $text = .Summary -}}
+{{- end -}}
+{{ $text | plainify | htmlUnescape | chomp -}}

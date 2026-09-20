@@ -1,5 +1,6 @@
 ---
 title: "Guide: Code Blocks, Reimagined"
+summary: "Filename bars, file-type icons, accent line highlighting and a copy button that works in light mode. No configuration."
 date: 2026-09-08
 authors:
   - name: homelabcentral

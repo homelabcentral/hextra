@@ -1,5 +1,6 @@
 ---
 title: "Guide: Icons, Bundled and Remote"
+summary: "272 icons ship with the theme, and five remote providers extend it by prefix. Neither needs a byte of configuration."
 date: 2026-09-17
 authors:
   - name: homelabcentral

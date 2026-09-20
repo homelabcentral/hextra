@@ -1,5 +1,6 @@
 ---
 title: Markdown Syntax Guide
+summary: "A sample of the basic Markdown syntax Hugo content files accept, from headings and lists through tables and code."
 date: 2020-01-01
 authors:
   - name: imfing

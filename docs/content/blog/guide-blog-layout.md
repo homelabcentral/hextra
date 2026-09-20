@@ -1,5 +1,6 @@
 ---
 title: "Guide: The New Blog Layout"
+summary: "Build the three-column blog step by step — identity rail, cards, widgets. Every part opt-in, nothing changes until you ask."
 date: 2026-09-08
 authors:
   - name: homelabcentral

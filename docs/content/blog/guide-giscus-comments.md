@@ -1,5 +1,6 @@
 ---
 title: "Guide: Comments with giscus"
+summary: "Comments stored as GitHub Discussions: nothing to host, nothing to pay for. Setup, the category trap, and why the box won't load."
 date: 2026-09-19
 authors:
   - name: homelabcentral

@@ -31,6 +31,8 @@ Only `title` and `date` really matter; the rest enable features. `hugo new --kin
 
 **The `<!--more-->` marker** splits excerpt from body. Without it Hugo generates a summary from the opening words, which usually reads worse.
 
+**`summary` in front matter** beats both. It is the blurb on the card and in the search index, and unlike `description` it never reaches `<meta name="description">` or `og:description` — so a post can carry a keyword-tight sentence for crawlers and a sharper one for readers. Set only one of the two and both surfaces use it.
+
 **Covers** resolve as a page resource, an asset path, or an absolute URL. For a post with its own images, make it a leaf bundle (`blog/shipping-v2/index.md` with `cover.jpg` beside it) so Hugo can resize the image.
 
 See `frontmatter.md` for `pinned`, `series`, `seriesOrder`, and `seriesOpened`.

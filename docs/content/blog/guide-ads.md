@@ -1,5 +1,6 @@
 ---
 title: "Guide: Placing Ads with the ad Shortcode and Layout Slots"
+summary: "An ad shortcode for placement by hand, four layout slots for the repeating positions, across four ad networks."
 date: 2026-09-12
 authors:
   - name: homelabcentral

@@ -63,6 +63,8 @@ With `card.enable`, list pages render each post as a card with cover image, read
 
 `layout` picks the card shape for the blog list and `termLayout` the one for tag pages. A `vertical` card puts the cover above the text and grows with its content; a `horizontal` card puts the cover on the inline-start 40%, keeps every card the same height from `sm` up, and hides the cover below that. Either value works on either page, and the defaults above are what the theme rendered before the keys existed.
 
+The excerpt is the post's `summary` front matter when it has one, then its `description`, then Hugo's own summary — the text after `<!--more-->`, or the opening words when there is no marker. Only `summary` is card-only: `description` also fills `<meta name="description">` and `og:description`, so set both when the sentence a reader should see differs from the one a crawler should index.
+
 ## Articles
 
 ```yaml {filename="hugo.yaml"}
