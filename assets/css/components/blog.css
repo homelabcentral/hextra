@@ -221,8 +221,8 @@
 }
 
 /* Three lines and an ellipsis. The excerpt is whatever
-   `utils/page-description` produces — a `description` front matter key, or a
-   slice of the post's own prose when there is none — so its length is not
+   `utils/card-description` produces — a `summary` front matter key, then a
+   `description`, then a slice of the post's own prose — so its length is not
    something the card can rely on. Unbounded, a long one sets the card's
    height and the list stops scanning as a list. */
 .hextra-blog-card-excerpt {

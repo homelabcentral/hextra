@@ -287,7 +287,7 @@ params:
 
 `layout` and `termLayout` pick the card shape independently for the blog list and for tag pages. A `vertical` card stacks the cover above the text and grows with its content; a `horizontal` card puts the cover on the inline-start 40% and keeps every card the same height from `sm` up. The values above are what the theme rendered before the keys existed.
 
-A card's excerpt is the post's `summary` front matter, then its `description`, then Hugo's own summary. Only `summary` is card-only — `description` also fills `<meta name="description">` and `og:description`.
+A card's excerpt is the post's `summary` front matter, then its `description`, then Hugo's own summary. `summary` is card-only when the post also sets `description`; on its own it fills `<meta name="description">` and `og:description` too.
 
 A post's cover image comes from the `cover` (or `featured_image`) front matter key, and otherwise from a page bundle resource whose name contains `cover` or `featured`. The value may be a path in `assets/`, a path under `static/`, or an absolute URL:
 

@@ -63,7 +63,7 @@ params:
 
 `layout` 决定博客列表的卡片形状，`termLayout` 决定标签页的卡片形状。`vertical` 把封面放在文字上方，高度随内容增长；`horizontal` 把封面放在行首侧 40%，并从 `sm` 断点起让所有卡片等高。两个取值在两种页面上都可用，上面的默认值与这些键加入之前的渲染结果一致。
 
-卡片摘要依次取自文章前置参数中的 `summary`、`description`，最后才是 Hugo 自己的摘要——`<!--more-->` 之后的文字，没有标记时则取开头几句。只有 `summary` 是卡片专用的：`description` 还会填充 `<meta name="description">` 和 `og:description`，所以当读者该看到的句子和爬虫该索引的句子不同时，两个都要设置。
+卡片摘要依次取自文章前置参数中的 `summary`、`description`，最后才是 Hugo 自己的摘要——`<!--more-->` 之后的文字，没有标记时则取开头几句。只有当文章同时设置了 `description` 时，`summary` 才是卡片专用的；单独使用时它也会填充 `<meta name="description">` 和 `og:description`。`description` 始终会填充两者，所以当读者该看到的句子和爬虫该索引的句子不同时，两个键都要设置。
 
 ```yaml {filename="content/blog/shipping-v2.md"}
 ---

@@ -6,7 +6,7 @@
   deciding whether to click, a meta description by a crawler — so a post can
   set both keys and keep them apart:
 
-  summary      wins here, ignored by the meta tags
+  summary      wins here; reaches the meta tags only when `description` is unset
   description  wins in the meta tags, used here only as a fallback
   neither      Hugo's own summary, from `<!--more-->` or the opening words
 

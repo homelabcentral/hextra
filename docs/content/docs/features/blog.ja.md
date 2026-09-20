@@ -63,7 +63,7 @@ params:
 
 `layout` はブログ一覧、`termLayout` はタグページのカード形状をそれぞれ選びます。`vertical` はカバーをテキストの上に置き、高さは内容に従って伸びます。`horizontal` はカバーを行頭側の 40% に置き、`sm` 以上ではすべてのカードを同じ高さに揃えます。どちらの値もどちらのページでも使え、上の値はこれらのキーが追加される前のレンダリング結果と同じです。
 
-カードの抜粋は、記事のフロントマターの `summary`、次に `description`、最後に Hugo 自身の要約（`<!--more-->` 以降のテキスト、マーカーがなければ冒頭の文）の順で決まります。カード専用なのは `summary` だけです。`description` は `<meta name="description">` と `og:description` にも入るため、読者に見せたい文とクローラーにインデックスさせたい文が異なるときは両方を設定してください。
+カードの抜粋は、記事のフロントマターの `summary`、次に `description`、最後に Hugo 自身の要約（`<!--more-->` 以降のテキスト、マーカーがなければ冒頭の文）の順で決まります。`summary` がカード専用になるのは、記事が `description` も設定しているときだけです。`summary` だけの場合は `<meta name="description">` と `og:description` にも入ります。`description` は常に両方に入るため、読者に見せたい文とクローラーにインデックスさせたい文が異なるときは両方のキーを設定してください。
 
 ```yaml {filename="content/blog/shipping-v2.md"}
 ---

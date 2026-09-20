@@ -35,14 +35,14 @@ Section landing pages (`_index.md`) take everything their page kind takes, plus 
 
 ## Identity
 
-| Key           | Type   | Notes                                                                                                                                                           |
-| ------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `title`       | string | Page heading, `<title>`, breadcrumb, and search result.                                                                                                         |
-| `linkTitle`   | string | Shorter label used in the sidebar and menus when the title is long. Spell it exactly — `linktitle` lowercase is a different key and the theme does not read it. |
-| `description` | string | Meta description and Open Graph summary. Falls back to the page summary.                                                                                        |
-| `summary`     | string | The blurb shown on blog cards and in the search index. Falls back to `description`, then to Hugo's own summary. Never used for the meta tags.                   |
-| `date`        | date   | Publication date. Drives blog ordering and the archives page.                                                                                                   |
-| `authors`     | list   | See [Blog](#blog).                                                                                                                                              |
+| Key           | Type   | Notes                                                                                                                                                                          |
+| ------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `title`       | string | Page heading, `<title>`, breadcrumb, and search result.                                                                                                                        |
+| `linkTitle`   | string | Shorter label used in the sidebar and menus when the title is long. Spell it exactly — `linktitle` lowercase is a different key and the theme does not read it.                |
+| `description` | string | Meta description and Open Graph summary. Falls back to the page summary.                                                                                                       |
+| `summary`     | string | The blurb shown on blog cards and in the search index. Falls back to `description`, then to Hugo's own summary. Reaches the meta tags only when the page has no `description`. |
+| `date`        | date   | Publication date. Drives blog ordering and the archives page.                                                                                                                  |
+| `authors`     | list   | See [Blog](#blog).                                                                                                                                                             |
 
 ## Ordering and navigation
 
