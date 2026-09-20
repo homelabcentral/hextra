@@ -61,9 +61,20 @@ params:
         enable: true
         cover: true
         readingTime: true
+        layout: vertical # vertical | horizontal
+        termLayout: horizontal # vertical | horizontal
 ```
 
 Remove the `card` block for a plain list instead of post cards. `pagerSize` defaults to 10 and also governs tag term pages.
+
+`layout` picks the card used on the blog list, `termLayout` the one used on tag pages. Both take the same two values, and either card works on either page:
+
+| Value        | Card                                                                                           |
+| ------------ | ---------------------------------------------------------------------------------------------- |
+| `vertical`   | Cover above the text, card height follows the content.                                         |
+| `horizontal` | Cover on the inline-start 40%, every card the same height from `sm` up, cover hidden below it. |
+
+The defaults shown above are what the theme has always rendered, so leaving both out changes nothing.
 
 ## The article page
 

@@ -55,9 +55,13 @@ params:
         enable: true
         cover: true
         readingTime: true
+        layout: vertical # vertical | horizontal
+        termLayout: horizontal # vertical | horizontal
 ```
 
 With `card.enable`, list pages render each post as a card with cover image, reading time, and excerpt — and the whole card is clickable, not just the title. The list page heading is hidden in card mode since the rail already identifies the page. Remove the `card` block to fall back to the plain list.
+
+`layout` picks the card shape for the blog list and `termLayout` the one for tag pages. A `vertical` card puts the cover above the text and grows with its content; a `horizontal` card puts the cover on the inline-start 40%, keeps every card the same height from `sm` up, and hides the cover below that. Either value works on either page, and the defaults above are what the theme rendered before the keys existed.
 
 ## Articles
 

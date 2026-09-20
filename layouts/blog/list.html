@@ -23,7 +23,7 @@
         {{- if $cfg.card.enable -}}
           <ul class="hextra-blog-list">
             {{- range $i, $post := $paginator.Pages -}}
-              <li>{{ partial "blog/post-card.html" (dict "page" $post "config" $cfg) }}</li>
+              <li>{{ partial "blog/post-card.html" (dict "page" $post "config" $cfg "variant" $cfg.card.layout) }}</li>
               {{/* A bare div is not valid inside a ul, so the ad gets a list
                 item of its own; .hextra-blog-list is already list-none.
               */}}
