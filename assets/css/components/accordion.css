@@ -9,16 +9,16 @@
    draw the same weight of edge. See `series.css`, which matches this. */
 .hextra-accordion {
   @apply hx:my-6 hx:overflow-hidden hx:rounded-lg hx:border;
-  @apply hx:border-neutral-400 hx:bg-neutral-100;
-  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
+  @apply hx:border-neutral-300 hx:bg-neutral-100;
+  @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-900;
   /* The edge lifts with the fill on hover, the way Nextra's cards do. Without
      it the border and the hovered surface converge and the outline vanishes
      for exactly as long as the pointer is on it. */
-  @apply hx:transition-colors hx:hover:border-neutral-500 hx:dark:hover:border-neutral-700;
+  @apply hx:transition-colors hx:hover:border-neutral-500 hx:dark:hover:border-neutral-600;
 }
 
 .hextra-accordion__item {
-  @apply hx:border-b hx:border-neutral-400 hx:dark:border-neutral-800;
+  @apply hx:border-b hx:border-neutral-300 hx:dark:border-neutral-700;
 
   &:last-child {
     @apply hx:border-b-0;

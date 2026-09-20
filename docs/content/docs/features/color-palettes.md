@@ -29,17 +29,27 @@ when nothing looks obviously wrong.
 The theme keeps its surfaces at fixed levels so one always sits where you expect
 relative to the page:
 
-| Role                             | Light         | Dark          |
-| -------------------------------- | ------------- | ------------- |
-| Page — `--hextra-bg`             | `#f7f7f7`     | `#111111`     |
-| Raised — code blocks, cards      | `neutral-50`  | `neutral-950` |
-| Panel — collapsibles, series box | `neutral-50`  | `neutral-900` |
-| Overlay — dropdowns, menus       | `neutral-100` | `neutral-900` |
-| Chrome — filename bars, hover    | `neutral-200` | `neutral-800` |
-| Borders                          | `neutral-400` | `neutral-800` |
+| Role                              | Light         | Dark          |
+| --------------------------------- | ------------- | ------------- |
+| Page — `--hextra-bg`              | `#f7f7f7`     | `#111111`     |
+| Raised — code blocks, cards       | `neutral-50`  | `neutral-950` |
+| Overlay — dropdowns, collapsibles | `neutral-100` | `neutral-900` |
+| Chrome — filename bars, hover     | `neutral-200` | `neutral-800` |
+| Borders                           | `neutral-300` | `neutral-700` |
 
 Note the direction flips between modes. In light mode a raised surface is
 _lighter_ than the page; in dark mode it is _darker_.
+
+Collapsibles — the accordion, the series box, the `details` shortcode — sit at
+Overlay rather than on a level of their own. What decides the level is what the
+element holds: anything carrying body text sits at Raised with the code blocks,
+including the blog, article and repository cards, while the slot a cover or
+thumbnail sits in goes one step up to Overlay, so an image that does not fill
+its column still reads as a surface above the card.
+
+Borders are one pair at 1px whatever the container — code block, card,
+collapsible or command frame. Hover lifts the edge to `neutral-500` in light and
+`neutral-600` in dark.
 
 The page itself is the exception: it is not a `neutral` step at all but its own
 token, `--hextra-bg`, whose two values fall between Tailwind's steps

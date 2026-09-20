@@ -17,8 +17,8 @@
 .hextra-article-card {
   @apply hx:flex hx:items-stretch hx:my-4 hx:no-underline;
   @apply hx:rounded-lg hx:border hx:overflow-hidden;
-  @apply hx:border-neutral-200 hx:bg-neutral-50;
-  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-950;
+  @apply hx:border-neutral-300 hx:bg-neutral-50;
+  @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-950;
   @apply hx:transition-colors hx:ease-in hx:duration-200;
 
   &:hover {

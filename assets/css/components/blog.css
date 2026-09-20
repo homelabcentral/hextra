@@ -175,7 +175,7 @@
 }
 
 .hextra-blog-card {
-  @apply hx:relative hx:overflow-hidden hx:rounded-lg hx:border hx:border-neutral-200 hx:bg-neutral-50 hx:transition-colors hx:hover:border-hextra-accent-400 hx:dark:border-neutral-800 hx:dark:bg-neutral-950;
+  @apply hx:relative hx:overflow-hidden hx:rounded-lg hx:border hx:border-neutral-300 hx:bg-neutral-50 hx:transition-colors hx:hover:border-hextra-accent-400 hx:dark:border-neutral-700 hx:dark:bg-neutral-950;
 }
 
 /* Stretch the title link over the whole card so anywhere on it opens the post,

@@ -12,12 +12,12 @@
      `neutral-100`, the Overlay level shared with `command.css`, and `neutral-900`
      in dark - one step above the page at `#111111`, so it reads as raised
      without competing with a code block at `neutral-950`. */
-  @apply hx:border-neutral-400 hx:bg-neutral-100;
-  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
+  @apply hx:border-neutral-300 hx:bg-neutral-100;
+  @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-900;
   /* The edge lifts with the fill on hover, the way Nextra's cards do. Without
      it the border and the hovered surface converge and the outline vanishes
      for exactly as long as the pointer is on it. */
-  @apply hx:transition-colors hx:hover:border-neutral-500 hx:dark:hover:border-neutral-700;
+  @apply hx:transition-colors hx:hover:border-neutral-500 hx:dark:hover:border-neutral-600;
 }
 
 .hextra-series__summary {
@@ -122,7 +122,7 @@ ol.hextra-series__list {
 /* Mirrors components/pager.html, which this replaces on posts in a series. */
 .hextra-series-nav {
   @apply hx:mb-8 hx:flex hx:items-center hx:border-t hx:pt-8;
-  @apply hx:border-neutral-200 hx:dark:border-neutral-800;
+  @apply hx:border-neutral-200 hx:dark:border-neutral-700;
   @apply hx:contrast-more:border-neutral-400 hx:dark:contrast-more:border-neutral-400;
   @apply hx:print:hidden;
 }

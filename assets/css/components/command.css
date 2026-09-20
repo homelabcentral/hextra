@@ -96,8 +96,8 @@
      with nothing to separate them once the frame's own border was dropped
      inside card slots. Dark never had the problem: the card drops to
      `neutral-950` while the frame stays at `neutral-900`. */
-  @apply hx:border-neutral-400 hx:bg-neutral-100;
-  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
+  @apply hx:border-neutral-300 hx:bg-neutral-100;
+  @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-900;
   @apply hx:my-6;
   container-type: inline-size;
 }

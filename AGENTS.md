@@ -335,21 +335,48 @@ red/amber/blue/green carry meaning; those live in `alert.css`, `jupyter.css`,
 **Surface levels.** Pick by role, not by eye. Note the direction inverts between
 modes: light raises by getting lighter, dark by getting darker.
 
-| Role                             | Light         | Dark          |
-| -------------------------------- | ------------- | ------------- |
-| Page                             | `hextra-bg`   | `hextra-bg`   |
-| Raised — code blocks, cards      | `neutral-50`  | `neutral-950` |
-| Panel — collapsibles, series box | `neutral-50`  | `neutral-900` |
-| Overlay — dropdowns, menus       | `neutral-100` | `neutral-900` |
-| Chrome — filename bars, hover    | `neutral-200` | `neutral-800` |
-| Borders                          | `neutral-400` | `neutral-800` |
+| Role                                                  | Light         | Dark          |
+| ----------------------------------------------------- | ------------- | ------------- |
+| Page                                                  | `hextra-bg`   | `hextra-bg`   |
+| Raised — code blocks, cards                           | `neutral-50`  | `neutral-950` |
+| Overlay — dropdowns, menus, collapsibles, cover slots | `neutral-100` | `neutral-900` |
+| Chrome — filename bars, hover                         | `neutral-200` | `neutral-800` |
+| Borders                                               | `neutral-300` | `neutral-700` |
 
 Overlays are their own level on purpose: a floating menu sits slightly darker
 than the page in light mode so it reads as above it, which is how Material and
-Nextra both treat them. Dropdown items hover one level up from their panel -
-`neutral-200` / `neutral-800` - which only works from that base.
-`page-context-menu.html` is the exception and hovers to `hextra-accent-100` /
-`hextra-accent-950` instead, tinting its icon and label with it.
+Nextra both treat them.
+
+Collapsibles - the accordion, the series box, the `details` shortcode - are
+Overlay too, not their own Panel level. They used to share the code block's
+`neutral-50` in light, which made a collapsed block read as another code block
+rather than as something sitting above the text.
+
+Which side of the Raised/Overlay line a thing falls on follows from what it
+holds. Body text goes on Raised, with the code blocks: `.hextra-blog-card`,
+`.hextra-article-card` and `.hextra-repo-card` all do. The slot a cover or
+thumbnail sits in goes on Overlay, so an image that does not fill its column
+still reads as a surface above the card - and the `command` shortcode's frame
+is Overlay for the same reason, being a cover made of text. A card and its own
+cover slot must never land on the same value; in dark the step is `neutral-950`
+against `neutral-900`.
+
+One border pair, everywhere, at 1px: `neutral-300` in light, `neutral-700` in
+dark. Code blocks, cards, collapsibles and the command frame all draw the same
+edge - they used to run `400`/`700`, `200`/`800` and `400`/`800` respectively,
+which read as three different weights of container. Hover lifts the edge from
+there: `neutral-500` in light and `neutral-600` in dark, the dark one a step
+_up_ from its resting colour rather than down, because `700` is now the resting
+colour.
+
+Dropdown items hover one level up from their panel - `neutral-200` /
+`neutral-800` - which only works from that base. `page-context-menu.html` is the
+exception and hovers to `hextra-accent-100` / `hextra-accent-950` instead,
+tinting its icon and label with it.
+
+A fill belongs on the element that spans the row. `.hextra-article-card__body`
+is sized by its content, so a fill there stops where the text stops and the
+card's colour resumes for the rest of the width.
 
 **Radius by size, not by taste.** The scale in use is four steps, and which one
 you want follows from what the element is:
