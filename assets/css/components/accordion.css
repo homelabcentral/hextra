@@ -1,14 +1,15 @@
 /* Surface, border and hover colours match the `details` shortcode, so the two
    collapsibles read as the same component family in a page that uses both.
 
-   The light surface is `neutral-50`, the same near-white a code block uses,
-   rather than the mid grey it had: side by side with a code block the grey read
-   as muddy. The hover keeps its distance from the resting surface, so it moves
-   down with it. The border is `neutral-400`, also the code block's, so the two
+   The light surface is `neutral-100`, the Overlay level - the same one
+   `command.css` gives its frame - so a collapsible, a text cover and a card
+   all sit on one surface in light mode. It was `neutral-50` (the code block's
+   near-white) before that unification. The hover keeps its distance from the
+   resting surface, so it moves down with it. The border is `neutral-400`, also the code block's, so the two
    draw the same weight of edge. See `series.css`, which matches this. */
 .hextra-accordion {
   @apply hx:my-6 hx:overflow-hidden hx:rounded-lg hx:border;
-  @apply hx:border-neutral-400 hx:bg-neutral-50;
+  @apply hx:border-neutral-400 hx:bg-neutral-100;
   @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
   /* The edge lifts with the fill on hover, the way Nextra's cards do. Without
      it the border and the hovered surface converge and the outline vanishes

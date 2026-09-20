@@ -3,6 +3,10 @@
    rendered as a horizontal card - and the tag pages put them one scroll apart.
    Keep them in step.
 
+   Light resting fill is `neutral-50`, the code block's surface in
+   `highlight.css`, so the text column reads as page content; the cover slot
+   below stays a step above it at `neutral-100`.
+
    Dark resting fill is the Raised level (`neutral-950`), not `neutral-800`,
    which is the Chrome level and read as a panel floating over the page rather
    than a card sitting on it.
@@ -41,6 +45,11 @@
   The body carries the padding on all sides, so a card with a cover shows the
   image flush to the edge and a card without one is still inset. No :has()
   needed.
+
+  No fill of its own: the body is sized by its content, not by the row, so a
+  fill here stops where the text stops and the card's own colour resumes for
+  the rest of the width - a vertical seam mid-card on any entry with a short
+  title. The card carries the colour instead.
 */
 .hextra-article-card__body {
   @apply hx:flex hx:flex-col hx:gap-1 hx:min-w-0 hx:p-4;

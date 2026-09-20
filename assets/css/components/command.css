@@ -89,17 +89,13 @@
      is behind it: the page as an article hero, `.hextra-blog-card-cover` in a
      card.
 
-     Light is `neutral-100`, not the `neutral-50` the collapsibles use
-     (`series.css`, the accordion). Those sit on the page, where `neutral-50`
-     reads as raised. This one mostly sits in a card, and both
-     `.hextra-blog-card` and `.hextra-article-card` are themselves
-     `neutral-50` - the cover was rendering in the exact same colour as the
-     body beside it, with nothing to separate them once the frame's own border
-     was dropped inside card slots. Dark never had the problem: the card drops
-     to `neutral-950` while the frame stays at `neutral-900`.
-
-     `neutral-100` is also the Overlay level `.hextra-blog-card-cover` uses, so
-     an image cover and a text cover now sit on the same surface. */
+     Light is `neutral-100`, the Overlay level `.hextra-blog-card-cover` uses,
+     so an image cover and a text cover sit on the same surface - and a step
+     above the cards that hold them, which stay at `neutral-50` with the code
+     blocks. Without that step the cover rendered in the card's exact colour,
+     with nothing to separate them once the frame's own border was dropped
+     inside card slots. Dark never had the problem: the card drops to
+     `neutral-950` while the frame stays at `neutral-900`. */
   @apply hx:border-neutral-400 hx:bg-neutral-100;
   @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
   @apply hx:my-6;

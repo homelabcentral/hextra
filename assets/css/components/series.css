@@ -8,11 +8,11 @@
      image, so it needs a bottom margin only. */
   @apply hx:mt-0 hx:mb-6 hx:overflow-hidden hx:rounded-lg hx:border;
   /* Same surface, border and hover colours as the `details` shortcode and the
-     accordion, so every collapsible in the theme reads as one family: the
-     near-white `neutral-50` a code block uses in light mode, and `neutral-900`
+     accordion, so every collapsible in the theme reads as one family:
+     `neutral-100`, the Overlay level shared with `command.css`, and `neutral-900`
      in dark - one step above the page at `#111111`, so it reads as raised
      without competing with a code block at `neutral-950`. */
-  @apply hx:border-neutral-400 hx:bg-neutral-50;
+  @apply hx:border-neutral-400 hx:bg-neutral-100;
   @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
   /* The edge lifts with the fill on hover, the way Nextra's cards do. Without
      it the border and the hovered surface converge and the outline vanishes
@@ -56,7 +56,7 @@
 
 .hextra-series__intro {
   /* neutral-500 is the theme's usual muted text, but on this module's
-     `neutral-50` it sits right on the 4.5:1 AA floor for 14px normal-weight
+     `neutral-100` it sits right on the 4.5:1 AA floor for 14px normal-weight
      text, with nothing left over for the summary's own hover surface.
      neutral-600 has real headroom and is already what the sibling links use.
      (The original figures here were measured against the pre-unification
