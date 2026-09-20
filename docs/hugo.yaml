@@ -325,8 +325,8 @@ params:
         readingTime: true
         # vertical | horizontal. `layout` is this list, `termLayout` the tag
         # pages; the two cards are interchangeable.
-        layout: horizontal
-        termLayout: vertical
+        layout: vertical
+        termLayout: horizontal
 
     article:
       displayPagination: true
