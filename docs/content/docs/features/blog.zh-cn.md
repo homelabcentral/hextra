@@ -55,9 +55,23 @@ params:
         enable: true
         cover: true
         readingTime: true
+        layout: vertical # vertical | horizontal
+        termLayout: horizontal # vertical | horizontal
 ```
 
 启用 `card.enable` 后，列表页会将每篇文章渲染为带封面图、阅读时长和摘要的卡片——并且整张卡片都可点击，而不仅仅是标题。卡片模式下列表页标题会被隐藏，因为侧栏已经标识了页面身份。移除 `card` 配置块即可回退到普通列表。
+
+`layout` 决定博客列表的卡片形状，`termLayout` 决定标签页的卡片形状。`vertical` 把封面放在文字上方，高度随内容增长；`horizontal` 把封面放在行首侧 40%，并从 `sm` 断点起让所有卡片等高。两个取值在两种页面上都可用，上面的默认值与这些键加入之前的渲染结果一致。
+
+卡片摘要依次取自文章前置参数中的 `summary`、`description`，最后才是 Hugo 自己的摘要——`<!--more-->` 之后的文字，没有标记时则取开头几句。只有 `summary` 是卡片专用的：`description` 还会填充 `<meta name="description">` 和 `og:description`，所以当读者该看到的句子和爬虫该索引的句子不同时，两个都要设置。
+
+```yaml {filename="content/blog/shipping-v2.md"}
+---
+title: "发布 v2"
+summary: "为卡片写的两行，精准利落。"
+description: "搜索引擎和链接预览会索引的那句话。"
+---
+```
 
 ## 文章页
 

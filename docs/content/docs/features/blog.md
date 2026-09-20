@@ -65,6 +65,14 @@ With `card.enable`, list pages render each post as a card with cover image, read
 
 The excerpt is the post's `summary` front matter when it has one, then its `description`, then Hugo's own summary — the text after `<!--more-->`, or the opening words when there is no marker. Only `summary` is card-only: `description` also fills `<meta name="description">` and `og:description`, so set both when the sentence a reader should see differs from the one a crawler should index.
 
+```yaml {filename="content/blog/shipping-v2.md"}
+---
+title: "Shipping v2"
+summary: "Two sharp lines, written for the card."
+description: "The sentence search engines and link previews index."
+---
+```
+
 ## Articles
 
 ```yaml {filename="hugo.yaml"}

@@ -55,9 +55,23 @@ params:
         enable: true
         cover: true
         readingTime: true
+        layout: vertical # vertical | horizontal
+        termLayout: horizontal # vertical | horizontal
 ```
 
 `card.enable` を指定すると、一覧ページでは各記事がカバー画像・読了時間・抜粋付きのカードとしてレンダリングされ、タイトルだけでなくカード全体がクリック可能になります。レールがページの役割を示しているため、カードモードでは一覧ページの見出しは非表示になります。`card` ブロックを削除すると、プレーンなリスト表示に戻ります。
+
+`layout` はブログ一覧、`termLayout` はタグページのカード形状をそれぞれ選びます。`vertical` はカバーをテキストの上に置き、高さは内容に従って伸びます。`horizontal` はカバーを行頭側の 40% に置き、`sm` 以上ではすべてのカードを同じ高さに揃えます。どちらの値もどちらのページでも使え、上の値はこれらのキーが追加される前のレンダリング結果と同じです。
+
+カードの抜粋は、記事のフロントマターの `summary`、次に `description`、最後に Hugo 自身の要約（`<!--more-->` 以降のテキスト、マーカーがなければ冒頭の文）の順で決まります。カード専用なのは `summary` だけです。`description` は `<meta name="description">` と `og:description` にも入るため、読者に見せたい文とクローラーにインデックスさせたい文が異なるときは両方を設定してください。
+
+```yaml {filename="content/blog/shipping-v2.md"}
+---
+title: "v2 リリース"
+summary: "カードのために書いた、短く鋭い 2 行。"
+description: "検索エンジンとリンクプレビューがインデックスする一文。"
+---
+```
 
 ## 記事ページ
 
