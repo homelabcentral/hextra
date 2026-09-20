@@ -1,5 +1,6 @@
 ---
 title: "Guide: Dev Tooling and VS Code Snippets"
+summary: "A self-documenting Makefile, a Compose devcontainer with a live preview, local CI through act, and 115 VS Code snippets."
 date: 2026-09-08
 authors:
   - name: homelabcentral

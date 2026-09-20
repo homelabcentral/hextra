@@ -83,7 +83,10 @@
 
     {{- $summary := "" -}}
     {{- if $showSummary -}}
-      {{- $summary = .Description | plainify | htmlUnescape -}}
+      {{- /* Front matter only. The chain in `utils/card-description.html`
+        ends at `.Summary`, which this partial must never touch — see the
+        deadlock note above. `.RawContent` below is the fallback instead. */ -}}
+      {{- $summary = .Params.summary | default .Description | plainify | htmlUnescape -}}
       {{- if not $summary -}}
         {{- /* Enough Markdown stripped to read as prose; the card clamps it anyway. */ -}}
         {{- $text := $raw -}}

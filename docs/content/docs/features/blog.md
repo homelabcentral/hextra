@@ -55,9 +55,23 @@ params:
         enable: true
         cover: true
         readingTime: true
+        layout: vertical # vertical | horizontal
+        termLayout: horizontal # vertical | horizontal
 ```
 
 With `card.enable`, list pages render each post as a card with cover image, reading time, and excerpt — and the whole card is clickable, not just the title. The list page heading is hidden in card mode since the rail already identifies the page. Remove the `card` block to fall back to the plain list.
+
+`layout` picks the card shape for the blog list and `termLayout` the one for tag pages. A `vertical` card puts the cover above the text and grows with its content; a `horizontal` card puts the cover on the inline-start 40%, keeps every card the same height from `sm` up, and hides the cover below that. Either value works on either page, and the defaults above are what the theme rendered before the keys existed.
+
+The excerpt is the post's `summary` front matter when it has one, then its `description`, then Hugo's own summary — the text after `<!--more-->`, or the opening words when there is no marker. `summary` is card-only when the post also sets `description`; on its own it fills `<meta name="description">` and `og:description` too. `description` always fills both, so set both keys when the sentence a reader should see differs from the one a crawler should index.
+
+```yaml {filename="content/blog/shipping-v2.md"}
+---
+title: "Shipping v2"
+summary: "Two sharp lines, written for the card."
+description: "The sentence search engines and link previews index."
+---
+```
 
 ## Articles
 

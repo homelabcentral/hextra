@@ -1,5 +1,6 @@
 ---
 title: Markdown 構文ガイド
+summary: "Hugo のコンテンツファイルで使える基本的な Markdown 記法のサンプル。見出しやリストから表、コードまで。"
 date: 2020-01-01
 authors:
   - name: imfing

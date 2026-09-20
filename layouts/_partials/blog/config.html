@@ -56,13 +56,33 @@
 {{- end -}}
 
 {{/* ---------------------------------------------------------------- card */}}
-{{- $card := dict "enable" false "cover" false "readingTime" false -}}
+{{/* `layout` is the blog list, `termLayout` the tag pages. The two cards are
+  one partial and are freely interchangeable, so the defaults here are the
+  only reason each page looks the way it always has.
+*/}}
+{{- $layouts := slice "vertical" "horizontal" -}}
+{{- $card := dict "enable" false "cover" false "readingTime" false "layout" "vertical" "termLayout" "horizontal" -}}
 {{- with $blog.list.card -}}
   {{- $enable := not (eq (index . "enable") false) -}}
+
+  {{- $layout := (index . "layout") | default "vertical" -}}
+  {{- if not (in $layouts $layout) -}}
+    {{- warnidf "blog-card-layout" `blog: params.blog.list.card.layout is %q; expected "vertical" or "horizontal". Falling back to "vertical".` $layout -}}
+    {{- $layout = "vertical" -}}
+  {{- end -}}
+
+  {{- $termLayout := (index . "termlayout") | default "horizontal" -}}
+  {{- if not (in $layouts $termLayout) -}}
+    {{- warnidf "blog-card-termlayout" `blog: params.blog.list.card.termLayout is %q; expected "vertical" or "horizontal". Falling back to "horizontal".` $termLayout -}}
+    {{- $termLayout = "horizontal" -}}
+  {{- end -}}
+
   {{- $card = dict
     "enable" $enable
     "cover" (and $enable (not (eq (index . "cover") false)))
     "readingTime" (and $enable (not (eq (index . "readingtime") false)))
+    "layout" $layout
+    "termLayout" $termLayout
   -}}
 {{- end -}}
 

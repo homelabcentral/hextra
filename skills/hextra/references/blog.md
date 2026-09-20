@@ -31,6 +31,8 @@ Only `title` and `date` really matter; the rest enable features. `hugo new --kin
 
 **The `<!--more-->` marker** splits excerpt from body. Without it Hugo generates a summary from the opening words, which usually reads worse.
 
+**`summary` in front matter** beats both. It is the blurb on the card and in the search index, and it reaches `<meta name="description">` and `og:description` only when the post has no `description` — so a post that sets both can carry a keyword-tight sentence for crawlers and a sharper one for readers. Set only one of the two and both surfaces use it.
+
 **Covers** resolve as a page resource, an asset path, or an absolute URL. For a post with its own images, make it a leaf bundle (`blog/shipping-v2/index.md` with `cover.jpg` beside it) so Hugo can resize the image.
 
 See `frontmatter.md` for `pinned`, `series`, `seriesOrder`, and `seriesOpened`.
@@ -61,9 +63,20 @@ params:
         enable: true
         cover: true
         readingTime: true
+        layout: vertical # vertical | horizontal
+        termLayout: horizontal # vertical | horizontal
 ```
 
 Remove the `card` block for a plain list instead of post cards. `pagerSize` defaults to 10 and also governs tag term pages.
+
+`layout` picks the card used on the blog list, `termLayout` the one used on tag pages. Both take the same two values, and either card works on either page:
+
+| Value        | Card                                                                                           |
+| ------------ | ---------------------------------------------------------------------------------------------- |
+| `vertical`   | Cover above the text, card height follows the content.                                         |
+| `horizontal` | Cover on the inline-start 40%, every card the same height from `sm` up, cover hidden below it. |
+
+The defaults shown above are what the theme has always rendered, so leaving both out changes nothing.
 
 ## The article page
 

@@ -1,12 +1,23 @@
-{{/* A single post card in the blog list.
+{{/* A single post card, in either of two layouts.
 
   The whole card is clickable: the title link is stretched over the card with
   a pseudo-element, so there is still exactly one link to the post and its
   accessible name is the post title. Tag links sit above that overlay and stay
   clickable in their own right.
 
+  The two variants are the same card with a different cover column, and the
+  difference is entirely in `components/blog.css`:
+
+  vertical    cover above the body, height follows the content
+  horizontal  cover on the inline-start 40%, fixed height from `sm` up,
+  cover hidden below it
+
+  Which one a page uses is `params.blog.list.card.layout` for the blog list
+  and `.termLayout` for tag pages, resolved in `blog/config.html`.
+
   @param {page} page The post.
   @param {dict} config The dict returned by `blog/config.html`.
+  @param {string} variant "vertical" or "horizontal". Default "vertical".
 
   @example {{ partial "blog/post-card.html" (dict "page" . "config" $cfg)
 }}
@@ -14,13 +25,17 @@
 {{- $page := .page -}}
 {{- $card := .config.card -}}
 {{- $displayTags := site.Params.blog.list.displayTags -}}
+{{- $horizontal := eq .variant "horizontal" -}}
+
+{{- $cardClass := cond $horizontal "hextra-blog-card hextra-blog-card-h" "hextra-blog-card" -}}
+{{- $coverClass := cond $horizontal "hextra-blog-card-h-cover" "hextra-blog-card-cover" -}}
 
 
-<article class="hextra-blog-card">
+<article class="{{ $cardClass }}">
   {{- if $card.cover -}}
     {{- $cover := partialCached "blog/cover.html" (dict "page" $page "variant" "card") $page.RelPermalink "card" -}}
     {{- if trim $cover " \n\t" -}}
-      <div class="hextra-blog-card-cover">
+      <div class="{{ $coverClass }}">
         {{- $cover | safeHTML -}}
       </div>
     {{- end -}}
@@ -30,6 +45,6 @@
       <a class="hextra-blog-card-link" href="{{ $page.RelPermalink }}">{{ $page.Title }}</a>
     </h2>
     {{- partial "blog/post-meta.html" (dict "page" $page "readingTime" $card.readingTime "tags" $displayTags) -}}
-    <p class="hextra-blog-card-excerpt">{{ partial "utils/page-description" $page }}</p>
+    <p class="hextra-blog-card-excerpt">{{ partial "utils/card-description" $page }}</p>
   </div>
 </article>

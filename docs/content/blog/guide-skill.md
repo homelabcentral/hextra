@@ -1,5 +1,6 @@
 ---
 title: "Guide: Using the Hextra Skill With Coding Agents"
+summary: "Agents guess Hugo's shortcode syntax and the build succeeds anyway. The shipped skill package tells them what this theme accepts."
 date: 2026-09-14
 authors:
   - name: homelabcentral

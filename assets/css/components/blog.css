@@ -220,8 +220,14 @@
   @apply hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
 }
 
+/* Three lines and an ellipsis. The excerpt is whatever
+   `utils/card-description` produces — a `summary` front matter key, then a
+   `description`, then a slice of the post's own prose — so its length is not
+   something the card can rely on. Unbounded, a long one sets the card's
+   height and the list stops scanning as a list. */
 .hextra-blog-card-excerpt {
   @apply hx:mt-3 hx:mb-0 hx:leading-7 hx:text-neutral-600 hx:dark:text-neutral-300;
+  @apply hx:line-clamp-3;
 }
 
 /* Horizontal card variant (tag pages): cover on the inline-start 40%, text
@@ -265,8 +271,10 @@
   @apply hx:line-clamp-2;
 }
 
+/* The clamp itself is on the base rule now; this adds the flex behaviour the
+   fixed-height variant needs on top of it. */
 .hextra-blog-card-h .hextra-blog-card-excerpt {
-  @apply hx:min-h-0 hx:line-clamp-3;
+  @apply hx:min-h-0;
 }
 
 .hextra-blog-meta {

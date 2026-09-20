@@ -1,5 +1,6 @@
 ---
 title: راهنمای نحو Markdown
+summary: "نمونه‌ای از نحو پایهٔ Markdown که فایل‌های محتوای Hugo می‌پذیرند، از عنوان‌ها و فهرست‌ها تا جدول‌ها و کد."
 date: 2020-01-01
 authors:
   - name: imfing

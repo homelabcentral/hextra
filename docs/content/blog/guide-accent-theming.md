@@ -1,5 +1,6 @@
 ---
 title: "Guide: Theming with Accent Colors and Palettes"
+summary: "Hextra's accent is an 11-shade oklch palette, not one hue. Rebrand the whole site by pasting a single CSS file."
 date: 2026-09-08
 authors:
   - name: homelabcentral

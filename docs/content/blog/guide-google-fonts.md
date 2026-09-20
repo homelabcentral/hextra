@@ -1,5 +1,6 @@
 ---
 title: "Guide: Adding Google Fonts to Your Site"
+summary: "Separate fonts for headings, body and code, set entirely in hugo.yaml. No template overrides, no custom CSS, no JavaScript."
 date: 2026-09-08
 authors:
   - name: homelabcentral

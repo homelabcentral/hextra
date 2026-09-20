@@ -1,5 +1,6 @@
 ---
 title: Markdown 语法指南
+summary: "Hugo 内容文件支持的基础 Markdown 语法示例，从标题、列表到表格和代码。"
 date: 2020-01-01
 authors:
   - name: imfing

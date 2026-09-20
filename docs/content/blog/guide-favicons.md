@@ -1,5 +1,6 @@
 ---
 title: "Guide: Favicons with Automatic Dark Mode"
+summary: "Generate the icon set, add a dark-mode favicon that follows the visitor's OS live, and dodge the one caching gotcha."
 date: 2026-09-08
 authors:
   - name: homelabcentral

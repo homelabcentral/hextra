@@ -1,15 +1,24 @@
+/* Resting and hover palette is `.hextra-article-card` in
+   components/article-card.css, deliberately: both are a link rendered as a
+   card, and a docs page can show them a scroll apart. Keep them in step.
+
+   Dark resting fill is the Raised level (`neutral-950`), not `neutral-800`,
+   which is the Chrome level and reads as a panel floating over the page.
+
+   Hover lifts the border to the accent and leaves the fill alone. The old
+   rule moved the fill instead, and its dark half moved it to `neutral-800` -
+   the resting colour - so dark mode had no hover state at all. */
 .hextra-repo-card {
   /* Height follows the content: a card with no description should not pad out
      to a fixed size. Growth is bounded by the clamp on the description. */
   @apply hx:flex hx:flex-col hx:my-4 hx:no-underline hx:overflow-hidden;
   @apply hx:rounded-lg hx:border;
   @apply hx:border-neutral-200 hx:bg-neutral-50;
-  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-800;
+  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-950;
   @apply hx:transition-colors hx:ease-in hx:duration-200;
 
   &:hover {
-    @apply hx:no-underline hx:border-neutral-300 hx:bg-neutral-100;
-    @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-800;
+    @apply hx:no-underline hx:border-hextra-accent-400;
   }
 }
 
@@ -23,7 +32,10 @@
 */
 .hextra-repo-card__thumbnail {
   @apply hx:block hx:w-full hx:shrink-0 hx:sm:w-56;
-  @apply hx:bg-neutral-200 hx:dark:bg-neutral-800;
+  /* The Overlay level, matching `.hextra-article-card__cover`: it is what
+     shows through an avatar or preview that does not fill its column, so it
+     has to read as a surface above the card rather than the Chrome level. */
+  @apply hx:bg-neutral-100 hx:dark:bg-neutral-900;
 
   img {
     @apply hx:block hx:size-full;
@@ -68,6 +80,7 @@
 .hextra-repo-card__title {
   @apply hx:flex hx:items-center hx:gap-2 hx:text-lg hx:font-semibold;
   @apply hx:text-neutral-900 hx:dark:text-neutral-100;
+  @apply hx:transition-colors;
 
   /* A long owner/repo truncates rather than wrapping onto a second line. */
   > span {
@@ -77,6 +90,13 @@
   svg {
     @apply hx:shrink-0;
   }
+}
+
+/* The title takes the accent on hover as well as the border, the same pair as
+   `.hextra-article-card:hover .hextra-article-card__title`. The whole card is
+   one `<a>` and the title a span inside it, so this hangs off the card. */
+.hextra-repo-card:hover .hextra-repo-card__title {
+  @apply hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
 }
 
 /* Clamped, so a long description ends in an ellipsis instead of growing the
