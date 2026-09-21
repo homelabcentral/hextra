@@ -9,7 +9,7 @@
   Config keys are lowercased by Hugo, so presence checks use lowercase names.
 
   @param {page} . The page being rendered.
-  @returns {dict} rail, widgets, card, article
+  @returns {dict} rail, widgets, list, card, article
 
   @example {{ $cfg := partial "blog/config.html" .
 }}
@@ -65,6 +65,28 @@
   {{- $widgets = merge (dict "enable" (not (eq (index $config "enable") false))) $sections -}}
 {{- end -}}
 
+{{/* ---------------------------------------------------------------- list */}}
+{{/* The blog list's own settings, as opposed to the card it renders. These
+  exist here rather than being read straight off `site.Params.blog.list` at the
+  call sites because that is what made a malformed `params.blog` fail the
+  build: `blog/list.html`, `term.html` and `blog/post-card.html` each walked
+  into it themselves, so sanitising it in this partial protected nothing.
+
+  Values are passed through rather than coerced. `sortBy` and `sortOrder` are
+  `utils/sort-pages`' to validate, and `displayTags` is read as a plain
+  truthiness test by its one caller - narrowing either here would change
+  behaviour rather than centralise it.
+*/}}
+{{- $list := dict "sortBy" nil "sortOrder" nil "pagerSize" 10 "displayTags" nil -}}
+{{- with $blog.list -}}
+  {{- $list = dict
+    "sortBy" (index . "sortby")
+    "sortOrder" (index . "sortorder")
+    "pagerSize" (int ((index . "pagersize") | default 10))
+    "displayTags" (index . "displaytags")
+  -}}
+{{- end -}}
+
 {{/* ---------------------------------------------------------------- card */}}
 {{/* `layout` is the blog list, `termLayout` the tag pages. The two cards are
   one partial and are freely interchangeable, so the defaults here are the
@@ -101,6 +123,7 @@
   "cover" false
   "readingTime" false
   "tags" false
+  "displayPagination" true
   "share" (dict "enable" false "links" slice)
   "related" (dict "enable" false "count" 3)
   "series" (dict "enable" false "opened" false)
@@ -137,14 +160,22 @@
       {{- $series = dict "enable" (ne $value false) "opened" false -}}
     {{- end -}}
   {{- end -}}
+  {{/* `displayPagination` uses `default` rather than a comparison because that
+    is what the call site in `blog/single.html` did, and this is a move, not a
+    behaviour change. Worth knowing: Hugo treats `false` as empty, so
+    `displayPagination: false` resolves to `true` here and the switch does not
+    actually work. Fixing that changes rendered output and belongs in its own
+    commit.
+  */}}
   {{- $article = dict
     "cover" (eq (index . "cover") true)
     "readingTime" (eq (index . "readingtime") true)
     "tags" (eq (index . "tags") true)
+    "displayPagination" (default true (index . "displaypagination"))
     "share" $share
     "related" $related
     "series" $series
   -}}
 {{- end -}}
 
-{{- return (dict "rail" $rail "widgets" $widgets "card" $card "article" $article) -}}
+{{- return (dict "rail" $rail "widgets" $widgets "list" $list "card" $card "article" $article) -}}

@@ -76,7 +76,7 @@
           order supersedes `reversePagination`, which orders the same posts by
           date; the store is still set so the pager sees it on the fall-through.
         */}}
-        {{- if (site.Params.blog.article.displayPagination | default true) -}}
+        {{- if $cfg.article.displayPagination -}}
           {{- .Store.Set "reversePagination" (.Params.reversePagination | default true) -}}
           {{- $seriesNav := "" -}}
           {{- if not (or (isset .Params "prev") (isset .Params "next")) -}}

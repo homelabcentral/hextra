@@ -24,7 +24,7 @@
 */}}
 {{- $page := .page -}}
 {{- $card := .config.card -}}
-{{- $displayTags := site.Params.blog.list.displayTags -}}
+{{- $displayTags := .config.list.displayTags -}}
 {{- $horizontal := eq .variant "horizontal" -}}
 
 {{- $cardClass := cond $horizontal "hextra-blog-card hextra-blog-card-h" "hextra-blog-card" -}}

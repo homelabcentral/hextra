@@ -18,7 +18,7 @@
           {{ .Content }}
           {{ partial "custom/content-end.html" . }}
         </div>
-        {{- $paginator := .Paginate .Pages.ByDate.Reverse (site.Params.blog.list.pagerSize | default 10) -}}
+        {{- $paginator := .Paginate .Pages.ByDate.Reverse $cfg.list.pagerSize -}}
         <ul class="hextra-blog-list">
           {{- range $paginator.Pages -}}
             <li>{{ partial "blog/post-card.html" (dict "page" . "config" $cfg "variant" $cfg.card.termLayout) }}</li>
