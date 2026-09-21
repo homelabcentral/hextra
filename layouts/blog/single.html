@@ -1,7 +1,7 @@
 {{ define "main" }}
   {{- $cfg := partial "blog/config.html" . -}}
   {{- $showRail := and $cfg.rail.enable $cfg.rail.onArticle -}}
-  <div class="hx:mx-auto hx:flex hextra-max-page-width">
+  <div class="hextra-blog-page hx:mx-auto hx:flex hextra-max-page-width">
     {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" (not $showRail)) }}{{ if $showRail }}{{ partial "blog/rail.html" (dict "context" . "config" $cfg) }}{{ end }}
     {{ partial "toc.html" . }}
     <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--hextra-navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">

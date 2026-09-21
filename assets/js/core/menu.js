@@ -137,12 +137,15 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // Dismiss on an in-page link, which scrolls behind the open panel
+    // Dismiss on an in-page link, which scrolls behind the open panel.
+    // Guarded on `isOpen`, like the backdrop above: `toggle()` on its own would
+    // *open* a closed panel from a link inside it, which the rail can reach -
+    // its links stay in the document while it is off-canvas.
     panel.querySelectorAll("a").forEach((link) => {
       link.addEventListener("click", () => {
         if (link.getAttribute("href") && link.getAttribute("href").startsWith("#")) {
           // Only dismiss overlay on mobile view
-          if (window.innerWidth < 768) {
+          if (window.innerWidth < 768 && drawer.isOpen()) {
             drawer.toggle();
           }
         }
@@ -169,7 +172,20 @@ document.addEventListener("DOMContentLoaded", function () {
       drawer.syncControlAria();
     });
   syncAria();
-  mobileQuery.addEventListener("change", syncAria);
+
+  // Crossing the breakpoint closes whatever is open before the ARIA is
+  // re-synced. Both panels become ordinary layout above `md` - a column and a
+  // navigation bar - so an open drawer has nothing left to close it: the
+  // backdrop stays over the page, `<body>` keeps `overflow-hidden`, and the
+  // hamburger keeps announcing itself expanded while it is `md:hidden`.
+  // Focus is not restored, since the control it would go back to may itself
+  // have just been hidden by the breakpoint.
+  mobileQuery.addEventListener("change", () => {
+    drawers.forEach((drawer) => {
+      if (drawer.isOpen()) drawer.toggle({ restoreFocus: false });
+    });
+    syncAria();
+  });
 
   // Close on Escape key (mobile only)
   document.addEventListener("keydown", (e) => {

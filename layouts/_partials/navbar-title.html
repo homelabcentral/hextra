@@ -1,15 +1,18 @@
 {{/* The navbar's logo and site title.
 
-  Accepts either the page directly (the long-standing call) or a dict, which is
-  how `navbar.html` passes `railToggle`. Nothing here reads the page - every
-  value comes from `site` - so the argument only decides whether the toggle is
-  wired up.
+  Takes the page, which is the signature it has always had - a site that copied
+  this partial into its own `layouts/` to change the logo keeps working. The
+  rail toggle is resolved here rather than passed in for that reason: handing
+  the partial a dict instead made every such override fail the build on
+  `.Site.Params.navbar.logo.path`, on every page, because Hugo resolves the
+  override and the override has no idea it is being given a map.
 
-  With `railToggle` set, the title also opens the blog identity rail below `md`,
-  where the rail slides in from the inline start: it is a sticky column from
+  Where the page renders the blog identity rail, the title also opens it below
+  `md`, sliding it in from the inline start: the rail is a sticky column from
   `md` up and would otherwise be unreachable on a phone. It stays an ordinary
-  link to the home page above that breakpoint, and with JavaScript off, so
-  nothing is lost if the toggle never binds.
+  link to the home page above that breakpoint, and with JavaScript off - where
+  `blog.css` puts the rail back in the flow rather than off-canvas, so its
+  contents are still reachable.
 
   Only the class and the drawer's accessible name are emitted here; the
   disclosure ARIA - `aria-controls`, `aria-expanded` and the `aria-label` that
@@ -19,14 +22,16 @@
   named the control after the site title on mobile, where activating it opens
   blog navigation rather than going home.
 
-  @param {page} context The page being rendered. May be passed bare. Unused.
-  @param {string} railToggle Non-empty when this page renders the rail.
+  @param {page} . The page being rendered. A dict carrying `context` is also
+  accepted, for callers written against the short-lived dict signature.
 
-  @example {{ partial "navbar-title.html" (dict "context" . "railToggle" (partial "blog/has-rail.html" .))
+  @example {{ partial "navbar-title.html" .
 }}
 */}}
+{{- $page := . -}}
+{{- if reflect.IsMap . -}}{{- $page = .context -}}{{- end -}}
 {{- $railToggle := "" -}}
-{{- if reflect.IsMap . -}}{{- $railToggle = .railToggle -}}{{- end -}}
+{{- with $page -}}{{- $railToggle = partial "blog/has-rail.html" . -}}{{- end -}}
 {{- $logoPath := site.Params.navbar.logo.path | default "images/logo.svg" -}}
 {{- $logoLink := site.Params.navbar.logo.link | default site.Home.RelPermalink -}}
 {{- $logoWidth := site.Params.navbar.logo.width | default "20" -}}
@@ -38,13 +43,19 @@
   `with`. Prettier deletes a significant space that sits beside a template
   action, which here fused the toggle class onto `hx:rtl:ml-auto` and the
   attribute onto the `href` - see the formatting notes in AGENTS.md.
+
+  The label goes through `htmlEscape`, not `%q`. `%q` is Go quoting, which
+  escapes a double quote as `\"` - valid in Go source and meaningless in HTML,
+  so a translation of `blogNavigation` containing one closed the attribute
+  early and spilled the rest into the tag. `safeHTMLAttr` below is what makes
+  that reachable: it is exactly the escaping Hugo would otherwise apply.
 */}}
 {{- $titleClass := "hx:flex hx:items-center hx:hover:opacity-75 hx:ltr:mr-auto hx:rtl:ml-auto" -}}
 {{- $toggleAttrs := "" -}}
 {{- with $railToggle -}}
   {{- $titleClass = printf "%s hextra-blog-rail-toggle" $titleClass -}}
   {{- $label := (T "blogNavigation") | default "Blog navigation" -}}
-  {{- $toggleAttrs = printf ` data-drawer-controls="hextra-blog-rail" data-drawer-label=%q` $label -}}
+  {{- $toggleAttrs = printf ` data-drawer-controls="hextra-blog-rail" data-drawer-label="%s"` (htmlEscape $label) -}}
 {{- end -}}
 
 

@@ -221,6 +221,29 @@ test("opening one drawer does not park focus on the other's control", async ({ p
   // Closing the navigation used to restore focus to its own control, which by
   // then was behind the rail's backdrop - so a tap on the title left the
   // keyboard focus on an element the user could not see.
-  const onHamburger = await page.evaluate((selector) => document.activeElement?.closest(selector) !== null, HAMBURGER);
+  // `Boolean`, not `!== null`: `closest` on an undefined `activeElement`
+  // short-circuits to `undefined`, and `undefined !== null` is true - so the
+  // assertion reported focus parked on the hamburger in exactly the case where
+  // focus was nowhere at all.
+  const onHamburger = await page.evaluate((selector) => Boolean(document.activeElement?.closest(selector)), HAMBURGER);
   expect(onHamburger, "focus was parked on the hamburger, behind the backdrop").toBe(false);
+});
+
+test("crossing the breakpoint closes an open drawer", async ({ page }) => {
+  await gotoBlog(page, 375);
+
+  await page.locator(TOGGLE).click();
+  await expect(page.locator(RAIL)).toHaveClass(/hextra-blog-rail--open/);
+
+  // From `md` up the rail is a permanently visible column and the backdrop is
+  // `md:hidden`, so nothing left on screen can close the drawer. `menu.js` used
+  // to re-sync the ARIA here and nothing else: the open state survived, the
+  // page behind stayed scroll-locked, and the hamburger kept announcing itself
+  // expanded from under `md:hidden`.
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  await expect(page.locator(RAIL)).not.toHaveClass(/hextra-blog-rail--open/);
+  await expect(page.locator(".hextra-blog-rail-backdrop")).toBeHidden();
+  await expect(page.locator("body")).not.toHaveClass(/hx:overflow-hidden/);
+  await expect(page.locator(HAMBURGER)).toHaveAttribute("aria-expanded", "false");
 });

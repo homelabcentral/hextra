@@ -78,6 +78,50 @@
   }
 }
 
+/* The drawer needs a script to open it, so with scripting off it is not a
+   drawer at all - it goes back in the flow. Without this the rail's
+   navigation, socials, tagline and sponsor are simply gone below `md`: the
+   site title stays a plain link to the home page, nothing binds the toggle,
+   and `visibility: hidden` above takes the contents out of the page for
+   assistive tech too. The old `banner` layout of `blog/identity.html` used to
+   cover this case by rendering a cut-down copy inline.
+
+   `scripting: none` reports JavaScript being switched off, not a script that
+   has yet to run, so this cannot flash the static rail before `menu.js` takes
+   over. Browsers that do not know the feature at all (before Chrome 120,
+   Firefox 113, Safari 17) keep the drawer-only behaviour.
+
+   The rail is the first flex item in the page row, so wrapping the row is all
+   it takes to put it full width above the article - which is where it sits in
+   the document. */
+@media not all and (min-width: 48rem) {
+  @media (scripting: none) {
+    .hextra-blog-page {
+      @apply hx:flex-wrap;
+    }
+
+    .hextra-blog-rail {
+      @apply hx:static hx:z-auto hx:w-full hx:pt-0 hx:shadow-none hx:ltr:border-r-0 hx:rtl:border-l-0 hx:border-b;
+      translate: none;
+      visibility: visible;
+      transition: none;
+    }
+
+    /* Same specificity as the off-canvas RTL rule above, and later, so it
+       wins; the unprefixed rule cannot reach it. */
+    [dir="rtl"] .hextra-blog-rail {
+      translate: none;
+    }
+
+    /* In the drawer this pins to the bottom of the viewport. In the flow it
+       would pin to the bottom of the rail's own box, which is a sticky rule
+       with nothing to stick to, plus a fade over the article below it. */
+    .hextra-blog-rail-switches {
+      @apply hx:static hx:shadow-none;
+    }
+  }
+}
+
 /* Sits between the page and the drawer. `hidden` is removed the moment the
    drawer opens, so the fade has something to run on; `menu.js` puts it back
    once the transition has finished. */

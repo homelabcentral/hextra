@@ -8,7 +8,9 @@
   @param {dict} config The dict returned by `blog/config.html`.
   @param {string} layout "rail" (stacked). Kept for call-site symmetry; the
   cut-down "banner" variant was removed when the rail became a mobile drawer
-  (see `blog/rail.html`), since the drawer shows the full stack instead.
+  (see `blog/rail.html`), since the drawer shows the full stack instead. With
+  scripting off the drawer cannot open, so `blog.css` puts the same stack back
+  in the flow under `@media (scripting: none)` rather than rebuilding a banner.
 
   @example {{ partial "blog/identity.html" (dict "context" . "config" $cfg "layout" "rail")
 }}
