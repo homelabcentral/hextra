@@ -1,86 +1,149 @@
-// Hamburger menu for mobile navigation
+// Mobile navigation drawers.
+//
+// Two of them, independent. The hamburger at the inline end drops the site
+// navigation down from the top (`.hextra-sidebar-container`); on blog pages the
+// site title slides the identity rail in from the inline start
+// (`.hextra-blog-rail`), which is a sticky column from `md` up and has nowhere
+// to go below it. Opening either closes the other, since both take the screen.
 
 document.addEventListener("DOMContentLoaded", function () {
-  const menu = document.querySelector(".hextra-hamburger-menu");
-  const sidebarContainer = document.querySelector(".hextra-sidebar-container");
   const mobileQuery = window.matchMedia("(max-width: 767px)");
+  const drawers = [];
 
-  function isMenuOpen() {
-    return menu.querySelector("svg").classList.contains("open");
-  }
+  // `createDrawer` handles the two presentations through `openClass`: the
+  // sidebar toggles the Tailwind transform utilities it has always used, the
+  // rail toggles a single class that `blog.css` turns into the slide.
+  function createDrawer(control, panel, options = {}) {
+    if (!control || !panel) return null;
 
-  // On mobile, the sidebar is off-screen so hide it from assistive tech
-  function syncAriaHidden() {
-    if (mobileQuery.matches) {
-      sidebarContainer.setAttribute("aria-hidden", isMenuOpen() ? "false" : "true");
-    } else {
-      sidebarContainer.removeAttribute("aria-hidden");
+    const { openClass = null, backdrop = null } = options;
+    // The hamburger animates its icon to an X - `navbar.css` keys that off
+    // `svg.open` under `.hextra-hamburger-menu`. The site title has no such
+    // icon, so open state is tracked here rather than read back off the SVG.
+    const icon = control.classList.contains("hextra-hamburger-menu") ? control.querySelector("svg") : null;
+    let open = false;
+    let backdropTimer = null;
+
+    const drawer = {
+      control,
+      panel,
+      isOpen() {
+        return open;
+      },
+      // On mobile the panel is off-screen, so hide it from assistive tech
+      syncAriaHidden() {
+        if (mobileQuery.matches) {
+          panel.setAttribute("aria-hidden", open ? "false" : "true");
+        } else {
+          panel.removeAttribute("aria-hidden");
+        }
+      },
+      toggle(options = {}) {
+        const { focusOnOpen = true } = options;
+
+        // Only one panel at a time: both cover the viewport.
+        if (!open) {
+          drawers.forEach((other) => {
+            if (other !== drawer && other.isOpen()) other.toggle({ focusOnOpen: false });
+          });
+        }
+
+        open = !open;
+        if (icon) icon.classList.toggle("open", open);
+
+        if (openClass) {
+          panel.classList.toggle(openClass, open);
+        } else {
+          panel.classList.toggle("hx:max-md:[transform:translate3d(0,-100%,0)]", !open);
+          panel.classList.toggle("hx:max-md:[transform:translate3d(0,0,0)]", open);
+        }
+
+        if (backdrop) {
+          window.clearTimeout(backdropTimer);
+          if (open) {
+            backdrop.hidden = false;
+            // Unhiding and adding the class in one frame gives the fade nothing
+            // to animate from, so the class waits for the next one.
+            requestAnimationFrame(() => backdrop.classList.add("hextra-blog-rail-backdrop--open"));
+          } else {
+            backdrop.classList.remove("hextra-blog-rail-backdrop--open");
+            backdropTimer = window.setTimeout(() => {
+              backdrop.hidden = true;
+            }, 300);
+          }
+        }
+
+        // While a panel is open, the page behind it must not scroll
+        const anyOpen = drawers.some((entry) => entry.isOpen());
+        document.body.classList.toggle("hx:overflow-hidden", anyOpen);
+        document.body.classList.toggle("hx:md:overflow-auto", anyOpen);
+
+        control.setAttribute("aria-expanded", open ? "true" : "false");
+        drawers.forEach((entry) => entry.syncAriaHidden());
+
+        // Move focus into the panel when opening, restore when closing
+        if (open) {
+          if (focusOnOpen) {
+            const firstFocusable = panel.querySelector('a, button, input, [tabindex="0"]');
+            if (firstFocusable) firstFocusable.focus();
+          }
+        } else {
+          control.focus();
+        }
+      },
+    };
+
+    control.addEventListener("click", (e) => {
+      // The site title is a real link to the home page and stays one from `md`
+      // up, and if scripting never runs. Only the mobile toggle intercepts it.
+      if (control.tagName === "A" && !mobileQuery.matches) return;
+
+      e.preventDefault();
+      // Pointer-initiated clicks on mobile should not force focus into the search input,
+      // which opens the software keyboard immediately.
+      drawer.toggle({ focusOnOpen: e.detail === 0 });
+    });
+
+    if (backdrop) {
+      backdrop.addEventListener("click", () => {
+        if (drawer.isOpen()) drawer.toggle();
+      });
     }
+
+    // Dismiss on an in-page link, which scrolls behind the open panel
+    panel.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        if (link.getAttribute("href") && link.getAttribute("href").startsWith("#")) {
+          // Only dismiss overlay on mobile view
+          if (window.innerWidth < 768) {
+            drawer.toggle();
+          }
+        }
+      });
+    });
+
+    drawers.push(drawer);
+    return drawer;
   }
 
-  // Set initial state
-  syncAriaHidden();
-  mobileQuery.addEventListener("change", syncAriaHidden);
-
-  function toggleMenu(options = {}) {
-    const { focusOnOpen = true } = options;
-
-    // Toggle the hamburger menu
-    menu.querySelector("svg").classList.toggle("open");
-
-    // When the menu is open, we want to show the navigation sidebar
-    sidebarContainer.classList.toggle("hx:max-md:[transform:translate3d(0,-100%,0)]");
-    sidebarContainer.classList.toggle("hx:max-md:[transform:translate3d(0,0,0)]");
-
-    // When the menu is open, we want to prevent the body from scrolling
-    document.body.classList.toggle("hx:overflow-hidden");
-    document.body.classList.toggle("hx:md:overflow-auto");
-
-    // Sync aria-expanded and aria-hidden
-    const isOpen = isMenuOpen();
-    menu.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    syncAriaHidden();
-
-    // Move focus into sidebar when opening, restore when closing
-    if (isOpen) {
-      if (focusOnOpen) {
-        const firstFocusable = sidebarContainer.querySelector('a, button, input, [tabindex="0"]');
-        if (firstFocusable) firstFocusable.focus();
-      }
-    } else {
-      menu.focus();
-    }
-  }
-
-  menu.addEventListener("click", (e) => {
-    e.preventDefault();
-    // Pointer-initiated clicks on mobile should not force focus into the search input,
-    // which opens the software keyboard immediately.
-    toggleMenu({ focusOnOpen: e.detail === 0 });
+  createDrawer(document.querySelector(".hextra-hamburger-menu"), document.querySelector(".hextra-sidebar-container"));
+  createDrawer(document.querySelector(".hextra-blog-rail-toggle"), document.querySelector(".hextra-blog-rail"), {
+    openClass: "hextra-blog-rail--open",
+    backdrop: document.querySelector(".hextra-blog-rail-backdrop"),
   });
 
-  // Close menu on Escape key (mobile only)
+  if (drawers.length === 0) return;
+
+  // Set initial state
+  drawers.forEach((drawer) => drawer.syncAriaHidden());
+  mobileQuery.addEventListener("change", () => drawers.forEach((drawer) => drawer.syncAriaHidden()));
+
+  // Close on Escape key (mobile only)
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     if (document.getElementById("hextra-search-dialog")?.open) return;
-    if (mobileQuery.matches && isMenuOpen()) {
-      toggleMenu();
-    }
-  });
-
-  // Select all anchor tags in the sidebar container
-  const sidebarLinks = sidebarContainer.querySelectorAll("a");
-
-  // Add click event listener to each anchor tag
-  sidebarLinks.forEach((link) => {
-    link.addEventListener("click", (e) => {
-      // Check if the href attribute contains a hash symbol (links to a heading)
-      if (link.getAttribute("href") && link.getAttribute("href").startsWith("#")) {
-        // Only dismiss overlay on mobile view
-        if (window.innerWidth < 768) {
-          toggleMenu();
-        }
-      }
-    });
+    if (!mobileQuery.matches) return;
+    const openDrawer = drawers.find((drawer) => drawer.isOpen());
+    if (openDrawer) openDrawer.toggle();
   });
 });

@@ -8,16 +8,100 @@
 
 /* ------------------------------------------------------------------ rail */
 
+/* Two presentations from one element. From `md` up it is the sticky identity
+   column beside the content; below `md` it is a drawer that slides in from the
+   inline start. The column properties are `md:`-scoped so they stay out of the
+   drawer's way - an unscoped `position`, `width` or `height` would override the
+   off-canvas block below. */
 .hextra-blog-rail {
-  @apply hx:hidden hx:md:flex hx:flex-col hx:w-64 hx:shrink-0 hx:self-start hx:sticky;
-  top: var(--hextra-navbar-height);
-  /* Fixed height (not max-height) so the switch panel pins to the bottom of
-     the viewport like the docs sidebar, whatever the rail content height */
-  height: calc(100vh - var(--hextra-navbar-height));
+  @apply hx:flex hx:flex-col hx:shrink-0 hx:md:w-64 hx:md:self-start hx:md:sticky;
+}
+
+@media (min-width: 48rem) {
+  .hextra-blog-rail {
+    top: var(--hextra-navbar-height);
+    /* Fixed height (not max-height) so the switch panel pins to the bottom of
+       the viewport like the docs sidebar, whatever the rail content height */
+    height: calc(100vh - var(--hextra-navbar-height));
+  }
+}
+
+/* The drawer. It slides along the inline axis rather than dropping from the
+   top the way `.hextra-sidebar-container` does, and stops short of the far edge
+   so the dimmed page stays visible behind it - that strip is what makes it read
+   as a panel over the page rather than a new screen.
+
+   `translate` is a logical property, so a positive X moves toward the inline
+   end in both directions and one rule covers LTR and RTL. The drawer starts
+   fully off-canvas at -100% of its own width.
+
+   `z-15` and `z-14` put the drawer and its backdrop under the navbar at `z-20`,
+   the same place `.hextra-sidebar-container` sits, so the navbar stays on top
+   and the drawer's top padding leaves room for it.
+
+   `visibility` rather than `display` keeps the transition: hidden while closed
+   so nothing inside is focusable or announced, and delayed on the way out so it
+   only applies once the slide has finished. */
+@media (max-width: 48rem) {
+  .hextra-blog-rail {
+    @apply hx:fixed hx:top-0 hx:bottom-0 hx:z-15 hx:overscroll-contain hx:bg-hextra-bg;
+    @apply hx:pt-[calc(var(--hextra-navbar-height)+var(--hextra-banner-height))];
+    @apply hx:border-neutral-300 hx:dark:border-neutral-700 hx:ltr:border-r hx:rtl:border-l;
+    @apply hx:shadow-2xl;
+    inset-inline-start: 0;
+    width: min(20rem, 85vw);
+    translate: -100%;
+    visibility: hidden;
+    transition:
+      translate 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+      visibility 0s linear 0.3s;
+  }
+
+  .hextra-blog-rail.hextra-blog-rail--open {
+    translate: 0;
+    visibility: visible;
+    transition:
+      translate 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+      visibility 0s;
+  }
+}
+
+/* Sits between the page and the drawer. `hidden` is removed the moment the
+   drawer opens, so the fade has something to run on; `menu.js` puts it back
+   once the transition has finished. */
+.hextra-blog-rail-backdrop {
+  @apply hx:fixed hx:inset-0 hx:z-14 hx:bg-neutral-950/40;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hextra-blog-rail-backdrop.hextra-blog-rail-backdrop--open {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hextra-blog-rail,
+  .hextra-blog-rail-backdrop {
+    transition-duration: 0.01ms;
+  }
 }
 
 .hextra-blog-rail-inner {
   @apply hx:flex hx:flex-col hx:grow hx:gap-6 hx:overflow-y-auto hx:overflow-x-hidden hx:px-4 hx:pt-6 hx:pb-8;
+}
+
+/* The drawer is wider than the 16rem column, so the avatar is no longer sized
+   to fit it. Everything else - navigation, socials, sponsor, switches - is the
+   desktop stack unchanged, which is the point of opening it here rather than
+   rebuilding it as a banner. */
+@media (max-width: 48rem) {
+  .hextra-blog-rail .hextra-blog-avatar {
+    @apply hx:h-16 hx:w-16;
+  }
+
+  .hextra-blog-rail-inner {
+    @apply hx:px-6;
+  }
 }
 
 /* Language/theme switches: mirrors the docs sidebar's sticky bottom panel
@@ -86,36 +170,6 @@
 
 .hextra-blog-sponsor-link {
   @apply hx:mt-2 hx:inline-flex hx:items-center hx:gap-1 hx:font-semibold hx:text-hextra-accent-600 hx:hover:underline hx:dark:text-hextra-accent-400 hx:hextra-focus-visible;
-}
-
-/* -------------------------------------------------------- mobile banner */
-
-.hextra-blog-banner {
-  @apply hx:mb-8 hx:flex hx:flex-col hx:gap-4 hx:border-b hx:border-neutral-200 hx:pb-6 hx:md:hidden hx:dark:border-neutral-800;
-}
-
-.hextra-blog-banner .hextra-blog-profile-head {
-  @apply hx:flex-row hx:items-center hx:gap-3;
-}
-
-.hextra-blog-banner .hextra-blog-avatar {
-  @apply hx:h-12 hx:w-12;
-}
-
-.hextra-blog-banner .hextra-blog-tagline {
-  @apply hx:hidden;
-}
-
-.hextra-blog-chips {
-  @apply hx:flex hx:gap-2 hx:overflow-x-auto hx:m-0 hx:p-0 hx:pb-1 hx:list-none;
-}
-
-.hextra-blog-chip {
-  @apply hx:inline-flex hx:items-center hx:gap-1.5 hx:whitespace-nowrap hx:rounded-full hx:border hx:border-neutral-200 hx:px-3 hx:py-1 hx:text-sm hx:text-neutral-600 hx:dark:border-neutral-800 hx:dark:text-neutral-300 hx:hextra-focus-visible;
-}
-
-.hextra-blog-chip[aria-current="page"] {
-  @apply hx:border-hextra-accent-500 hx:font-semibold hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
 }
 
 /* --------------------------------------------------------------- widgets */
