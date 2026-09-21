@@ -1,10 +1,10 @@
 {{/* Whether this page renders the blog identity rail.
 
   The four blog layouts each decide this for themselves - `blog/list.html`,
-  `blog/single.html`, `taxonomy.html` and `term.html` - and the navbar has to
-  reach the same answer before any of them run, so it knows whether to wire the
-  site title up as the rail's toggle. Keeping the condition here means the
-  navbar and the layouts cannot drift apart.
+  `blog/single.html`, `taxonomy.html` and `term.html` - and `navbar-title.html`
+  has to reach the same answer before any of them run, so it knows whether to
+  wire the site title up as the rail's toggle. Keeping the condition here means
+  the navbar and the layouts cannot drift apart.
 
   Returns a non-empty string when the rail renders, and nothing otherwise, so
   the result works directly in an `if` or a `with`.
@@ -17,7 +17,7 @@
 */}}
 {{- $page := . -}}
 {{- $show := false -}}
-{{/* The page kind is checked before the configuration, not after. `navbar.html`
+{{/* The page kind is checked before the configuration, not after. The navbar
   calls this partial for every page in the site, and `blog/config.html` resolves
   the whole `params.blog` tree on each call; a home page, a docs page or a 404
   can never show the rail, so they never need it resolved.

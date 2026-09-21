@@ -1,7 +1,7 @@
 {{ define "main" }}
   {{- $cfg := partial "blog/config.html" . -}}
   {{- $readMore := (T "readMore") | default "Read more →" -}}
-  <div class="hx:mx-auto hx:flex hextra-max-page-width">
+  <div class="hextra-blog-page hx:mx-auto hx:flex hextra-max-page-width">
     {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" (not $cfg.rail.enable)) }}{{ partial "blog/rail.html" (dict "context" . "config" $cfg) }}
     <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--hextra-navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">
       <main id="content" class="hx:w-full hx:min-w-0 hextra-max-content-width hx:px-6 hx:pt-4 hx:md:px-12">
@@ -14,8 +14,8 @@
           {{ .Content }}
           {{ partial "custom/content-end.html" . }}
         </div>
-        {{- $pages := partial "utils/sort-pages" (dict "page" . "by" site.Params.blog.list.sortBy "order" site.Params.blog.list.sortOrder) -}}
-        {{- $pagerSize := site.Params.blog.list.pagerSize | default 10 -}}
+        {{- $pages := partial "utils/sort-pages" (dict "page" . "by" $cfg.list.sortBy "order" $cfg.list.sortOrder) -}}
+        {{- $pagerSize := $cfg.list.pagerSize -}}
         {{- $paginator := .Paginate $pages $pagerSize -}}
         {{- $adSlot := "" -}}
         {{- with (partialCached "ads/config.html" . .RelPermalink) }}{{ $adSlot = index .slots "bloglist" }}{{ end -}}
@@ -36,7 +36,7 @@
           {{- range $i, $post := $paginator.Pages }}
             <div class="hx:mb-10">
               <h3><a style="color: inherit; text-decoration: none;" class="hx:block hx:font-semibold hx:mt-8 hx:text-2xl " href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-              {{ if site.Params.blog.list.displayTags }}
+              {{ if $cfg.list.displayTags }}
                 <div class="hx:text-sm hx:leading-7">
                   {{ partial "tags.html" (dict "context" .) }}
                 </div>

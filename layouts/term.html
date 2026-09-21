@@ -1,7 +1,7 @@
 {{ define "main" }}
   {{- $cfg := partial "blog/config.html" . -}}
   {{- $widgetSection := partial "utils/taxonomy-section.html" . -}}
-  <div class="hx:mx-auto hx:flex hextra-max-page-width">
+  <div class="hextra-blog-page hx:mx-auto hx:flex hextra-max-page-width">
     {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" (not $cfg.rail.enable)) }}{{ partial "blog/rail.html" (dict "context" . "config" $cfg) }}
     <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--hextra-navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">
       <main id="content" class="hx:w-full hx:min-w-0 hextra-max-content-width hx:px-6 hx:pt-4 hx:md:px-12">
@@ -18,7 +18,7 @@
           {{ .Content }}
           {{ partial "custom/content-end.html" . }}
         </div>
-        {{- $paginator := .Paginate .Pages.ByDate.Reverse (site.Params.blog.list.pagerSize | default 10) -}}
+        {{- $paginator := .Paginate .Pages.ByDate.Reverse $cfg.list.pagerSize -}}
         <ul class="hextra-blog-list">
           {{- range $paginator.Pages -}}
             <li>{{ partial "blog/post-card.html" (dict "page" . "config" $cfg "variant" $cfg.card.termLayout) }}</li>

@@ -16,10 +16,11 @@
 
   <nav class="hextra-max-navbar-width hx:mx-auto hx:flex hx:items-center hx:justify-end hx:gap-1 hx:md:gap-2 hx:h-[var(--hextra-navbar-height)] hx:px-6">
     {{/* Below `md` the site title doubles as the blog rail's toggle, sliding
-      it in from the inline start - see `navbar-title.html`. The hamburger at
-      the other end is untouched and keeps opening the site navigation.
+      it in from the inline start - see `navbar-title.html`, which works that
+      out for itself from the page. The hamburger at the other end is untouched
+      and keeps opening the site navigation.
     */}}
-    {{ partial "navbar-title.html" (dict "context" . "railToggle" (partial "blog/has-rail.html" .)) }}
+    {{ partial "navbar-title.html" . }}
 
     {{- $currentPage := . -}}
     {{- range .Site.Menus.main -}}

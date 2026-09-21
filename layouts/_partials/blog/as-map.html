@@ -1,0 +1,25 @@
+{{/* One `params.blog` sub-tree, guaranteed to be a map.
+
+  Every block under `params.blog` is read with `index`, which fails the build
+  on anything that is not a map - and because `navbar.html` reaches
+  `blog/config.html` on every page through `blog/has-rail.html`, that failure
+  takes the home page and the docs down with the blog. The shapes that get
+  written by accident are all plausible shorthand: `list: 10` for the pager
+  size, `rail: true` to turn it on, `recent: 5` for a widget count.
+
+  Warns once per path and returns an empty dict, which is falsy - so the caller
+  can hand the result straight to `with` and keep its defaults.
+
+  @param {any} value The configured value, or nothing.
+  @param {string} name Dotted path below `params`, for the warning.
+  @returns {dict} The value when it is a map, an empty dict otherwise.
+
+  @example {{ $rail := partial "blog/as-map.html" (dict "value" $blog.rail "name" "blog.rail")
+}}
+*/}}
+{{- $value := .value -}}
+{{- if and $value (not (reflect.IsMap $value)) -}}
+  {{- warnidf (printf "blog-params-type-%s" .name) `blog: params.%s is %T; expected a map. Ignoring it.` .name $value -}}
+  {{- $value = dict -}}
+{{- end -}}
+{{- return (or $value dict) -}}

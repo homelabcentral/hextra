@@ -289,7 +289,7 @@ verify: ## Format, regenerate, build and run everything - use before committing
 	@$(MAKE) test
 	@$(OK) "verified - formatted, generated files current, build and suite green"
 
-# The four suites below each carry skill-check for the same reason `test` does:
+# The five suites below each carry skill-check for the same reason `test` does:
 # a stale skill reference is generated-file drift, it fails CI, and running one
 # suite while fixing it is the normal loop - so the warning has to be on the
 # targets people actually iterate with, not only on the slowest one. It costs a
@@ -321,8 +321,19 @@ test-mobile: ## Build, then run mobile menu tests
 	@$(MAKE) build
 	@npm run test:mobile-menu
 
+# The suite that asserts the design system rather than the markup: the surface
+# and border table from AGENTS.md, the rail drawer's breakpoint and direction,
+# the lead's typeface, and the theme swap being atomic. All four are things the
+# a11y sweep structurally cannot see - it runs at one viewport, in one colour
+# scheme, and never interacts with the page.
+.PHONY: test-design
+test-design: ## Build, then run design-system tests (surfaces, rail drawer, lead, theme swap)
+	@$(MAKE) skill-check
+	@$(MAKE) build
+	@npm run test:design
+
 .PHONY: test-build
-test-build: ## Build, then run build-output tests (asciidoc, command, render-link, search)
+test-build: ## Build, then run build-output tests (asciidoc, blog config, command, docs drift, render-link, search)
 	@$(MAKE) skill-check
 	@$(MAKE) build
 	@npm run test:build

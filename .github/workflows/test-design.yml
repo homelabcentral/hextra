@@ -1,0 +1,93 @@
+name: Design System Tests
+
+# The design system, asserted rather than described.
+#
+# The surface and border levels live in a prose table in AGENTS.md, next to a
+# palette of hand-written `dark:` pairs that nothing cross-checks. The
+# accessibility sweep cannot stand in for it: it runs at one viewport, in one
+# colour scheme, never interacts with the page, and has `color-contrast`
+# disabled - so a component drifting onto the wrong surface, a drawer that is
+# unreachable at exactly one width, or a theme swap that animates in two passes
+# are all invisible to it.
+#
+# Its own workflow rather than a step in another, for the same reason
+# test-format.yml is: a failure here means the rendered design moved, which is
+# a different conversation from a broken build or a WCAG violation.
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+# The event is part of the group on purpose: push and pull_request both fire
+# for a same-repo push with an open PR, and they build different commits - the
+# branch head and refs/pull/N/merge. Sharing a group would make them cancel each
+# other, so one of the two commits would go untested.
+concurrency:
+  group: design-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  design:
+    runs-on: ubuntu-latest
+    # Both events run, and they are not redundant: a push builds the branch head,
+    # while a pull_request builds refs/pull/N/merge - the branch merged into the
+    # current main. Only the second catches a change that is green on its own
+    # branch and breaks once main has moved. A guard that skipped pull_request
+    # for same-repo PRs left nothing testing the merge commit, and because a job
+    # skipped by a job-level `if` reports as satisfied, the required check went
+    # green without running.
+    env:
+      HUGO_VERSION: 0.166.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Setup Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: "1.26"
+          cache: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Setup Hugo
+        run: |
+          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
+          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+
+      # The compiled CSS is what these specs read colours out of, and it is a
+      # tracked build artefact. `npm run build` renders the site but does NOT
+      # recompile the stylesheet, so a stale `main.css` would be tested here
+      # rather than the source. test-assets.yml is what guards that it matches;
+      # this job simply uses what is committed, the same as the browser does.
+      - name: Build site
+        run: npm run build
+
+      - name: Run design system tests
+        run: npm run test:design
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: design-report
+          path: playwright-report/
+          retention-days: 14
