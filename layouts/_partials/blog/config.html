@@ -15,21 +15,19 @@
 }}
 */}}
 {{- $page := . -}}
-{{/* Every lookup below walks into `$blog` as a map. A site that sets
-  `blog: true`, or any other scalar, would fail the build on the first of them
-  - and since `navbar.html` reaches this partial through `blog/has-rail.html`,
-  that failure would take every page with it, not only the blog. Warn once and
-  fall back to the everything-disabled configuration.
+{{/* Every block below is walked with `index`, which fails the build on a
+  scalar - and since `navbar.html` reaches this partial through
+  `blog/has-rail.html`, that failure would take every page with it, not only
+  the blog. `blog/as-map.html` warns once per path and hands back an empty
+  dict, so a malformed block disables its own feature and nothing else. Each
+  level needs its own call: guarding `params.blog` alone still left
+  `blog.list: 10` to fail on the first `index` inside it.
 */}}
-{{- $blog := site.Params.blog -}}
-{{- if and $blog (not (reflect.IsMap $blog)) -}}
-  {{- warnidf "blog-params-type" `blog: params.blog is %T; expected a map. Ignoring it.` $blog -}}
-  {{- $blog = dict -}}
-{{- end -}}
+{{- $blog := partial "blog/as-map.html" (dict "value" site.Params.blog "name" "blog") -}}
 
 {{/* ---------------------------------------------------------------- rail */}}
 {{- $rail := dict "enable" false -}}
-{{- with $blog.rail -}}
+{{- with partial "blog/as-map.html" (dict "value" $blog.rail "name" "blog.rail") -}}
   {{- $rail = dict
     "enable" (not (eq (index . "enable") false))
     "onArticle" (eq (index . "onarticle") true)
@@ -49,12 +47,15 @@
 
 {{/* ------------------------------------------------------------- widgets */}}
 {{- $widgets := dict "enable" false -}}
-{{- with $blog.widgets -}}
+{{- with partial "blog/as-map.html" (dict "value" $blog.widgets "name" "blog.widgets") -}}
   {{- $config := . -}}
   {{- $sections := dict -}}
   {{- range $name, $default := (dict "recent" 5 "pinned" 3 "tags" 10) -}}
     {{- $section := dict "enable" false "count" $default -}}
-    {{- with index $config $name -}}
+    {{/* `recent: 5` rather than `recent: { count: 5 }` is the obvious way to
+      write this and the wrong one, so it goes through the guard too.
+    */}}
+    {{- with partial "blog/as-map.html" (dict "value" (index $config $name) "name" (printf "blog.widgets.%s" $name)) -}}
       {{- $section = dict
         "enable" (not (eq (index . "enable") false))
         "count" (int ((index . "count") | default $default))
@@ -77,8 +78,9 @@
   truthiness test by its one caller - narrowing either here would change
   behaviour rather than centralise it.
 */}}
+{{- $listConfig := partial "blog/as-map.html" (dict "value" $blog.list "name" "blog.list") -}}
 {{- $list := dict "sortBy" nil "sortOrder" nil "pagerSize" 10 "displayTags" nil -}}
-{{- with $blog.list -}}
+{{- with $listConfig -}}
   {{- $list = dict
     "sortBy" (index . "sortby")
     "sortOrder" (index . "sortorder")
@@ -91,10 +93,13 @@
 {{/* `layout` is the blog list, `termLayout` the tag pages. The two cards are
   one partial and are freely interchangeable, so the defaults here are the
   only reason each page looks the way it always has.
+
+  Reached through `$listConfig` rather than `$blog.list.card`, so a scalar
+  `blog.list` is a warning above rather than a field lookup on an int here.
 */}}
 {{- $layouts := slice "vertical" "horizontal" -}}
 {{- $card := dict "enable" false "cover" false "readingTime" false "layout" "vertical" "termLayout" "horizontal" -}}
-{{- with $blog.list.card -}}
+{{- with partial "blog/as-map.html" (dict "value" $listConfig.card "name" "blog.list.card") -}}
   {{- $enable := not (eq (index . "enable") false) -}}
 
   {{- $layout := (index . "layout") | default "vertical" -}}
@@ -128,16 +133,17 @@
   "related" (dict "enable" false "count" 3)
   "series" (dict "enable" false "opened" false)
 -}}
-{{- with $blog.article -}}
+{{- with partial "blog/as-map.html" (dict "value" $blog.article "name" "blog.article") -}}
+  {{- $articleConfig := . -}}
   {{- $share := dict "enable" false "links" slice -}}
-  {{- with index . "share" -}}
+  {{- with partial "blog/as-map.html" (dict "value" (index $articleConfig "share") "name" "blog.article.share") -}}
     {{- $share = dict
       "enable" (and (not (eq (index . "enable") false)) (gt (len ((index . "links") | default slice)) 0))
       "links" ((index . "links") | default slice)
     -}}
   {{- end -}}
   {{- $related := dict "enable" false "count" 3 -}}
-  {{- with index . "related" -}}
+  {{- with partial "blog/as-map.html" (dict "value" (index $articleConfig "related") "name" "blog.article.related") -}}
     {{- $related = dict
       "enable" (not (eq (index . "enable") false))
       "count" (int ((index . "count") | default 3))
@@ -146,11 +152,12 @@
   {{/* Presence is the switch, so the check is `isset` rather than `with`:
     `series: {}` and a bare `series:` are empty values that `with` would skip,
     leaving the block an author wrote with no effect. Only an explicit false -
-    either `series: false` or `enable: false` - opts back out.
+    either `series: false` or `enable: false` - opts back out. A scalar is
+    meaningful here, so this one is not routed through `blog/as-map.html`.
   */}}
   {{- $series := dict "enable" false "opened" false -}}
-  {{- if isset . "series" -}}
-    {{- $value := index . "series" -}}
+  {{- if isset $articleConfig "series" -}}
+    {{- $value := index $articleConfig "series" -}}
     {{- if reflect.IsMap $value -}}
       {{- $series = dict
         "enable" (not (eq (index $value "enable") false))
@@ -160,18 +167,16 @@
       {{- $series = dict "enable" (ne $value false) "opened" false -}}
     {{- end -}}
   {{- end -}}
-  {{/* `displayPagination` uses `default` rather than a comparison because that
-    is what the call site in `blog/single.html` did, and this is a move, not a
-    behaviour change. Worth knowing: Hugo treats `false` as empty, so
-    `displayPagination: false` resolves to `true` here and the switch does not
-    actually work. Fixing that changes rendered output and belongs in its own
-    commit.
+  {{/* `displayPagination` is compared against `false` rather than run through
+    `default`, which is what the call site in `blog/single.html` used to do.
+    Hugo treats `false` as empty, so `default true false` is `true` and the
+    documented `displayPagination: false` silently did nothing.
   */}}
   {{- $article = dict
-    "cover" (eq (index . "cover") true)
-    "readingTime" (eq (index . "readingtime") true)
-    "tags" (eq (index . "tags") true)
-    "displayPagination" (default true (index . "displaypagination"))
+    "cover" (eq (index $articleConfig "cover") true)
+    "readingTime" (eq (index $articleConfig "readingtime") true)
+    "tags" (eq (index $articleConfig "tags") true)
+    "displayPagination" (not (eq (index $articleConfig "displaypagination") false))
     "share" $share
     "related" $related
     "series" $series

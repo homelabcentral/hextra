@@ -119,3 +119,86 @@ test("onArticle: false keeps the rail off individual posts", async () => {
     built.dispose();
   }
 });
+
+// A block one level down is just as fatal as a scalar `params.blog`, and the
+// shapes that get written by accident are all plausible shorthand: `list: 10`
+// for the pager size, `rail: true` to switch it on, `recent: 5` for a widget
+// count. Each needs its own guard - the top-level one runs before any of them
+// exists.
+const MALFORMED: ReadonlyArray<{ path: string; params: string }> = [
+  { path: "params.blog.rail", params: "params:\n  blog:\n    rail: true\n" },
+  { path: "params.blog.list", params: "params:\n  blog:\n    list: 10\n" },
+  { path: "params.blog.list.card", params: "params:\n  blog:\n    list:\n      card: true\n" },
+  { path: "params.blog.widgets", params: "params:\n  blog:\n    widgets: 3\n" },
+  { path: "params.blog.widgets.recent", params: "params:\n  blog:\n    widgets:\n      recent: 5\n" },
+  { path: "params.blog.article", params: "params:\n  blog:\n    article: true\n" },
+  { path: "params.blog.article.share", params: "params:\n  blog:\n    article:\n      share: true\n" },
+  { path: "params.blog.article.related", params: "params:\n  blog:\n    article:\n      related: 3\n" },
+];
+
+for (const { path, params } of MALFORMED) {
+  test(`a scalar ${path} warns instead of failing the whole build`, async () => {
+    const built = buildSite(site(params), { throwOnFailure: false });
+    try {
+      expect(built.status, `hugo exited ${built.status}:\n${built.stderr}`).toBe(0);
+      expect(built.output, `${path} was swallowed silently`).toContain(path);
+
+      // The build surviving is the whole point: the navbar resolves this tree
+      // on every page, so a typo here used to take the home page with it.
+      const home = readFileSync(join(built.publishDir, "index.html"), "utf8");
+      expect(home).toContain("hextra-nav-container");
+    } finally {
+      built.dispose();
+    }
+  });
+}
+
+// `displayPagination` was moved into `blog/config.html` as
+// `default true (index . "displaypagination")`. Hugo treats `false` as empty,
+// so `default` handed back `true` and the documented switch did nothing. The
+// two builds below differ only in that key, which is the only way to tell a
+// working switch from a vacuous assertion.
+const TWO_POSTS: SiteFiles = {
+  "content/blog/_index.md": "---\ntitle: Blog\n---\n",
+  "content/blog/first-post.md": "---\ntitle: First Post\ndate: 2026-01-01\n---\n\nBody.\n",
+  "content/blog/second-post.md": "---\ntitle: Second Post\ndate: 2026-01-02\n---\n\nBody.\n",
+};
+
+function pagerSite(value: string): SiteFiles {
+  return {
+    "hugo.yaml": `title: Test\ntheme: hextra\nparams:\n  blog:\n    article:\n      displayPagination: ${value}\n`,
+    "content/_index.md": "---\ntitle: Home\n---\n",
+    ...TWO_POSTS,
+  };
+}
+
+// `components/pager.html` carries no class of its own, so the marker is the
+// sibling post's URL. That appears in the sidebar navigation tree as well, so
+// the assertion has to be scoped to `<main>` - where the only thing that links
+// to another post is the pager, `blog/related.html` and `blog/series.html`
+// being off in this configuration.
+function mainOf(html: string, label: string): string {
+  const opened = html.indexOf("<main");
+  const closed = html.indexOf("</main>", opened);
+  expect(opened, `${label}: no <main> in the rendered page`).toBeGreaterThan(-1);
+  expect(closed, `${label}: unclosed <main> in the rendered page`).toBeGreaterThan(opened);
+  return html.slice(opened, closed);
+}
+
+test("displayPagination: false actually suppresses the article pager", async () => {
+  const on = buildSite(pagerSite("true"));
+  try {
+    const post = readFileSync(join(on.publishDir, "blog", "first-post", "index.html"), "utf8");
+    expect(mainOf(post, "displayPagination: true"), "the pager is missing with displayPagination: true - pick another marker").toContain("/blog/second-post/");
+  } finally {
+    on.dispose();
+  }
+
+  const off = buildSite(pagerSite("false"));
+  try {
+    const post = readFileSync(join(off.publishDir, "blog", "first-post", "index.html"), "utf8");
+    expect(mainOf(post, "displayPagination: false"), "displayPagination: false left the pager on the page").not.toContain("/blog/second-post/");
+  } finally {
+    off.dispose();
+  }
+});
