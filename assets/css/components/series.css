@@ -72,9 +72,11 @@ ol.hextra-series__list {
 }
 
 .hextra-series__item {
-  /* Deliberately lighter than the container's own `neutral-400` edge: this is
-     the dotted rule threading the parts together, not a component edge, and at
-     the container's weight it competed with the border it sits inside. */
+  /* The same `neutral-300`/`neutral-700` pair as the container's own edge, but
+     dotted: this is the rule threading the parts together, not a component
+     edge, and the dashes are what keep it from competing with the border it
+     sits inside. It used to be a step lighter as well, back when containers
+     drew a heavier edge. */
   @apply hx:border-s hx:border-dotted hx:border-neutral-300 hx:dark:border-neutral-700;
   @apply hx:py-1 hx:ps-4 hx:text-sm;
 

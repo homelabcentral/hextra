@@ -16,7 +16,13 @@ document.addEventListener("DOMContentLoaded", function () {
   function createDrawer(control, panel, options = {}) {
     if (!control || !panel) return null;
 
-    const { openClass = null, backdrop = null } = options;
+    const { openClass = null, backdrop = null, ariaOnMobile = false } = options;
+    // `ariaOnMobile` controls are links that only behave as a disclosure below
+    // `md`; above it the panel they name is a permanently visible column and
+    // activating them navigates. Their disclosure ARIA therefore cannot be
+    // emitted at build time - it is added and removed here with the breakpoint.
+    const ariaControls = control.dataset.drawerControls || panel.id || null;
+    const ariaLabel = control.dataset.drawerLabel || null;
     // The hamburger animates its icon to an X - `navbar.css` keys that off
     // `svg.open` under `.hextra-hamburger-menu`. The site title has no such
     // icon, so open state is tracked here rather than read back off the SVG.
@@ -30,6 +36,24 @@ document.addEventListener("DOMContentLoaded", function () {
       isOpen() {
         return open;
       },
+      // The control's own ARIA. A control that is only a disclosure below `md`
+      // drops the whole set above it, so assistive tech announces a plain link
+      // to the home page rather than a collapsed menu that will never open.
+      syncControlAria() {
+        if (ariaOnMobile && !mobileQuery.matches) {
+          control.removeAttribute("aria-controls");
+          control.removeAttribute("aria-expanded");
+          control.removeAttribute("aria-label");
+          return;
+        }
+        if (ariaOnMobile) {
+          if (ariaControls) control.setAttribute("aria-controls", ariaControls);
+          // Renames the control for what it actually does here: the site title
+          // is the wrong name for a button that opens blog navigation.
+          if (ariaLabel) control.setAttribute("aria-label", ariaLabel);
+        }
+        control.setAttribute("aria-expanded", open ? "true" : "false");
+      },
       // On mobile the panel is off-screen, so hide it from assistive tech
       syncAriaHidden() {
         if (mobileQuery.matches) {
@@ -39,12 +63,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       },
       toggle(options = {}) {
-        const { focusOnOpen = true } = options;
+        const { focusOnOpen = true, restoreFocus = true } = options;
 
-        // Only one panel at a time: both cover the viewport.
+        // Only one panel at a time: both cover the viewport. The other drawer
+        // closes without restoring focus to its own control - that control is
+        // now behind a backdrop, and focus belongs with whatever opened this
+        // one.
         if (!open) {
           drawers.forEach((other) => {
-            if (other !== drawer && other.isOpen()) other.toggle({ focusOnOpen: false });
+            if (other !== drawer && other.isOpen()) other.toggle({ restoreFocus: false });
           });
         }
 
@@ -78,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.body.classList.toggle("hx:overflow-hidden", anyOpen);
         document.body.classList.toggle("hx:md:overflow-auto", anyOpen);
 
-        control.setAttribute("aria-expanded", open ? "true" : "false");
+        drawer.syncControlAria();
         drawers.forEach((entry) => entry.syncAriaHidden());
 
         // Move focus into the panel when opening, restore when closing
@@ -87,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const firstFocusable = panel.querySelector('a, button, input, [tabindex="0"]');
             if (firstFocusable) firstFocusable.focus();
           }
-        } else {
+        } else if (restoreFocus) {
           control.focus();
         }
       },
@@ -130,13 +157,19 @@ document.addEventListener("DOMContentLoaded", function () {
   createDrawer(document.querySelector(".hextra-blog-rail-toggle"), document.querySelector(".hextra-blog-rail"), {
     openClass: "hextra-blog-rail--open",
     backdrop: document.querySelector(".hextra-blog-rail-backdrop"),
+    ariaOnMobile: true,
   });
 
   if (drawers.length === 0) return;
 
   // Set initial state
-  drawers.forEach((drawer) => drawer.syncAriaHidden());
-  mobileQuery.addEventListener("change", () => drawers.forEach((drawer) => drawer.syncAriaHidden()));
+  const syncAria = () =>
+    drawers.forEach((drawer) => {
+      drawer.syncAriaHidden();
+      drawer.syncControlAria();
+    });
+  syncAria();
+  mobileQuery.addEventListener("change", syncAria);
 
   // Close on Escape key (mobile only)
   document.addEventListener("keydown", (e) => {

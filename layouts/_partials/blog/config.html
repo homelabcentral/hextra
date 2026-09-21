@@ -15,7 +15,17 @@
 }}
 */}}
 {{- $page := . -}}
+{{/* Every lookup below walks into `$blog` as a map. A site that sets
+  `blog: true`, or any other scalar, would fail the build on the first of them
+  - and since `navbar.html` reaches this partial through `blog/has-rail.html`,
+  that failure would take every page with it, not only the blog. Warn once and
+  fall back to the everything-disabled configuration.
+*/}}
 {{- $blog := site.Params.blog -}}
+{{- if and $blog (not (reflect.IsMap $blog)) -}}
+  {{- warnidf "blog-params-type" `blog: params.blog is %T; expected a map. Ignoring it.` $blog -}}
+  {{- $blog = dict -}}
+{{- end -}}
 
 {{/* ---------------------------------------------------------------- rail */}}
 {{- $rail := dict "enable" false -}}

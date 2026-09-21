@@ -26,7 +26,7 @@ Hextra's blog is a configurable three-column layout: an identity rail on the lef
 | Center     | Post cards (list pages) or the article                                  | `params.blog.list`, `params.blog.article` |
 | Right rail | Recently updated, pinned posts, trending tags                           | `params.blog.widgets`                     |
 
-The rule throughout: defining a block turns a feature on, an explicit `enable: false` turns it back off, and omitting a block means it never renders. Below the `md` breakpoint the rail is hidden and the identity block renders as a banner at the top of the content column instead.
+The rule throughout: defining a block turns a feature on, an explicit `enable: false` turns it back off, and omitting a block means it never renders. Below the `md` breakpoint the rail turns into a drawer rather than disappearing: tapping the site title in the navbar slides the whole column in from the leading edge, and the backdrop, <kbd>Esc</kbd> or any in-page link closes it again. Nothing is dropped on a phone — the tagline, the sponsor card and the switches all come with it.
 
 ## Step 1 — The identity rail
 

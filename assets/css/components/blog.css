@@ -31,9 +31,12 @@
    so the dimmed page stays visible behind it - that strip is what makes it read
    as a panel over the page rather than a new screen.
 
-   `translate` is a logical property, so a positive X moves toward the inline
-   end in both directions and one rule covers LTR and RTL. The drawer starts
-   fully off-canvas at -100% of its own width.
+   `translate` is a physical transform, not a logical one, so the off-canvas
+   direction has to be written per writing mode: -100% of its own width in LTR,
+   +100% in RTL, where `inset-inline-start` resolves to the right edge. The
+   `[dir="rtl"]` form matches what Tailwind's `rtl:` variant compiles to and is
+   supported further back than `:dir()`; it must stay above the `--open` rule,
+   which has the same specificity and has to win.
 
    `z-15` and `z-14` put the drawer and its backdrop under the navbar at `z-20`,
    the same place `.hextra-sidebar-container` sits, so the navbar stays on top
@@ -41,8 +44,13 @@
 
    `visibility` rather than `display` keeps the transition: hidden while closed
    so nothing inside is focusable or announced, and delayed on the way out so it
-   only applies once the slide has finished. */
-@media (max-width: 48rem) {
+   only applies once the slide has finished.
+
+   The query is `not all and (min-width: 48rem)`, which is what `hx:max-md:`
+   compiles to, rather than `max-width: 48rem`, which also matches at exactly
+   48rem where the `md:` utilities and `menu.js` have already switched over -
+   see the note at the top of `sidebar.css`. */
+@media not all and (min-width: 48rem) {
   .hextra-blog-rail {
     @apply hx:fixed hx:top-0 hx:bottom-0 hx:z-15 hx:overscroll-contain hx:bg-hextra-bg;
     @apply hx:pt-[calc(var(--hextra-navbar-height)+var(--hextra-banner-height))];
@@ -55,6 +63,10 @@
     transition:
       translate 0.3s cubic-bezier(0.32, 0.72, 0, 1),
       visibility 0s linear 0.3s;
+  }
+
+  [dir="rtl"] .hextra-blog-rail {
+    translate: 100%;
   }
 
   .hextra-blog-rail.hextra-blog-rail--open {
@@ -79,13 +91,6 @@
   opacity: 1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hextra-blog-rail,
-  .hextra-blog-rail-backdrop {
-    transition-duration: 0.01ms;
-  }
-}
-
 .hextra-blog-rail-inner {
   @apply hx:flex hx:flex-col hx:grow hx:gap-6 hx:overflow-y-auto hx:overflow-x-hidden hx:px-4 hx:pt-6 hx:pb-8;
 }
@@ -94,7 +99,7 @@
    to fit it. Everything else - navigation, socials, sponsor, switches - is the
    desktop stack unchanged, which is the point of opening it here rather than
    rebuilding it as a banner. */
-@media (max-width: 48rem) {
+@media not all and (min-width: 48rem) {
   .hextra-blog-rail .hextra-blog-avatar {
     @apply hx:h-16 hx:w-16;
   }

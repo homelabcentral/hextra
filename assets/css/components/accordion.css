@@ -5,8 +5,10 @@
    `command.css` gives its frame - so a collapsible, a text cover and a card
    all sit on one surface in light mode. It was `neutral-50` (the code block's
    near-white) before that unification. The hover keeps its distance from the
-   resting surface, so it moves down with it. The border is `neutral-400`, also the code block's, so the two
-   draw the same weight of edge. See `series.css`, which matches this. */
+   resting surface, so it moves down with it. The border is the single
+   `neutral-300`/`neutral-700` pair every container in the theme draws, the code
+   block included, so they all read as one weight of edge. See `series.css`,
+   which matches this. */
 .hextra-accordion {
   @apply hx:my-6 hx:overflow-hidden hx:rounded-lg hx:border;
   @apply hx:border-neutral-300 hx:bg-neutral-100;

@@ -16,16 +16,23 @@
 }}
 */}}
 {{- $page := . -}}
-{{- $cfg := partial "blog/config.html" $page -}}
 {{- $show := false -}}
-{{- if $cfg.rail.enable -}}
-  {{- if or (eq $page.Kind "taxonomy") (eq $page.Kind "term") -}}
-    {{- $show = true -}}
-  {{- else if eq $page.Type "blog" -}}
-    {{/* An article only gets the rail when `onArticle` is set; a section
-      listing always does.
-    */}}
-    {{- $show = cond (eq $page.Kind "page") $cfg.rail.onArticle true -}}
+{{/* The page kind is checked before the configuration, not after. `navbar.html`
+  calls this partial for every page in the site, and `blog/config.html` resolves
+  the whole `params.blog` tree on each call; a home page, a docs page or a 404
+  can never show the rail, so they never need it resolved.
+*/}}
+{{- if or (eq $page.Kind "taxonomy") (eq $page.Kind "term") (eq $page.Type "blog") -}}
+  {{- $cfg := partial "blog/config.html" $page -}}
+  {{- if $cfg.rail.enable -}}
+    {{- if or (eq $page.Kind "taxonomy") (eq $page.Kind "term") -}}
+      {{- $show = true -}}
+    {{- else -}}
+      {{/* An article only gets the rail when `onArticle` is set; a section
+        listing always does.
+      */}}
+      {{- $show = cond (eq $page.Kind "page") $cfg.rail.onArticle true -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
 {{- if $show }}true{{ end -}}

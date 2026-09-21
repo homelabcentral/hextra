@@ -341,7 +341,7 @@ params:
         icon: heart
 ```
 
-The rail is hidden below the `md` breakpoint, where the profile, links and socials appear as a banner above the post list instead. To hide it on a single page, set `blog.rail: false` in that page's front matter.
+Below the `md` breakpoint the rail becomes a drawer, opened by tapping the site title in the navbar and closed by the backdrop, <kbd>Esc</kbd> or any in-page link. To hide it on a single page, set `blog.rail: false` in that page's front matter.
 
 ### Blog Widgets
 
