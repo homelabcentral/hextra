@@ -15,7 +15,7 @@ The blog is a configurable three-column layout: a left identity rail, the post l
 | Center     | Post cards (list pages) or the article                                  | `params.blog.list`, `params.blog.article` |
 | Right rail | Recently updated, pinned posts, trending tags                           | `params.blog.widgets`                     |
 
-Every feature is opt-in: defining a block turns it on, an explicit `enable: false` turns it back off. The rail is hidden below the `md` breakpoint, where the identity block renders as a banner at the top of the content column instead.
+Every feature is opt-in: defining a block turns it on, an explicit `enable: false` turns it back off. Below the `md` breakpoint the rail becomes a drawer: it slides in from the leading edge when you tap the site title in the navbar, over a dimmed page, and closes on the backdrop, on <kbd>Esc</kbd>, or on any in-page link. The hamburger at the other end is untouched and still opens the site navigation.
 
 ## Identity rail
 

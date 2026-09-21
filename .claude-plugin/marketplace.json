@@ -11,7 +11,7 @@
       "source": "./",
       "displayName": "Hextra",
       "description": "Author and configure a Hugo site built on the Hextra theme — shortcodes, front matter, hugo.yaml, the blog, and Markdown features.",
-      "version": "0.15.0",
+      "version": "0.16.0",
       "category": "documentation",
       "keywords": [
         "hugo",

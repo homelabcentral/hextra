@@ -1,4 +1,10 @@
-@media (max-width: 48rem) {
+/* `not all and (min-width: 48rem)` rather than `max-width: 48rem`: the latter
+   *includes* 48rem, where Tailwind's `md:` utilities and `menu.js`'s
+   `(max-width: 767px)` query have both already switched to the desktop branch.
+   At exactly 768px that left the drawer positioned as an overlay with nothing
+   to translate it off-canvas. This form is what `hx:max-md:` compiles to, so
+   CSS, utilities and script agree on the boundary. `blog.css` matches. */
+@media not all and (min-width: 48rem) {
   .hextra-sidebar-container {
     @apply hx:fixed hx:pt-[calc(var(--hextra-navbar-height)+var(--hextra-banner-height))] hx:top-0 hx:w-full hx:bottom-0 hx:z-15 hx:overscroll-contain hx:bg-hextra-bg;
     transition: transform 0.4s cubic-bezier(0.52, 0.16, 0.04, 1);

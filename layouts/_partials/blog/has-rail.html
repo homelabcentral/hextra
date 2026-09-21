@@ -1,0 +1,38 @@
+{{/* Whether this page renders the blog identity rail.
+
+  The four blog layouts each decide this for themselves - `blog/list.html`,
+  `blog/single.html`, `taxonomy.html` and `term.html` - and the navbar has to
+  reach the same answer before any of them run, so it knows whether to wire the
+  site title up as the rail's toggle. Keeping the condition here means the
+  navbar and the layouts cannot drift apart.
+
+  Returns a non-empty string when the rail renders, and nothing otherwise, so
+  the result works directly in an `if` or a `with`.
+
+  @param {page} . The page being rendered.
+  @returns {string} "true" when the rail renders, empty otherwise.
+
+  @example {{ $hasRail := partial "blog/has-rail.html" .
+}}
+*/}}
+{{- $page := . -}}
+{{- $show := false -}}
+{{/* The page kind is checked before the configuration, not after. `navbar.html`
+  calls this partial for every page in the site, and `blog/config.html` resolves
+  the whole `params.blog` tree on each call; a home page, a docs page or a 404
+  can never show the rail, so they never need it resolved.
+*/}}
+{{- if or (eq $page.Kind "taxonomy") (eq $page.Kind "term") (eq $page.Type "blog") -}}
+  {{- $cfg := partial "blog/config.html" $page -}}
+  {{- if $cfg.rail.enable -}}
+    {{- if or (eq $page.Kind "taxonomy") (eq $page.Kind "term") -}}
+      {{- $show = true -}}
+    {{- else -}}
+      {{/* An article only gets the rail when `onArticle` is set; a section
+        listing always does.
+      */}}
+      {{- $show = cond (eq $page.Kind "page") $cfg.rail.onArticle true -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- if $show }}true{{ end -}}

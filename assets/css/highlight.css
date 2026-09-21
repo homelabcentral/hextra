@@ -9,15 +9,15 @@
 
   pre {
     /* @apply hx:text-[.9em] hx:bg-neutral-50 hx:overflow-x-auto hx:font-medium hx:subpixel-antialiased hx:dark:bg-neutral-950 hx:contrast-more:border hx:contrast-more:border-hextra-accent-900/20 hx:contrast-more:contrast-150 hx:contrast-more:dark:border-hextra-accent-100/40; */
-    @apply hx:text-[.9em] hx:bg-neutral-50 hx:border hx:border-neutral-400 hx:overflow-x-auto hx:font-medium hx:subpixel-antialiased hx:dark:border hx:dark:border-neutral-700 hx:dark:bg-neutral-950 hx:contrast-more:border hx:contrast-more:border-hextra-accent-900/20 hx:contrast-more:contrast-150 hx:contrast-more:dark:border-hextra-accent-100/40;
+    @apply hx:text-[.9em] hx:bg-neutral-50 hx:border hx:border-neutral-300 hx:overflow-x-auto hx:font-medium hx:subpixel-antialiased hx:dark:border hx:dark:border-neutral-700 hx:dark:bg-neutral-950 hx:contrast-more:border hx:contrast-more:border-hextra-accent-900/20 hx:contrast-more:contrast-150 hx:contrast-more:dark:border-hextra-accent-100/40;
   }
 
   /* .code-border {
-    @apply hx:border-2 hx:dark:border hx:border-neutral-400 hx:dark:border-neutral-700 hx:rounded-xl hx:dark:rounded-xl;
+    @apply hx:border-2 hx:dark:border hx:border-neutral-300 hx:dark:border-neutral-700 hx:rounded-xl hx:dark:rounded-xl;
   } */
 
   .hextra-code-filename {
-    @apply hx:absolute hx:top-0 hx:z-1 hx:w-full hx:flex hx:items-center hx:gap-1.5 hx:rounded-t-lg hx:bg-neutral-200 hx:py-3 hx:px-4 hx:text-xs hx:text-neutral-700 hx:dark:bg-neutral-800 hx:dark:text-neutral-200 hx:border-1  hx:border-neutral-400 hx:dark:border-1 hx:dark:border-neutral-700;
+    @apply hx:absolute hx:top-0 hx:z-1 hx:w-full hx:flex hx:items-center hx:gap-1.5 hx:rounded-t-lg hx:bg-neutral-200 hx:py-3 hx:px-4 hx:text-xs hx:text-neutral-700 hx:dark:bg-neutral-800 hx:dark:text-neutral-200 hx:border-1  hx:border-neutral-300 hx:dark:border-1 hx:dark:border-neutral-700;
   }
 
   /* Pinned to the inline-end of the bar. The copy button drops to top-10 when a
@@ -44,7 +44,7 @@
   }
 
   /* .highlight {
-    @apply hx:border-2 hx:dark:border hx:border-neutral-400 hx:dark:border-neutral-700 hx:rounded-xl hx:dark:rounded-xl;
+    @apply hx:border-2 hx:dark:border hx:border-neutral-300 hx:dark:border-neutral-700 hx:rounded-xl hx:dark:rounded-xl;
   } */
 }
 
@@ -66,7 +66,7 @@
   */
   .lntable {
     @apply hx:m-0 hx:block hx:w-auto hx:overflow-auto hx:rounded-lg;
-    @apply hx:border hx:border-neutral-400 hx:dark:border-neutral-700;
+    @apply hx:border hx:border-neutral-300 hx:dark:border-neutral-700;
 
     pre {
       @apply hx:pt-4 hx:pb-4;
@@ -155,5 +155,5 @@
   and the code cell's, which is the theme's original look.
 */
 .hextra-lineno-divider .chroma .lntd:first-child {
-  @apply hx:border-e hx:border-neutral-400 hx:dark:border-neutral-700;
+  @apply hx:border-e hx:border-neutral-300 hx:dark:border-neutral-700;
 }

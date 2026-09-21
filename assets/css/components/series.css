@@ -8,16 +8,16 @@
      image, so it needs a bottom margin only. */
   @apply hx:mt-0 hx:mb-6 hx:overflow-hidden hx:rounded-lg hx:border;
   /* Same surface, border and hover colours as the `details` shortcode and the
-     accordion, so every collapsible in the theme reads as one family: the
-     near-white `neutral-50` a code block uses in light mode, and `neutral-900`
+     accordion, so every collapsible in the theme reads as one family:
+     `neutral-100`, the Overlay level shared with `command.css`, and `neutral-900`
      in dark - one step above the page at `#111111`, so it reads as raised
      without competing with a code block at `neutral-950`. */
-  @apply hx:border-neutral-400 hx:bg-neutral-50;
-  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
+  @apply hx:border-neutral-300 hx:bg-neutral-100;
+  @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-900;
   /* The edge lifts with the fill on hover, the way Nextra's cards do. Without
      it the border and the hovered surface converge and the outline vanishes
      for exactly as long as the pointer is on it. */
-  @apply hx:transition-colors hx:hover:border-neutral-500 hx:dark:hover:border-neutral-700;
+  @apply hx:transition-colors hx:hover:border-neutral-500 hx:dark:hover:border-neutral-600;
 }
 
 .hextra-series__summary {
@@ -56,7 +56,7 @@
 
 .hextra-series__intro {
   /* neutral-500 is the theme's usual muted text, but on this module's
-     `neutral-50` it sits right on the 4.5:1 AA floor for 14px normal-weight
+     `neutral-100` it sits right on the 4.5:1 AA floor for 14px normal-weight
      text, with nothing left over for the summary's own hover surface.
      neutral-600 has real headroom and is already what the sibling links use.
      (The original figures here were measured against the pre-unification
@@ -72,9 +72,11 @@ ol.hextra-series__list {
 }
 
 .hextra-series__item {
-  /* Deliberately lighter than the container's own `neutral-400` edge: this is
-     the dotted rule threading the parts together, not a component edge, and at
-     the container's weight it competed with the border it sits inside. */
+  /* The same `neutral-300`/`neutral-700` pair as the container's own edge, but
+     dotted: this is the rule threading the parts together, not a component
+     edge, and the dashes are what keep it from competing with the border it
+     sits inside. It used to be a step lighter as well, back when containers
+     drew a heavier edge. */
   @apply hx:border-s hx:border-dotted hx:border-neutral-300 hx:dark:border-neutral-700;
   @apply hx:py-1 hx:ps-4 hx:text-sm;
 
@@ -122,7 +124,7 @@ ol.hextra-series__list {
 /* Mirrors components/pager.html, which this replaces on posts in a series. */
 .hextra-series-nav {
   @apply hx:mb-8 hx:flex hx:items-center hx:border-t hx:pt-8;
-  @apply hx:border-neutral-200 hx:dark:border-neutral-800;
+  @apply hx:border-neutral-200 hx:dark:border-neutral-700;
   @apply hx:contrast-more:border-neutral-400 hx:dark:contrast-more:border-neutral-400;
   @apply hx:print:hidden;
 }

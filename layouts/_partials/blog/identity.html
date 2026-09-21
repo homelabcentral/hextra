@@ -6,19 +6,20 @@
 
   @param {page} context The page being rendered.
   @param {dict} config The dict returned by `blog/config.html`.
-  @param {string} layout "rail" (stacked, default) or "banner" (mobile, inline).
+  @param {string} layout "rail" (stacked). Kept for call-site symmetry; the
+  cut-down "banner" variant was removed when the rail became a mobile drawer
+  (see `blog/rail.html`), since the drawer shows the full stack instead.
 
-  @example {{ partial "blog/identity.html" (dict "context" . "config" $cfg "layout" "banner")
+  @example {{ partial "blog/identity.html" (dict "context" . "config" $cfg "layout" "rail")
 }}
 */ -}}
 {{- $context := .context -}}
 {{- $rail := .config.rail -}}
-{{- $banner := eq (.layout | default "rail") "banner" -}}
 {{- $menu := partial "blog/menu.html" (dict "context" $context) -}}
 {{- $socialLinksLabel := (T "socialLinks") | default "Social links" -}}
 
 
-<div class="{{ cond $banner "hextra-blog-banner" "hextra-blog-profile" }}">
+<div class="hextra-blog-profile">
   {{- with $rail.profile -}}
     <div class="hextra-blog-profile-head">
       {{- with .avatar -}}
@@ -52,11 +53,11 @@
   {{- end -}}
 
   {{- with $menu.nav -}}
-    <ul class="{{ cond $banner "hextra-blog-chips" "hextra-blog-nav" }}">
+    <ul class="hextra-blog-nav">
       {{- range . -}}
         <li>
           <a
-            class="{{ cond $banner "hextra-blog-chip" "hextra-blog-nav-link" }}"
+            class="hextra-blog-nav-link"
             href="{{ .link }}"
             {{ if .active }}aria-current="page"{{ end }}
             {{ if .external }}target="_blank" rel="{{ .rel }}"{{ end }}
@@ -92,7 +93,5 @@
     </ul>
   {{- end -}}
 
-  {{- if not $banner -}}
-    {{- partial "blog/sponsor.html" (dict "config" .config) -}}
-  {{- end -}}
+  {{- partial "blog/sponsor.html" (dict "config" .config) -}}
 </div>

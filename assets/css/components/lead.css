@@ -1,7 +1,23 @@
 .hextra-lead {
-  @apply hx:my-6 hx:text-lg hx:leading-relaxed hx:text-neutral-600 hx:dark:text-neutral-300;
-  @apply hx:ltr:border-l-2 hx:rtl:border-r-2 hx:border-hextra-accent-500 hx:dark:border-hextra-accent-600;
+  @apply hx:my-6 hx:text-lg hx:leading-relaxed hx:tracking-tight hx:text-neutral-600 hx:dark:text-neutral-300;
+  @apply hx:ltr:border-l-4 hx:rtl:border-r-4 hx:border-hextra-accent-500 hx:dark:border-hextra-accent-600;
   @apply hx:ltr:pl-4 hx:rtl:pr-4;
+
+  /* A lead is a standfirst, so it takes the display face rather than the body
+     one - the same convention a newspaper intro follows. Set raw because no
+     `hx:` utility maps to `--font-heading`; the token still resolves to
+     whatever `params.fonts.heading` names. Weight stays inherited, so the
+     contrast is the typeface, not bolding.
+
+     The children are named explicitly because `typography.css` sets
+     `font-family` on `.content :where(p, a, li, blockquote)` directly, and a
+     declaration on the element beats one inherited from an ancestor whatever
+     the specificity. Both selectors weigh (0,1,0), so this one wins on source
+     order - `lead.css` is imported after `typography.css` in `styles.css`. */
+  &,
+  :where(p, a, li, blockquote) {
+    font-family: var(--font-heading);
+  }
 
   > :first-child {
     @apply hx:mt-0;

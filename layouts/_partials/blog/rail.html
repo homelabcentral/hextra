@@ -6,8 +6,18 @@
   singular `querySelector('.hextra-sidebar-container')`, so this rail must never
   carry that class, and must be emitted after the sidebar partial.
 
-  Hidden below the `md` breakpoint, where `blog/identity.html` renders as a
-  banner at the top of the content column instead.
+  Below `md` it slides in from the inline start as a drawer, opened by the
+  navbar's site title (`navbar-title.html` adds `hextra-blog-rail-toggle` where
+  the rail renders). That is deliberately not the hamburger at the other end,
+  which keeps opening the site navigation: the two hold different things and
+  both are wanted on a phone. `menu.js` drives them as two independent drawers
+  and closes one when the other opens.
+
+  The rail must not carry `hextra-sidebar-container`; that class is the docs
+  sidebar's, and `menu.js` binds it to the navigation hamburger.
+
+  Opening the full column here replaced the old `banner` layout of
+  `blog/identity.html`, which dropped the tagline and the sponsor outright.
 
   @param {page} context The page being rendered.
   @param {dict} config The dict returned by `blog/config.html`.
@@ -19,7 +29,11 @@
   {{- $context := .context -}}
   {{- $blogNavigation := (T "blogNavigation") | default "Blog navigation" -}}
   {{- $displayThemeToggle := (site.Params.theme.displayToggle | default true) -}}
-  <aside class="hextra-blog-rail hx:print:hidden" aria-label="{{ $blogNavigation }}">
+  {{/* Dims the page behind the open drawer and closes it when tapped. Inert
+  and invisible until then, and never rendered from `md` up, where the rail is
+  a column in the layout rather than an overlay. */}}
+  <div class="hextra-blog-rail-backdrop hx:md:hidden hx:print:hidden" hidden></div>
+  <aside id="hextra-blog-rail" class="hextra-blog-rail hx:print:hidden" aria-label="{{ $blogNavigation }}">
     <div class="hextra-scrollbar hextra-blog-rail-inner">
       {{- partial "blog/identity.html" (dict "context" $context "config" .config "layout" "rail") -}}
     </div>

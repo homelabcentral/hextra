@@ -1,17 +1,60 @@
-{{- $logoPath := .Site.Params.navbar.logo.path | default "images/logo.svg" -}}
-{{- $logoLink := .Site.Params.navbar.logo.link | default .Site.Home.RelPermalink -}}
-{{- $logoWidth := .Site.Params.navbar.logo.width | default "20" -}}
-{{- $logoHeight := .Site.Params.navbar.logo.height | default "20" -}}
-{{- $logoDarkPath := .Site.Params.navbar.logo.dark | default $logoPath -}}
+{{/* The navbar's logo and site title.
+
+  Accepts either the page directly (the long-standing call) or a dict, which is
+  how `navbar.html` passes `railToggle`. Nothing here reads the page - every
+  value comes from `site` - so the argument only decides whether the toggle is
+  wired up.
+
+  With `railToggle` set, the title also opens the blog identity rail below `md`,
+  where the rail slides in from the inline start: it is a sticky column from
+  `md` up and would otherwise be unreachable on a phone. It stays an ordinary
+  link to the home page above that breakpoint, and with JavaScript off, so
+  nothing is lost if the toggle never binds.
+
+  Only the class and the drawer's accessible name are emitted here; the
+  disclosure ARIA - `aria-controls`, `aria-expanded` and the `aria-label` that
+  renames the control - is applied by `menu.js` and only below `md`. Baking it
+  into the markup announced a collapsed disclosure on desktop, where the rail
+  is a permanently visible column and the control does not toggle anything, and
+  named the control after the site title on mobile, where activating it opens
+  blog navigation rather than going home.
+
+  @param {page} context The page being rendered. May be passed bare. Unused.
+  @param {string} railToggle Non-empty when this page renders the rail.
+
+  @example {{ partial "navbar-title.html" (dict "context" . "railToggle" (partial "blog/has-rail.html" .))
+}}
+*/}}
+{{- $railToggle := "" -}}
+{{- if reflect.IsMap . -}}{{- $railToggle = .railToggle -}}{{- end -}}
+{{- $logoPath := site.Params.navbar.logo.path | default "images/logo.svg" -}}
+{{- $logoLink := site.Params.navbar.logo.link | default site.Home.RelPermalink -}}
+{{- $logoWidth := site.Params.navbar.logo.width | default "20" -}}
+{{- $logoHeight := site.Params.navbar.logo.height | default "20" -}}
+{{- $logoDarkPath := site.Params.navbar.logo.dark | default $logoPath -}}
+
+{{/* Both the extra class and the data attribute are built as strings, with
+  their leading spaces inside the quotes, rather than written inline next to a
+  `with`. Prettier deletes a significant space that sits beside a template
+  action, which here fused the toggle class onto `hx:rtl:ml-auto` and the
+  attribute onto the `href` - see the formatting notes in AGENTS.md.
+*/}}
+{{- $titleClass := "hx:flex hx:items-center hx:hover:opacity-75 hx:ltr:mr-auto hx:rtl:ml-auto" -}}
+{{- $toggleAttrs := "" -}}
+{{- with $railToggle -}}
+  {{- $titleClass = printf "%s hextra-blog-rail-toggle" $titleClass -}}
+  {{- $label := (T "blogNavigation") | default "Blog navigation" -}}
+  {{- $toggleAttrs = printf ` data-drawer-controls="hextra-blog-rail" data-drawer-label=%q` $label -}}
+{{- end -}}
 
 
-<a class="hx:flex hx:items-center hx:hover:opacity-75 hx:ltr:mr-auto hx:rtl:ml-auto" href="{{ $logoLink }}">
-  {{- $displayTitle := (.Site.Params.navbar.displayTitle | default true) }}
-  {{- if (.Site.Params.navbar.displayLogo | default true) }}
-    <img class="hx:mr-2 hx:block hx:dark:hidden" src="{{ $logoPath | relURL }}" alt="{{ cond $displayTitle `Logo` .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
-    <img class="hx:mr-2 hx:hidden hx:dark:block" src="{{ $logoDarkPath | relURL }}" alt="{{ cond $displayTitle `Dark Logo` .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+<a class="{{ $titleClass }}" href="{{ $logoLink }}" {{ $toggleAttrs | safeHTMLAttr }}>
+  {{- $displayTitle := (site.Params.navbar.displayTitle | default true) }}
+  {{- if (site.Params.navbar.displayLogo | default true) }}
+    <img class="hx:mr-2 hx:block hx:dark:hidden" src="{{ $logoPath | relURL }}" alt="{{ cond $displayTitle `Logo` site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+    <img class="hx:mr-2 hx:hidden hx:dark:block" src="{{ $logoDarkPath | relURL }}" alt="{{ cond $displayTitle `Dark Logo` site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
   {{- end }}
   {{- if $displayTitle }}
-    <span class="hx:mr-2 hx:font-extrabold hx:inline hx:select-none">{{- .Site.Title -}}</span>
+    <span class="hx:mr-2 hx:font-extrabold hx:inline hx:select-none">{{- site.Title -}}</span>
   {{- end }}
 </a>
