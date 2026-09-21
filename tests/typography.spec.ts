@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { formatColor, resolveColor } from "./helpers/color";
 
 // The lead - a standfirst, so it takes the display face rather than the body
 // one. Two things make that fragile enough to be worth a test.
@@ -56,6 +57,10 @@ test("the lead draws a 4px rule on the inline start", async ({ page }) => {
   // `border-left-width` so this keeps working if that changes.
   await expect(lead).toHaveCSS("border-inline-start-width", "4px");
 
-  const color = await lead.evaluate((el) => getComputedStyle(el).borderInlineStartColor);
-  expect(color, "the rule is transparent, so its width is meaningless").not.toMatch(/(^|,\s*)0\s*\)$/);
+  // Resolved through the canvas rather than pattern-matched on the computed
+  // string. The palette is authored in `oklch()`, so a transparent accent
+  // serialises as `oklch(... / 0)` and never matches an `rgba(..., 0)` regex -
+  // the guard passed vacuously for exactly the failure it is written to catch.
+  const color = await resolveColor(lead, "border-inline-start-color");
+  expect(color[3], `the rule is ${formatColor(color)}, so its width is meaningless`).toBeGreaterThan(0);
 });

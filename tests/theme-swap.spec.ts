@@ -35,7 +35,11 @@ test("the theme class is applied with transitions suppressed", async ({ page }) 
     // Any element that actually animates a colour. Picked at runtime rather
     // than named, so the test does not quietly stop covering anything when a
     // component drops `transition-colors`.
-    const sample = Array.from(document.querySelectorAll<HTMLElement>("*")).find((el) => {
+    //
+    // Typed `Element`, not `HTMLElement`: the sweep is over `*`, so an SVG can
+    // win it, and `className` on an `SVGElement` is an `SVGAnimatedString`
+    // rather than a string. Reading `classList.value` works on both.
+    const sample = Array.from(document.querySelectorAll("*")).find((el) => {
       const style = getComputedStyle(el);
       return style.transitionDuration !== "0s" && /color/.test(style.transitionProperty);
     });
@@ -43,7 +47,7 @@ test("the theme class is applied with transitions suppressed", async ({ page }) 
 
     const samples: unknown[] = [];
     (window as unknown as { __themeSamples: unknown[] }).__themeSamples = samples;
-    (window as unknown as { __sampleTag: string }).__sampleTag = `${sample.tagName.toLowerCase()}.${sample.className}`;
+    (window as unknown as { __sampleTag: string }).__sampleTag = `${sample.tagName.toLowerCase()}.${sample.classList.value}`;
 
     new MutationObserver(() => {
       samples.push({
@@ -106,7 +110,7 @@ test("the suppression class does not outlive the swap", async ({ page }) => {
   await expect(page.locator("html")).not.toHaveClass(/hextra-theme-switching/);
 
   const duration = await page.evaluate(() => {
-    const sample = Array.from(document.querySelectorAll<HTMLElement>("*")).find((el) => /color/.test(getComputedStyle(el).transitionProperty) && el.className.includes("transition"));
+    const sample = Array.from(document.querySelectorAll("*")).find((el) => /color/.test(getComputedStyle(el).transitionProperty) && el.classList.value.includes("transition"));
     return sample ? getComputedStyle(sample).transitionDuration : null;
   });
   expect(duration, "transitions are still suppressed after the swap").not.toBe("0s");
