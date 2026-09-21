@@ -9,6 +9,7 @@
     "test": "npx playwright test",
     "test:a11y": "npx playwright test tests/accessibility.spec.ts",
     "test:mobile-menu": "npx playwright test tests/mobile-menu.spec.ts",
+    "test:design": "npx playwright test tests/blog-rail.spec.ts tests/surfaces.spec.ts tests/typography.spec.ts tests/theme-swap.spec.ts",
     "test:build": "npx playwright test tests/asciidoc.spec.ts tests/blog-config.spec.ts tests/command-block.spec.ts tests/docs-drift.spec.ts tests/katex.spec.ts tests/render-link.spec.ts tests/search-data.spec.ts tests/search-fragments.spec.ts",
     "changelog": "node scripts/changelog.mjs --version $(cat VERSION)",
     "vendor:icons": "node scripts/vendor-codeblock-icons.mjs",

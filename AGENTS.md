@@ -416,6 +416,16 @@ drift apart one edit at a time.
 **Contrast is a gate, not a nicety.** `make test-a11y` enforces WCAG AA, and
 accent-on-surface is where it fails. Verify in both modes before assuming.
 
+**The table above is a test, not only a convention.** `make test-design` reads
+every component's resolved `background-color` and `border-color` in both modes
+and compares them to the named token — so a surface that drifts one ramp stop,
+a border that reverts to an older pair, or two levels that collapse into one
+fail there rather than at review. Add a new container to `SURFACES` in
+`tests/surfaces.spec.ts` when you add one to this table. Note what that suite
+exists to cover that `test-a11y` cannot: the sweep runs at a single viewport,
+in light mode only, never interacts with the page, and has `color-contrast`
+disabled.
+
 **Two traps, both hit in anger:**
 
 - Hugo's `highlight` returns `<div class="highlight">`. A `<div>` inside a
@@ -541,9 +551,11 @@ that skips them is a change that has to be redone.
 - **Never commit to `main` directly, and never merge into it locally.** Land
   every change through a pull request, even a one-line one, even when working
   alone.
-- This is not ceremony. `test-build.yml`, `test-accessibility.yml` and
-  `test-mobile-menu.yml` all trigger on `pull_request` only — pushing straight
-  to `main` runs _none_ of them, including the `build-skill --check` gate.
+- This is not ceremony. `test-build.yml`, `test-accessibility.yml`,
+  `test-design.yml`, `test-mobile-menu.yml`, `test-format.yml` and
+  `test-assets.yml` all trigger on `pull_request` — pushing straight to `main`
+  runs none of them against the merge commit, including the
+  `build-skill --check` gate.
 - Stack branches when a change genuinely depends on an unmerged one, and say so
   in the PR. Otherwise branch from `main`.
 - `make pr TITLE="..."` opens the PR and refuses the four states that make `gh`
@@ -591,7 +603,8 @@ individual targets are still there when you want one of them on its own:
 make fmt-check   # formatting, without writing
 make skill-check # generated skill files are current
 make test        # the two checks above, then Playwright: build output,
-                 # mobile menu, WCAG AA
+                 # mobile menu, WCAG AA, design system
+make test-design # surfaces and borders, the rail drawer, the lead, theme swap
 make build       # production build of docs/
 ```
 
@@ -605,6 +618,14 @@ make build       # production build of docs/
   changed.
 - Accessibility is WCAG 2.2 AA and enforced by `make test-a11y`. Its budget
   scales with the sitemap; a timeout there is a slow test, not a violation.
+- **Know what the sweep does not cover.** `accessibility.spec.ts` walks every
+  English page, but at Playwright's default 1280x720, in light mode, without
+  interacting — and with `color-contrast` and `target-size` disabled. Nothing
+  below `md`, nothing in dark, nothing behind a click and no contrast figure
+  reaches it. Components that need any of those get a direct test:
+  `test-design` for surfaces and the rail drawer, and the context-menu and TOC
+  blocks inside `accessibility.spec.ts` for contrast, which re-enable the rule
+  for their own subtree.
 
 ### Formatting
 
