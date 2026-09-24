@@ -174,7 +174,7 @@
     "scope": "markdown",
     "prefix": "hxbadge",
     "body": [
-      "{{< badge content=\"${1:Badge}\" color=\"${2|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" size=\"${3|xs,sm,md,lg,xl|}\" icon=\"${4:sparkles}\" >}}"
+      "{{< badge content=\"${1:Badge}\" color=\"${2|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" size=\"${3|md,xs,sm,lg,xl|}\" icon=\"${4:sparkles}\" >}}"
     ],
     "description": "Badge. size is xs/sm/md/lg/xl, md being the default. The old type= names (default/tip/info/warning/error/important) still map onto colors."
   },
@@ -190,7 +190,7 @@
     "scope": "markdown",
     "prefix": "hxbadge-link",
     "body": [
-      "{{< badge content=\"${1:Badge}\" color=\"${2|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" size=\"${3|xs,sm,md,lg,xl|}\" link=\"${4:https://example.com}\" border=${5|true,false|} >}}"
+      "{{< badge content=\"${1:Badge}\" color=\"${2|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" size=\"${3|md,xs,sm,lg,xl|}\" link=\"${4:https://example.com}\" border=${5|true,false|} >}}"
     ],
     "description": "Badge wrapped in a link (opens in a new tab)."
   },

@@ -101,11 +101,11 @@ A shortcode to create a badge.
 Positional: The content of the badge.
 
 ```markdown
-{{< badge content="Badge" color="gray" size="xs" icon="sparkles" >}}
+{{< badge content="Badge" color="gray" size="md" icon="sparkles" >}}
 
 {{< badge "Badge" >}}
 
-{{< badge content="Badge" color="gray" size="xs" link="https://example.com" border=true >}}
+{{< badge content="Badge" color="gray" size="md" link="https://example.com" border=true >}}
 ```
 
 ### stats
