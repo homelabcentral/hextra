@@ -57,86 +57,86 @@ Five shortcodes use percent delimiters so their inner content is rendered as Mar
 
 ### Shortcodes
 
-| Prefix                  | What it inserts                                            |
-| ----------------------- | ---------------------------------------------------------- |
-| `hxcallout`             | Callout box; type picks the color and default icon         |
-| `hxcallout-emoji`       | Callout with a custom emoji                                |
-| `hxcallout-icon`        | Callout with an explicit icon name                         |
-| `hxcards`               | Card grid container with two cards                         |
-| `hxcard`                | Single card — link, title, icon, subtitle                  |
-| `hxcard-tag`            | Card with a badge tag — `tagColor`, `tagIcon`, `tagBorder` |
-| `hxcard-image`          | Image card — `method`/`options` feed Hugo image processing |
-| `hxtabs`                | Tabbed interface with two tabs                             |
-| `hxtab`                 | One tab — `name`, `icon`, `selected`                       |
-| `hxsteps`               | Numbered step list with h3 headings                        |
-| `hxdetails`             | Collapsible block                                          |
-| `hxfiletree`            | File tree with a folder and a file                         |
-| `hxfiletree-folder`     | Folder node                                                |
-| `hxfiletree-file`       | File node                                                  |
-| `hxgallery`             | Gallery container with two items                           |
-| `hxgallery-item`        | Local gallery image                                        |
-| `hxgallery-item-remote` | Remote gallery image, with the required `width`/`height`   |
-| `hxbadge`               | Badge — content, color, icon                               |
-| `hxbadge-inline`        | Badge, positional short form                               |
-| `hxbadge-link`          | Badge wrapped in a link                                    |
-| `hxicon`                | Built-in SVG icon                                          |
-| `hxicon-remote`         | Remote icon — `lucide:` / `tabler:` / `simple:`            |
-| `hxjupyter`             | Jupyter notebook embed                                     |
-| `hxpdf`                 | PDF embed                                                  |
-| `hxasciinema`           | Asciinema recording with playback options                  |
-| `hxterm`                | Glossary term                                              |
-| `hxinclude`             | Inline another page's content                              |
-| `hxaccordion`           | Accordion container with two sections                      |
-| `hxaccordion-item`      | One accordion section                                      |
-| `hxarticle`             | Card for another page — title, summary, cover              |
-| `hxbutton`              | Link styled as a button, via `href`                        |
-| `hxbutton-page`         | Button linking to an internal page via `pageRef`           |
-| `hxcta`                 | Call-to-action button                                      |
-| `hxlead`                | Lead paragraph                                             |
-| `hxborderless`          | Reference table without cell borders                       |
-| `hxkeywords`            | Keyword pill container with two keywords                   |
-| `hxkeyword`             | One keyword pill                                           |
-| `hxstats`               | Metrics grid with two figures                              |
-| `hxstat`                | One figure                                                 |
-| `hxtimeline`            | Timeline container with one entry                          |
+| Prefix                  | What it inserts                                                 |
+| ----------------------- | --------------------------------------------------------------- |
+| `hxcallout`             | Callout box; type picks the color and default icon              |
+| `hxcallout-emoji`       | Callout with a custom emoji                                     |
+| `hxcallout-icon`        | Callout with an explicit icon name                              |
+| `hxcards`               | Card grid container with two cards                              |
+| `hxcard`                | Single card — link, title, icon, subtitle                       |
+| `hxcard-tag`            | Card with a badge tag — `tagColor`, `tagIcon`, `tagBorder`      |
+| `hxcard-image`          | Image card — `method`/`options` feed Hugo image processing      |
+| `hxtabs`                | Tabbed interface with two tabs                                  |
+| `hxtab`                 | One tab — `name`, `icon`, `selected`                            |
+| `hxsteps`               | Numbered step list with h3 headings                             |
+| `hxdetails`             | Collapsible block                                               |
+| `hxfiletree`            | File tree with a folder and a file                              |
+| `hxfiletree-folder`     | Folder node                                                     |
+| `hxfiletree-file`       | File node                                                       |
+| `hxgallery`             | Gallery container with two items                                |
+| `hxgallery-item`        | Local gallery image                                             |
+| `hxgallery-item-remote` | Remote gallery image, with the required `width`/`height`        |
+| `hxbadge`               | Badge — content, color, icon                                    |
+| `hxbadge-inline`        | Badge, positional short form                                    |
+| `hxbadge-link`          | Badge wrapped in a link                                         |
+| `hxicon`                | Built-in SVG icon                                               |
+| `hxicon-remote`         | Remote icon — `lucide:` / `tabler:` / `simple:`                 |
+| `hxjupyter`             | Jupyter notebook embed                                          |
+| `hxpdf`                 | PDF embed                                                       |
+| `hxasciinema`           | Asciinema recording with playback options                       |
+| `hxterm`                | Glossary term                                                   |
+| `hxinclude`             | Inline another page's content                                   |
+| `hxaccordion`           | Accordion container with two sections                           |
+| `hxaccordion-item`      | One accordion section                                           |
+| `hxarticle`             | Card for another page — title, summary, cover                   |
+| `hxbutton`              | Link styled as a button, via `href`                             |
+| `hxbutton-page`         | Button linking to an internal page via `pageRef`                |
+| `hxcta`                 | Call-to-action button                                           |
+| `hxlead`                | Lead paragraph                                                  |
+| `hxborderless`          | Reference table without cell borders                            |
+| `hxkeywords`            | Keyword pill container with two keywords                        |
+| `hxkeyword`             | One keyword pill                                                |
+| `hxstats`               | Metrics grid with two figures                                   |
+| `hxstat`                | One figure                                                      |
+| `hxtimeline`            | Timeline container with one entry                               |
 | `hxtimeline-item`       | One timeline entry — `badge`, `badgeColor`, `badgeIcon`, `icon` |
-| `hxswatches`            | Colour palette from positional hex codes                   |
-| `hxlist`                | List of pages, filtered by `where`/`value`                 |
-| `hxad`                  | One ad at this point — needs `params.ads` configured       |
-| `hxadprovider`          | Ad with an explicit network, format and alignment          |
-| `hxchart`               | Chart.js chart from an inline config                       |
-| `hxtypeit`              | Typewriter effect, one string per line                     |
-| `hxvideo`               | Self-hosted video with controls                            |
-| `hxvideo-autoplay`      | Background-style video — autoplay implies muted            |
-| `hxyoutube`             | YouTube embed that loads the player on click               |
-| `hxemail`               | Obfuscated mailto link                                     |
-| `hxgithub`              | GitHub repository card                                     |
-| `hxgitlab`              | GitLab project card by namespace path                      |
-| `hxgitlab-id`           | GitLab project card by numeric id                          |
-| `hxgitea`               | Gitea repository card                                      |
-| `hxforgejo`             | Forgejo repository card                                    |
-| `hxcodeberg`            | Codeberg repository card                                   |
-| `hxhuggingface`         | Hugging Face model card                                    |
-| `hxhuggingface-dataset` | Hugging Face dataset card                                  |
-| `hxansible`             | Ansible Galaxy role card                                   |
-| `hxansible-collection`  | Ansible Galaxy collection card                             |
-| `hxgist`                | GitHub gist as a theme code block                          |
-| `hxgist-live`           | Gist refreshed in the reader's browser                     |
-| `hxcodeimporter`        | Import a file from a URL as a code block                   |
-| `hxcodeimporter-lines`  | Imported excerpt with line numbers and highlights          |
-| `hxcodeimporter-live`   | Imported file refreshed in the reader's browser            |
-| `hxltr`                 | Force left-to-right inside an RTL page                     |
-| `hxrtl`                 | Force right-to-left inside an LTR page                     |
-| `hxhero`                | Complete hero block for a `hextra-home` page               |
-| `hxhero-container`      | Hero container with a side image                           |
-| `hxhero-headline`       | Hero headline                                              |
-| `hxhero-subtitle`       | Hero subtitle                                              |
-| `hxhero-badge`          | Pill badge above the headline                              |
-| `hxhero-button`         | Hero call-to-action button                                 |
-| `hxhero-section`        | Home-layout section heading                                |
-| `hxfeature-grid`        | Feature grid with two cards                                |
-| `hxfeature-card`        | Feature card                                               |
-| `hxfeature-card-image`  | Feature card with a background image and gradient          |
+| `hxswatches`            | Colour palette from positional hex codes                        |
+| `hxlist`                | List of pages, filtered by `where`/`value`                      |
+| `hxad`                  | One ad at this point — needs `params.ads` configured            |
+| `hxadprovider`          | Ad with an explicit network, format and alignment               |
+| `hxchart`               | Chart.js chart from an inline config                            |
+| `hxtypeit`              | Typewriter effect, one string per line                          |
+| `hxvideo`               | Self-hosted video with controls                                 |
+| `hxvideo-autoplay`      | Background-style video — autoplay implies muted                 |
+| `hxyoutube`             | YouTube embed that loads the player on click                    |
+| `hxemail`               | Obfuscated mailto link                                          |
+| `hxgithub`              | GitHub repository card                                          |
+| `hxgitlab`              | GitLab project card by namespace path                           |
+| `hxgitlab-id`           | GitLab project card by numeric id                               |
+| `hxgitea`               | Gitea repository card                                           |
+| `hxforgejo`             | Forgejo repository card                                         |
+| `hxcodeberg`            | Codeberg repository card                                        |
+| `hxhuggingface`         | Hugging Face model card                                         |
+| `hxhuggingface-dataset` | Hugging Face dataset card                                       |
+| `hxansible`             | Ansible Galaxy role card                                        |
+| `hxansible-collection`  | Ansible Galaxy collection card                                  |
+| `hxgist`                | GitHub gist as a theme code block                               |
+| `hxgist-live`           | Gist refreshed in the reader's browser                          |
+| `hxcodeimporter`        | Import a file from a URL as a code block                        |
+| `hxcodeimporter-lines`  | Imported excerpt with line numbers and highlights               |
+| `hxcodeimporter-live`   | Imported file refreshed in the reader's browser                 |
+| `hxltr`                 | Force left-to-right inside an RTL page                          |
+| `hxrtl`                 | Force right-to-left inside an LTR page                          |
+| `hxhero`                | Complete hero block for a `hextra-home` page                    |
+| `hxhero-container`      | Hero container with a side image                                |
+| `hxhero-headline`       | Hero headline                                                   |
+| `hxhero-subtitle`       | Hero subtitle                                                   |
+| `hxhero-badge`          | Pill badge above the headline                                   |
+| `hxhero-button`         | Hero call-to-action button                                      |
+| `hxhero-section`        | Home-layout section heading                                     |
+| `hxfeature-grid`        | Feature grid with two cards                                     |
+| `hxfeature-card`        | Feature card                                                    |
+| `hxfeature-card-image`  | Feature card with a background image and gradient               |
 
 ### Front matter
 
