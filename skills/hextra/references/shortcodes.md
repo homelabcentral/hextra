@@ -9,7 +9,7 @@ Every shortcode the theme ships: 60 of them, with parameters taken from the temp
 
 - **Notation is not interchangeable.** A shortcode listed as `{{% %}}` renders its body as Markdown and breaks when written with angle brackets. The `{{% %}}` shortcodes are: `details`, `include`, `ltr`, `rtl`, `steps`.
 - **A paired shortcode needs a closing tag.** Self-closing ones must not have one.
-- **Icon names are a closed set.** Any `icon`, `tagIcon`, or `badgeIcon` value must appear in `icons.md`, or carry a remote provider prefix (`lucide:`, `tabler:`, `tabler-filled:`, `simple:`, `iconify:`). An unknown name is not silent: it fails the build with `icon "name" not found`.
+- **Icon names are a closed set.** Any `icon`, `tagIcon`, or `badgeIcon` value must appear in `icons.md`, carry a remote provider prefix (`lucide:`, `tabler:`, `tabler-filled:`, `simple:`, `iconify:`), or be a `file:` path to an SVG in the project. An unknown name is not silent: it fails the build with `icon "name" not found`.
 - **Build-time fetching can be switched off.** The shortcodes marked _fetches at build time_ all go quiet when `params.remoteFetch.enable` is `false`.
 
 ## Callouts and text
@@ -93,18 +93,19 @@ A shortcode to create a badge.
 | `class` | string | The class of the badge. |
 | `color` | string | The color of the badge. One of `gray`, `purple`, `indigo`, `blue`, `green`, `yellow`, `orange`, `amber`, `red`. Deprecated alias: `type`. |
 | `content` | string | The content of the badge. |
-| `icon` | string | The icon of the badge. |
+| `icon` | string | The icon of the badge. A bundled or remote icon name, or `file:<path>` for an SVG in the page bundle or the assets directory. |
 | `link` | string | The link of the badge. |
+| `size` | string | The size of the badge. One of `sm`, `md`, `lg`. Default `md`. |
 | `type` | string | **Deprecated.** Earlier name for `color`; still accepted. |
 
 Positional: The content of the badge.
 
 ```markdown
-{{< badge content="Badge" color="gray" icon="sparkles" >}}
+{{< badge content="Badge" color="gray" size="sm" icon="sparkles" >}}
 
 {{< badge "Badge" >}}
 
-{{< badge content="Badge" color="gray" link="https://example.com" border=true >}}
+{{< badge content="Badge" color="gray" size="sm" link="https://example.com" border=true >}}
 ```
 
 ### stats
@@ -162,7 +163,7 @@ Create an icon.
 | Parameter | Type | Notes |
 | --- | --- | --- |
 | `attributes` | string | The attributes of the icon. Default `height=1em`. |
-| `name` | string | The name of the icon: a bundled name from data/icons.yaml, or a remote name carrying a provider prefix - `lucide:`, `tabler:`, `tabler-filled:`, `simple:`, or `iconify:`, the last taking a `set/icon` pair. An unknown name fails the build. Also accepted as the first positional argument. |
+| `name` | string | The name of the icon: a bundled name from data/icons.yaml, a remote name carrying a provider prefix - `lucide:`, `tabler:`, `tabler-filled:`, `simple:`, or `iconify:`, the last taking a `set/icon` pair - or `file:` followed by the path to an SVG in the page bundle or the assets directory. An unknown name fails the build. Also accepted as the first positional argument. |
 
 Positional: The name of the icon.
 

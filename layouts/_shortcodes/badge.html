@@ -4,7 +4,8 @@
   @param {string} color The color of the badge.
   @param {string} class The class of the badge.
   @param {string} link The link of the badge.
-  @param {string} icon The icon of the badge.
+  @param {string} icon The icon of the badge. A bundled or remote icon name, or `file:<path>` for an SVG in the page bundle or the assets directory.
+  @param {string} size The size of the badge. One of sm, md, lg. Default md.
   @deprecated type Earlier name for `color`; still accepted.
   @param {bool} border Draw the badge outline. Default true; pass false for a flat badge.
 
@@ -14,6 +15,8 @@
 
   @example {{< badge content="Badge" color="blue" >}}
 @example
+{{< badge content="Badge" icon="file:icons/brew.svg" size="lg" >}}
+@example
 {{< badge "Badge" >}}
 */}}
 {{- if .IsNamedParams -}}
@@ -22,16 +25,22 @@
   {{- $class := .Get "class" | default "" -}}
   {{- $link := .Get "link" | default "" -}}
   {{- $icon := .Get "icon" | default "" -}}
-  {{- $border := not (eq (.Get "border") false) | default true }}
+  {{- $size := .Get "size" | default "md" -}}
+
+  {{- /* Not `not (eq X false) | default true`: `default` treats false as empty, so that form always returned true and the documented parameter did nothing. Comparing the formatted value is nil-safe - a missing parameter prints `<nil>`, which is not "false", so the default stays true. */ -}}
+  {{- $border := ne (printf "%v" (.Get "border")) "false" -}}
 
   {{- if $link -}}
-    <a href="{{ $link }}" title="{{ $content | plainify }}" target="_blank" class="not-prose hx:inline-flex hx:align-middle hx:no-underline hover:hx:no-underline">
+    {{- /* rel="noreferrer" because target="_blank" without it leaks the referrer and window.opener. */ -}}
+    <a href="{{ $link }}" title="{{ $content | plainify }}" target="_blank" rel="noreferrer" class="hextra-badge-link not-prose hx:no-underline hover:hx:no-underline">
       {{- partial "shortcodes/badge.html" (dict
         "content" $content
         "color" $color
         "class" $class
         "border" $border
         "icon" $icon
+        "size" $size
+        "page" $.Page
         )
       -}}
     </a>
@@ -42,6 +51,8 @@
       "class" $class
       "border" $border
       "icon" $icon
+      "size" $size
+      "page" $.Page
       )
     -}}
   {{- end -}}
@@ -50,6 +61,7 @@
   {{- partial "shortcodes/badge.html" (dict
     "content" $content
     "border" true
+    "page" $.Page
     )
   -}}
 {{- end -}}

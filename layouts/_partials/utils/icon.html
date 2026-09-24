@@ -4,17 +4,65 @@
   which is what `utils/icon-exists.html` needs in order to answer "would this
   name render?" without taking the build down while it asks. Anything that can
   fail a normal call fails a quiet one the same way - unknown name, bad remote
-  provider, remote fetching disabled, fetch error - so the two cannot drift.
+  provider, remote fetching disabled, fetch error, missing or non-SVG icon file
+  - so the two cannot drift.
+
+  `page` is optional and only matters for the `file:` prefix: it is the page a
+  relative path should resolve against as a page resource before the assets
+  directory is tried. Callers that have a page in hand pass it; the rest get
+  the assets lookup alone.
 */}}
 {{- $siteData := partial "utils/hugo-compat/site-data.html" . -}}
-{{- $name := .name -}}
+{{- $name := .name | default "" -}}
+{{- $page := .page -}}
 {{- $quiet := .quiet | default false -}}
 {{- $icon := index $siteData.icons $name -}}
 {{- $isRemoteIcon := false -}}
+{{- $isFileIcon := false -}}
 
 {{- if not $icon -}}
   {{/* Vendored icons (see scripts/vendor-codeblock-icons.mjs) — avoids remote fetches for built-in code block icons */}}
   {{- $icon = index (index $siteData "icons-vendored" | default dict) $name -}}
+{{- end -}}
+
+{{/* `file:` reads a project SVG rather than a pack. It sits before the remote
+  providers because it fetches nothing: the file belongs to the site, so it is
+  inlined the same way a `data/icons.yaml` entry is, which is what lets
+  `currentColor` and CSS sizing reach it. An `<img>` would reach neither.
+
+  The file is inlined with only its `<script>` blocks, root `class` and
+  intrinsic `width`/`height` removed. Everything else - including an internal
+  `<style>`, whose class names are global once inlined - is emitted verbatim,
+  on the same trust footing as a partial in the same repository.
+*/}}
+{{- if and (not $icon) (hasPrefix $name "file:") -}}
+  {{- $path := strings.TrimPrefix "file:" $name -}}
+  {{- if or (in $path "..") (not (findRE `^[A-Za-z0-9._/-]+$` $path)) -}}
+    {{- if $quiet -}}{{- return "" -}}{{- end -}}
+    {{- errorf "invalid icon file path %q" $path -}}
+  {{- end -}}
+  {{- if not (hasSuffix (lower $path) ".svg") -}}
+    {{- if $quiet -}}{{- return "" -}}{{- end -}}
+    {{- errorf "icon file %q is not an SVG - only SVG files can be used as an icon" $path -}}
+  {{- end -}}
+
+  {{- $resource := false -}}
+  {{- with $page -}}
+    {{- $resource = .Resources.Get $path -}}
+  {{- end -}}
+  {{- if not $resource -}}
+    {{- $resource = resources.Get $path -}}
+  {{- end -}}
+  {{- if not $resource -}}
+    {{- if $quiet -}}{{- return "" -}}{{- end -}}
+    {{- errorf "icon file %q not found - looked for a page resource, then in the assets directory" $path -}}
+  {{- end -}}
+
+  {{- $icon = $resource.Content -}}
+  {{- $isFileIcon = true -}}
+  {{- if and (not (strings.Contains $icon "fill=")) (not (strings.Contains $icon "stroke=")) -}}
+    {{- $icon = replaceRE "<svg" `<svg fill="currentColor"` $icon -}}
+  {{- end -}}
 {{- end -}}
 
 {{- if not $icon -}}
@@ -82,8 +130,23 @@
 
 {{- $icon = $icon | safeHTML -}}
 
-{{- if $isRemoteIcon -}}
+{{/* Anything that did not come from `data/` arrives with markup the theme did
+  not write. A pack's own root `class` collides with the theme's, and a
+  `<script>` block has no business in an icon at all.
+*/}}
+{{- $isExternal := or $isRemoteIcon $isFileIcon -}}
+{{- if $isExternal -}}
+  {{- $icon = replaceRE `(?s)<script[^>]*>.*?</script>` "" $icon -}}
   {{- $icon = replaceRE `(<svg[^>]*?)\sclass=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+{{- end -}}
+
+{{/* A file icon is sized by CSS, so its intrinsic `width`/`height` always go -
+  including when the caller passes no attributes at all. A remote icon keeps
+  the existing behaviour, where they go only if a caller is overriding them.
+*/}}
+{{- if $isFileIcon -}}
+  {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+  {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
 {{- end -}}
 
 {{- if .attributes -}}

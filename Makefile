@@ -323,11 +323,12 @@ test-mobile: ## Build, then run mobile menu tests
 
 # The suite that asserts the design system rather than the markup: the surface
 # and border table from AGENTS.md, the rail drawer's breakpoint and direction,
-# the lead's typeface, and the theme swap being atomic. All four are things the
-# a11y sweep structurally cannot see - it runs at one viewport, in one colour
-# scheme, and never interacts with the page.
+# the lead's typeface, the badge size scale and its inline layout, and the
+# theme swap being atomic. All of it is what the a11y sweep structurally cannot
+# see - it runs at one viewport, in one colour scheme, never interacts with the
+# page, and has target-size disabled.
 .PHONY: test-design
-test-design: ## Build, then run design-system tests (surfaces, rail drawer, lead, theme swap)
+test-design: ## Build, then run design-system tests (surfaces, rail drawer, lead, badge, theme swap)
 	@$(MAKE) skill-check
 	@$(MAKE) build
 	@npm run test:design

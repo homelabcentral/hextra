@@ -46,6 +46,24 @@ It then can be used in the shortcode like this:
 
 Tip: [Iconify Design](https://iconify.design/) is a great place to find SVG icons to copy in this way. You can also use any of them without copying anything, through the `iconify:` provider prefix described in [Remote icon packs](#remote-icon-packs) below.
 
+### Icons from a file
+
+An SVG that already lives in your project does not have to be pasted into `data/icons.yaml`. Prefix its path with `file:` and the theme reads it straight off disk:
+
+{{< icon "file:icons/hexagon.svg" >}}
+
+```
+{{</* icon "file:icons/hexagon.svg" */>}}
+
+{{</* badge content="Badge" icon="file:icons/hexagon.svg" */>}}
+```
+
+The path resolves first as a resource of the page bundle the shortcode is called from, and then against the site's `assets/` directory — so `file:icons/hexagon.svg` finds `assets/icons/hexagon.svg`, and a logo sitting next to an `index.md` in a page bundle is reachable by its bare file name.
+
+The file is inlined rather than linked, which is what lets it behave like every other icon: CSS sizes it, and an SVG carrying no `fill` or `stroke` of its own picks up the surrounding text colour through `currentColor`. The theme drops the root `<svg>` element's `width`, `height` and `class` so they cannot fight the sizing around it, and strips any `<script>` block. Everything else is emitted as written — including an internal `<style>`, whose class names become global once inlined.
+
+Only SVG works, and only a path that is actually there. A `.png`, or a name with no matching file, fails the build with a message naming the path rather than rendering nothing.
+
 ### Remote icon packs
 
 Remote icons can be loaded on demand by using a provider prefix. Hextra supports these providers:

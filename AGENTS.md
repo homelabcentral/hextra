@@ -604,7 +604,8 @@ make fmt-check   # formatting, without writing
 make skill-check # generated skill files are current
 make test        # the two checks above, then Playwright: build output,
                  # mobile menu, WCAG AA, design system
-make test-design # surfaces and borders, the rail drawer, the lead, theme swap
+make test-design # surfaces and borders, the rail drawer, the lead, the badge
+                 # size scale, theme swap
 make build       # production build of docs/
 ```
 
@@ -623,9 +624,9 @@ make build       # production build of docs/
   interacting — and with `color-contrast` and `target-size` disabled. Nothing
   below `md`, nothing in dark, nothing behind a click and no contrast figure
   reaches it. Components that need any of those get a direct test:
-  `test-design` for surfaces and the rail drawer, and the context-menu and TOC
-  blocks inside `accessibility.spec.ts` for contrast, which re-enable the rule
-  for their own subtree.
+  `test-design` for surfaces, the rail drawer and the badge's target size, and
+  the context-menu and TOC blocks inside `accessibility.spec.ts` for contrast,
+  which re-enable the rule for their own subtree.
 
 ### Formatting
 

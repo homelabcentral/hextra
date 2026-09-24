@@ -1,3 +1,72 @@
+/*
+  Badge sizes are absolute, not derived from `em`. `md` is what every badge
+  rendered at before `size` existed - `.65rem` text in a 1.5rem pill with a
+  12px icon - so adding the scale moves nothing on an existing site. `sm` and
+  `lg` step from there.
+
+  The icon box constrains height only, with `w-auto` on the svg. That is what
+  the template's old hardcoded `height=12` did: a wordmark or any other
+  non-square icon keeps its aspect ratio instead of letterboxing into a square.
+  Sizing it here rather than in the template is the point of the split - a
+  hardcoded pixel height in Go had no way to know which size step it was in.
+*/
+
 .hextra-badge {
-  @apply hx:inline-flex hx:items-center;
+  @apply hx:inline-flex hx:items-center hx:align-middle;
+}
+
+.hextra-badge__pill {
+  @apply hx:inline-flex hx:items-center hx:rounded-full;
+}
+
+.hextra-badge__icon {
+  @apply hx:inline-flex hx:shrink-0 hx:items-center;
+
+  > svg {
+    @apply hx:h-full hx:w-auto;
+  }
+}
+
+.hextra-badge--sm {
+  .hextra-badge__pill {
+    @apply hx:gap-1 hx:px-2 hx:text-[.6rem] hx:leading-5;
+  }
+
+  .hextra-badge__icon {
+    @apply hx:h-2.5;
+  }
+}
+
+.hextra-badge--md {
+  .hextra-badge__pill {
+    @apply hx:gap-1 hx:px-2.5 hx:text-[.65rem] hx:leading-6;
+  }
+
+  .hextra-badge__icon {
+    @apply hx:h-3;
+  }
+}
+
+.hextra-badge--lg {
+  .hextra-badge__pill {
+    @apply hx:gap-1.5 hx:px-3.5 hx:text-sm hx:leading-8;
+  }
+
+  .hextra-badge__icon {
+    @apply hx:h-4;
+  }
+}
+
+/*
+  WCAG 2.2 SC 2.5.8 asks for a 24x24 CSS px target at AA. A `sm` pill is 20px
+  of line box - 22px once the border is added, and 20px flat when `border` is
+  false - so a linked `sm` badge would fail it either way. The floor lives on
+  the link rather than on the pill, which leaves the pill's own proportions
+  alone. `md` and `lg` clear 24px on their own, so this is a no-op for them.
+
+  `accessibility.spec.ts` disables `target-size`, so nothing in the suite
+  catches this - see tests/badge.spec.ts, which measures the link box directly.
+*/
+.hextra-badge-link {
+  @apply hx:inline-flex hx:items-center hx:align-middle hx:min-h-6;
 }

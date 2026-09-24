@@ -1,8 +1,39 @@
+{{/* Shared renderer for the `badge` shortcode, the `card` tag and the
+  `timeline-item` badge.
+
+  The colours stay as inline `hx:` pairs rather than moving to `badge.css`: they
+  are the hue-coded semantic exception AGENTS.md names, and nine variants is one
+  table, not nine components. Everything structural - the pill, the size steps
+  and the icon box - lives in `badge.css`, so `size` and the icon cannot drift
+  apart the way a hardcoded `height=12` drifted from a hardcoded font size.
+
+  @param {string} content The badge text.
+  @param {string} color One of the nine badge colours.
+  @param {string} class Extra classes for the outer wrapper.
+  @param {bool} border Draw the outline.
+  @param {string} icon Icon name, including a `file:` path.
+  @param {string} size One of sm, md (default), lg.
+  @param {page} page Optional page a `file:` icon resolves against.
+
+  The wrapper is a span, not a div: a div inside a Markdown paragraph closes the
+  <p>, which turns two badges written side by side into two blocks with no text
+  node between them to collapse into a space.
+*/}}
+
 {{- $content := .content -}}
 {{- $color := .color | default .type | default "" -}}{{- /* Compatibility with previous parameter. */ -}}
 {{- $class := .class | default "" -}}
-{{- $border := .border | default false -}}
+{{- /* Not `not (eq X false) | default true`: `default` treats false as empty, so that form always returned true and the documented parameter did nothing. Comparing the formatted value is nil-safe - a missing parameter prints `<nil>`, which is not "false", so the default stays true. */ -}}
+{{- $border := ne (printf "%v" .border) "false" -}}
 {{- $icon := .icon | default "" -}}
+{{- $page := .page -}}
+{{- $size := .size | default "md" -}}
+
+{{- $sizes := slice "sm" "md" "lg" -}}
+{{- if not (in $sizes $size) -}}
+  {{- warnf "badge: unknown size %q, falling back to 'md'" $size -}}
+  {{- $size = "md" -}}
+{{- end -}}
 
 {{- /* Compatibility with previous names. */ -}}
 {{- $mapping := (dict
@@ -29,10 +60,14 @@
 
 {{- $borderClass := cond (eq $border true) "hx:border" "" -}}
 {{- $badgeClass := or ($styleClass.Get $color) ($styleClass.Get "gray") -}}
-<div class="hextra-badge {{ $class }}">
-  <div class="hx:inline-flex hx:gap-1 hx:items-center hx:rounded-full hx:px-2.5 hx:leading-6 hx:text-[.65rem] {{ $borderClass }} {{ $badgeClass }}">
-    {{- with $icon -}}{{- partial "utils/icon" (dict "name" . "attributes" "height=12") -}}{{- end -}}
+<span class="hextra-badge hextra-badge--{{ $size }} {{ $class }}">
+  <span class="hextra-badge__pill {{ $borderClass }} {{ $badgeClass }}">
+    {{- with $icon -}}
+      <span class="hextra-badge__icon">
+        {{- partial "utils/icon" (dict "name" . "page" $page "attributes" `aria-hidden="true" focusable="false"`) -}}
+      </span>
+    {{- end -}}
     {{- $content -}}
-  </div>
-</div>
+  </span>
+</span>
 {{- /* Strip trailing newline. */ -}}

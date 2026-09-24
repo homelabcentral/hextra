@@ -516,7 +516,7 @@ function buildShortcodes(shortcodes, snippets) {
         .join(", ") +
       ".",
     "- **A paired shortcode needs a closing tag.** Self-closing ones must not have one.",
-    '- **Icon names are a closed set.** Any `icon`, `tagIcon`, or `badgeIcon` value must appear in `icons.md`, or carry a remote provider prefix (`lucide:`, `tabler:`, `tabler-filled:`, `simple:`, `iconify:`). An unknown name is not silent: it fails the build with `icon "name" not found`.',
+    '- **Icon names are a closed set.** Any `icon`, `tagIcon`, or `badgeIcon` value must appear in `icons.md`, carry a remote provider prefix (`lucide:`, `tabler:`, `tabler-filled:`, `simple:`, `iconify:`), or be a `file:` path to an SVG in the project. An unknown name is not silent: it fails the build with `icon "name" not found`.',
     "- **Build-time fetching can be switched off.** The shortcodes marked _fetches at build time_ all go quiet when `params.remoteFetch.enable` is `false`.",
     "",
   ];
@@ -589,6 +589,8 @@ function buildIcons(yaml) {
     "```",
     "",
     "A name containing a colon is fetched from a remote provider instead — `lucide:`, `tabler:`, `tabler-filled:` and `simple:` take that pack's own name, `iconify:` takes a `set/icon` pair, as in `iconify:simple-icons/reddit`. Remote fetching needs no configuration; it is on by default. Set `params.icons.remote.enable: false` to turn it off, or `params.icons.remote.providers` to add a provider or repin an existing one. See the `icon` entry in `shortcodes.md`.",
+    "",
+    "`file:` is the third form and fetches nothing: it names an SVG in the project, resolved first as a resource of the current page bundle and then against the site's `assets/` directory, as in `file:icons/hexagon.svg` for `assets/icons/hexagon.svg`. The file is inlined, so CSS sizes it and an SVG with no `fill` or `stroke` of its own inherits the surrounding text colour. Only SVG works; a missing file or a non-SVG path fails the build.",
     "",
     "## Available names",
     "",

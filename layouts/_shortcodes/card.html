@@ -31,7 +31,8 @@
 {{- $lqip := "" -}}
 {{- $tag := .Get "tag" -}}
 {{- $tagColor := .Get "tagColor" | default (.Get "tagType") | default "" -}}{{- /* Compatibility with previous parameter. */ -}}
-{{- $tagBorder := not (eq (.Get "tagBorder") false) | default true }}
+{{- /* Not `not (eq X false) | default true`: `default` treats false as empty, so that form always returned true and the documented parameter did nothing. Comparing the formatted value is nil-safe - a missing parameter prints `<nil>`, which is not "false", so the default stays true. */ -}}
+{{- $tagBorder := ne (printf "%v" (.Get "tagBorder")) "false" -}}
 {{- $tagIcon := .Get "tagIcon" | default "" -}}
 
 {{/* Image processing options */}}
