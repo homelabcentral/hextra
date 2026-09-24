@@ -382,8 +382,8 @@
     "scope": "markdown",
     "prefix": "hxtimeline-item",
     "body": [
-      "{{< timeline-item header=\"${1:v1.0}\" subheader=\"${2:First release}\" badge=\"${3:2024}\" badgeColor=\"${4|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" icon=\"${5:star}\" >}}",
-      "${6:Content}",
+      "{{< timeline-item header=\"${1:v1.0}\" subheader=\"${2:First release}\" badge=\"${3:2024}\" badgeColor=\"${4|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" badgeIcon=\"${5:sparkles}\" icon=\"${6:star}\" >}}",
+      "${7:Content}",
       "{{< /timeline-item >}}"
     ],
     "description": "One timeline entry. badgeColor takes the nine badge colors."

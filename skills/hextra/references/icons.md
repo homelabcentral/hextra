@@ -5,7 +5,7 @@
 
 The 272 icons bundled with the theme. Use a name from this list verbatim — an unknown name fails the build with `icon "name" not found`, so never guess one.
 
-Valid wherever the theme takes an icon: the `icon` shortcode, and the `icon` parameter on `callout`, `card`, `cta`, `button`, `badge`, `accordion-item`, `timeline-item`, `stat`, `keyword`, `feature-card`, and the repository cards. Also `tagIcon` on `card` and `params.icon` on a `hugo.yaml` menu entry.
+Valid wherever the theme takes an icon: the `icon` shortcode, and the `icon` parameter on `callout`, `card`, `cta`, `button`, `badge`, `accordion-item`, `timeline-item`, `stat`, `keyword`, `feature-card`, and the repository cards. Also `tagIcon` on `card`, `badgeIcon` on `timeline-item`, and `params.icon` on a `hugo.yaml` menu entry.
 
 ```markdown
 {{< icon "sparkles" >}}

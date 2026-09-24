@@ -42,7 +42,7 @@ Hugo ships a built-in `details` and Hextra shadows it. The APIs are inverted —
 
 **4. Icon names are a closed set.**
 
-Every `icon=` and `tagIcon=` value must appear in `references/icons.md`, carry a remote provider prefix (`lucide:`, `tabler:`, `tabler-filled:`, `simple:`, `iconify:`), or be a `file:` path to an SVG in the project — `file:icons/hexagon.svg` for `assets/icons/hexagon.svg`. An unknown name fails the build with `icon "name" not found`, so a plausible-sounding guess costs a build rather than rendering blank. Look it up.
+Every `icon=`, `tagIcon=`, and `badgeIcon=` value must appear in `references/icons.md`, carry a remote provider prefix (`lucide:`, `tabler:`, `tabler-filled:`, `simple:`, `iconify:`), or be a `file:` path to an SVG in the project — `file:icons/hexagon.svg` for `assets/icons/hexagon.svg`. An unknown name fails the build with `icon "name" not found`, so a plausible-sounding guess costs a build rather than rendering blank. Look it up.
 
 ## Where to look
 
