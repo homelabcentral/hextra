@@ -99,7 +99,7 @@ Five shortcodes use percent delimiters so their inner content is rendered as Mar
 | `hxstats`               | Metrics grid with two figures                              |
 | `hxstat`                | One figure                                                 |
 | `hxtimeline`            | Timeline container with one entry                          |
-| `hxtimeline-item`       | One timeline entry — `badge`, `badgeColor`, `icon`         |
+| `hxtimeline-item`       | One timeline entry — `badge`, `badgeColor`, `badgeIcon`, `icon` |
 | `hxswatches`            | Colour palette from positional hex codes                   |
 | `hxlist`                | List of pages, filtered by `where`/`value`                 |
 | `hxad`                  | One ad at this point — needs `params.ads` configured       |

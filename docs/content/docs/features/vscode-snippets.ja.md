@@ -99,7 +99,7 @@ Content
 | `hxstats`               | 指標 2 つを並べたグリッド                                    |
 | `hxstat`                | 指標 1 つ                                                    |
 | `hxtimeline`            | エントリ 1 つを含むタイムラインコンテナ                      |
-| `hxtimeline-item`       | タイムラインのエントリ — `badge`、`badgeColor`、`icon`       |
+| `hxtimeline-item`       | タイムラインのエントリ — `badge`、`badgeColor`、`badgeIcon`、`icon` |
 | `hxswatches`            | 位置引数の 16 進コードによるカラーパレット                   |
 | `hxlist`                | `where`/`value` で絞り込んだページ一覧                       |
 | `hxad`                  | この位置に広告を 1 つ — `params.ads` の設定が必要            |

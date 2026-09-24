@@ -99,7 +99,7 @@ Content
 | `hxstats`               | 含两项指标的指标网格                                 |
 | `hxstat`                | 单项指标                                             |
 | `hxtimeline`            | 含一个条目的时间线容器                               |
-| `hxtimeline-item`       | 单个时间线条目 —— `badge`、`badgeColor`、`icon`      |
+| `hxtimeline-item`       | 单个时间线条目 —— `badge`、`badgeColor`、`badgeIcon`、`icon` |
 | `hxswatches`            | 由位置参数十六进制色值组成的调色板                   |
 | `hxlist`                | 按 `where`/`value` 过滤的页面列表                    |
 | `hxad`                  | 在此处插入一个广告 — 需要配置 `params.ads`           |
