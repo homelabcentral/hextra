@@ -80,21 +80,49 @@ services:
       # Those run as SIBLINGS of this container on the host daemon, not
       # inside it - paths act mounts must exist on the host.
       - /var/run/docker.sock:/var/run/docker.sock
-      # Host SSH config and keys, read-only, so git inside the container picks
-      # the same per-host identity the host does - `git@github-homelabcentral:`
-      # uses the homelabcentral key, everything else the default.
+      # One GitHub identity, declared rather than inherited.
       #
-      # The keys are never unlocked here: VS Code forwards the host ssh-agent
-      # automatically and the agent does the signing. This mount exists only so
-      # ssh can read ~/.ssh/config and the IdentityFile paths it names, which is
-      # the only way to pick one identity out of a multi-key agent.
+      # The host's whole ~/.ssh used to be mounted over /home/vscode/.ssh so the
+      # container could read the host's config. That brings every identity with
+      # it: the forwarded agent offers all of them, the host's catch-all block
+      # names the default key, and a bare `git@github.com` authenticated as
+      # whichever account GitHub matched first. Which key a container uses is
+      # not something to inherit - it is a property of the container.
       #
-      # Requires `IgnoreUnknown UseKeychain` in a leading `Host *` block on the
-      # host: UseKeychain is macOS-only and Linux OpenSSH aborts the whole file
-      # on it ("Bad configuration option: usekeychain").
+      # So: the key and its public half only, bound to a fixed path,
+      # `id_container` - so the choice of key lives here, in one variable, and
+      # another repository copies the same two entries pointing at a different
+      # one. The config that names that path is `.devcontainer/ssh-config`,
+      # which needs no mount of its own: it is in the repository, the
+      # repository is already mounted, and postCreateCommand symlinks
+      # ~/.ssh/config to it. Editing it takes effect on the next connection,
+      # with no rebuild.
+      #
+      # ~/.ssh itself stays a container-owned directory, which is what lets ssh
+      # write known_hosts; under the old read-only directory mount it could not.
+      #
+      # The key is never unlocked here. It is passphrase-protected and the
+      # passphrase is in the macOS Keychain; VS Code forwards the host ssh-agent
+      # and the agent signs. `IdentitiesOnly` in ssh-config narrows what the
+      # agent is asked to offer, it does not bypass it - so `docker exec`, which
+      # gets no forwarded agent, still cannot push.
+      #
+      # `IgnoreUnknown UseKeychain` on the host is no longer a requirement: the
+      # macOS-only keywords that Linux OpenSSH aborts on are in the host's
+      # config, which this container no longer reads.
+      #
+      # ~/.ssh is a named volume so known_hosts outlives a rebuild. Docker
+      # creates the directory root-owned either way - it does not exist in the
+      # image - so postCreateCommand chowns it; without that ssh cannot write
+      # known_hosts and every single connection re-asks to trust github.com.
+      - ssh_home:/home/vscode/.ssh
       - type: bind
-        source: ${HOME}/.ssh
-        target: /home/vscode/.ssh
+        source: ${HOME}/.ssh/${HEXTRA_SSH_KEY:-homelabcentral}
+        target: /home/vscode/.ssh/id_container
+        read_only: true
+      - type: bind
+        source: ${HOME}/.ssh/${HEXTRA_SSH_KEY:-homelabcentral}.pub
+        target: /home/vscode/.ssh/id_container.pub
         read_only: true
     # Keep the container alive; the dev container attaches to it.
     command: sleep infinity
@@ -121,3 +149,6 @@ volumes:
   playwright_browsers:
   go_pkg:
   go_bin:
+  # ~/.ssh, so known_hosts persists. The key and the config are bind-mounted
+  # read-only on top of it; only known_hosts is ever written here.
+  ssh_home:

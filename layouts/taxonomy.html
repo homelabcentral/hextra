@@ -20,7 +20,10 @@
           <div class="hextra-tag-browse">
             {{- range . -}}
               <a class="hextra-tag-chip" href="{{ .Page.RelPermalink }}">
-                <span>#{{ .Page.LinkTitle }}</span>
+                {{/* The raw term, not the humanized title - see the same
+                  chip in blog/widgets/tags.html.
+                */}}
+                <span>#{{ .Page.Data.Term }}</span>
                 <span class="hextra-tag-count">{{ .Count }}</span>
               </a>
             {{- end -}}

@@ -18,14 +18,21 @@
   //    then stops - so a host with more than one GitHub key authenticates as
   //    whichever it happened to offer first. ssh's only selection mechanism is
   //    IdentityFile + IdentitiesOnly (ssh_config(5)); there is no way to pick
-  //    by fingerprint or comment. That means ssh has to be able to READ the
-  //    host's ~/.ssh/config, which is a file, which needs a mount.
+  //    by fingerprint or comment.
   //
-  // The mount is declared in docker-compose.yml, NOT here, and deliberately so.
-  // The equivalent for this file is written out below, commented; uncommenting
-  // it works, but the `readonly` would be silently discarded, giving the
-  // read-write access to the host's real private keys. The reason is that the
-  // two orchestrators take different paths through the devcontainers CLI:
+  //    That selection is declared, not inherited. `ssh-config` in this
+  //    directory is mounted over ~/.ssh/config and names one identity,
+  //    `id_container`, which docker-compose.yml binds to one host key. The
+  //    host's own ~/.ssh is not mounted: reading it is what dragged every
+  //    other identity in, and which key a container uses is a property of the
+  //    container rather than of the machine it runs on.
+  //
+  // The mounts are declared in docker-compose.yml, NOT here, and deliberately
+  // so. The equivalent for this file is written out below, commented;
+  // uncommenting it works, but the `readonly` would be silently discarded,
+  // giving read-write access to the host's real private keys. The reason is
+  // that the two orchestrators take different paths through the devcontainers
+  // CLI:
   //
   //   - image/Dockerfile containers (spec-node/singleContainer.ts) pass the
   //     mount string through verbatim as `--mount <string>`, so Docker itself
@@ -37,28 +44,28 @@
   //     has no readonly field, so the flag is gone before the volume string is
   //     built. No warning is issued.
   //
-  // This repo is compose-based ("dockerComposeFile" above), so the mount lives
+  // This repo is compose-based ("dockerComposeFile" above), so the mounts live
   // in docker-compose.yml where long syntax supports read_only: true.
   //
-  // Read-only costs nothing here: ssh only wants to WRITE to ~/.ssh to append
-  // to known_hosts, which fails with a non-fatal "Failed to add the host to the
-  // list of known hosts" warning and connects anyway - and only for a host the
-  // Mac has never connected to. In exchange, nothing running in this container
-  // (npm lifecycle scripts, Playwright, act, go install) can modify or delete
-  // the host's keys.
+  // Read-only costs nothing: the three mounted files are all ones the container
+  // has no business writing, and ~/.ssh itself is a container-owned directory,
+  // so ssh can still write known_hosts there. Under the old whole-directory
+  // mount it could not, and every first connection warned. In exchange nothing
+  // running here (npm lifecycle scripts, Playwright, act, go install) can
+  // modify or delete a host key.
   //
-  // Requires `IgnoreUnknown UseKeychain` in a LEADING `Host *` block on the
-  // host: UseKeychain is macOS-only and Linux OpenSSH aborts the entire file on
-  // it ("Bad configuration option: usekeychain"). It has to be in a block that
-  // matches every host, not inside a narrower one, or the other blocks still
-  // abort the parse.
+  // `IgnoreUnknown UseKeychain` on the host is no longer a requirement. That
+  // was needed because Linux OpenSSH aborts the entire file on the macOS-only
+  // `UseKeychain` keyword, and the container used to parse the host's config.
+  // It no longer reads it.
   //
-  // Ready to uncomment. If you do, DELETE the bind entry from
+  // Ready to uncomment. If you do, DELETE the corresponding bind entries from
   // docker-compose.yml first - two mounts on the same target is an error - and
-  // accept that this one is read-write.
+  // accept that these are read-write.
   //
   // "mounts": [
-  //   "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,readonly"
+  //   "source=${localEnv:HOME}/.ssh/homelabcentral,target=/home/vscode/.ssh/id_container,type=bind,readonly",
+  //   "source=${localWorkspaceFolder}/.devcontainer/ssh-config,target=/home/vscode/.ssh/config,type=bind,readonly"
   // ],
   "features": {
     "ghcr.io/devcontainers/features/hugo:1": {
@@ -134,8 +141,22 @@
   // The apt-get update is deliberate even though `playwright install
   // --with-deps` directly above runs one of its own; depending on that as an
   // implicit side effect would break the moment the Playwright step moves.
-  // This runs on every create, and "Rebuild Container" always creates. What it
-  // downloads is held across rebuilds by three named volumes declared in
+  // This runs on every create, and "Rebuild Container" always creates.
+  //
+  // The ~/.ssh chown comes first and is NOT recursive: Docker creates that
+  // directory root-owned, so ssh cannot write known_hosts and re-asks to trust
+  // github.com on every connection - while the key mounted inside it is
+  // read-only, which a recursive chown would fail on.
+  //
+  // ~/.ssh/config is a symlink to `.devcontainer/ssh-config` rather than a
+  // mount of its own. The file is in the repository and the repository is
+  // already mounted, so a second bind of the same file would be the same bytes
+  // twice; the symlink also means an edit applies on the next connection
+  // instead of on the next rebuild. ssh resolves the link before its
+  // permission check, and the target arrives through the bind as vscode-owned
+  // and not group-writable, which is what that check wants.
+  //
+  // What it downloads is held across rebuilds by three named volumes declared in
   // docker-compose.yml - the Playwright browser, the Go module cache and
   // /go/bin - because none of them change between rebuilds and all three would
   // otherwise be fetched again. Docker creates a named volume root-owned, so
@@ -146,7 +167,7 @@
   // for asciinema, so its guard only helps when postCreateCommand is re-run
   // rather than on a rebuild; freeze is the one that skips outright, from
   // /go/bin.
-  "postCreateCommand": "sudo chown -R \"$(id -u):$(id -g)\" node_modules /home/vscode/.cache/ms-playwright /go/pkg /go/bin && npm install && npx playwright install --with-deps chromium || exit 1; command -v asciinema >/dev/null 2>&1 || { sudo apt-get update && sudo apt-get install -y --no-install-recommends asciinema; } || echo 'devcontainer: asciinema unavailable (optional, docs casts only)'; command -v freeze >/dev/null 2>&1 || go install github.com/charmbracelet/freeze@v0.2.2 || echo 'devcontainer: freeze unavailable (optional, snippet SVGs only)'; gh repo set-default homelabcentral/hextra 2>/dev/null || true;",
+  "postCreateCommand": "sudo chown \"$(id -u):$(id -g)\" /home/vscode/.ssh && sudo chmod 700 /home/vscode/.ssh && ln -sfn \"${containerWorkspaceFolder}/.devcontainer/ssh-config\" /home/vscode/.ssh/config && sudo chown -R \"$(id -u):$(id -g)\" node_modules /home/vscode/.cache/ms-playwright /go/pkg /go/bin && npm install && npx playwright install --with-deps chromium || exit 1; command -v asciinema >/dev/null 2>&1 || { sudo apt-get update && sudo apt-get install -y --no-install-recommends asciinema; } || echo 'devcontainer: asciinema unavailable (optional, docs casts only)'; command -v freeze >/dev/null 2>&1 || go install github.com/charmbracelet/freeze@v0.2.2 || echo 'devcontainer: freeze unavailable (optional, snippet SVGs only)'; gh repo set-default homelabcentral/hextra 2>/dev/null || true;",
   // Docker Desktop's VirtioFS periodically serves uid 0 for the *root inode* of
   // a bind mount. Measured in this container: 32 of 300 reads (~11%), in ~1s
   // windows roughly every 25s. Children are never affected - 0 of 300 on both
@@ -163,9 +184,28 @@
   // per-read and is not stored anywhere - it tells git to stop consulting it.
   // See docker/for-mac#6298 and #6243, both open.
   //
-  // postStart, not postCreate: the value is wrong intermittently for the life
-  // of the container, so this has to be in place on every start, not just the
-  // first. Guarded so repeated starts do not append duplicate entries.
+  // It is set twice, in two mechanisms, because they fail in different ways.
+  //
+  // `containerEnv` is the one that actually holds. GIT_CONFIG_COUNT and its
+  // numbered key/value pairs are read by git as configuration of the highest
+  // precedence, and an environment variable exists from the moment a process
+  // starts - so there is no window in which git can run without it. The
+  // postStartCommand alone left one: it runs after the container starts and
+  // after VS Code attaches, while the git extension begins probing the
+  // repository immediately, which is why the warning appeared on open and then
+  // stopped mattering a second later.
+  //
+  // The command stays as the fallback for anything that clears the
+  // environment, and because it writes the value where a plain `git config
+  // --list` will show it. postStart rather than postCreate: the ownership is
+  // wrong intermittently for the life of the container, not just at creation,
+  // and the container's ~/.gitconfig does not survive a rebuild anyway.
+  // Guarded so repeated starts do not append duplicate entries.
+  "containerEnv": {
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "safe.directory",
+    "GIT_CONFIG_VALUE_0": "${containerWorkspaceFolder}"
+  },
   "postStartCommand": "git config --global --get-all safe.directory 2>/dev/null | grep -qxF \"${containerWorkspaceFolder}\" || git config --global --add safe.directory \"${containerWorkspaceFolder}\"",
   // 1313 is the Hugo dev server, preview:8043 is the goStatic service, 9323 is
   // the Playwright HTML report (`make report`, or served automatically after a
