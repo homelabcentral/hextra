@@ -61,7 +61,7 @@
   {{- $icon = $resource.Content -}}
   {{- $isFileIcon = true -}}
   {{- if and (not (strings.Contains $icon "fill=")) (not (strings.Contains $icon "stroke=")) -}}
-    {{- $icon = replaceRE "<svg" `<svg fill="currentColor"` $icon -}}
+    {{- $icon = replaceRE "<svg" `<svg fill="currentColor"` $icon 1 -}}
   {{- end -}}
 {{- end -}}
 
@@ -114,7 +114,7 @@
             {{- $icon = .Content -}}
             {{- $isRemoteIcon = true -}}
             {{- if and (not (strings.Contains $icon "fill=")) (not (strings.Contains $icon "stroke=")) -}}
-              {{- $icon = replaceRE "<svg" `<svg fill="currentColor"` $icon -}}
+              {{- $icon = replaceRE "<svg" `<svg fill="currentColor"` $icon 1 -}}
             {{- end -}}
           {{- end -}}
         {{- end -}}
@@ -133,11 +133,19 @@
 {{/* Anything that did not come from `data/` arrives with markup the theme did
   not write. A pack's own root `class` collides with the theme's, and a
   `<script>` block has no business in an icon at all.
+
+  Every rewrite below that targets the root element passes a replacement limit
+  of 1, because `replaceRE` otherwise rewrites every match in the file and
+  `<svg>` nests - an editor export routinely carries inner ones. Without the
+  limit each of those is given `fill="currentColor"`, stripped of its own
+  sizing and handed the caller's attributes, so an inner graphic is recoloured
+  and resized to the caller's `height=1em`. The `<script>` strip is the one
+  that should reach every match, and so takes no limit.
 */}}
 {{- $isExternal := or $isRemoteIcon $isFileIcon -}}
 {{- if $isExternal -}}
   {{- $icon = replaceRE `(?s)<script[^>]*>.*?</script>` "" $icon -}}
-  {{- $icon = replaceRE `(<svg[^>]*?)\sclass=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+  {{- $icon = replaceRE `(<svg[^>]*?)\sclass=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
 {{- end -}}
 
 {{/* A file icon is sized by CSS, so its intrinsic `width`/`height` always go -
@@ -176,16 +184,16 @@
     {{- end -}}
   {{- end -}}
   {{- if $strip -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+    {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
+    {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
   {{- end -}}
 {{- end -}}
 
 {{- if .attributes -}}
   {{- $attributes := .attributes -}}
   {{- if $isRemoteIcon -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+    {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
+    {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
   {{- end -}}
   {{/* 235 of the icons in data/icons.yaml already carry aria-hidden, so a
     caller passing its own would otherwise emit the attribute twice. Drop the
@@ -193,9 +201,9 @@
     for remote icons above.
   */}}
   {{- if strings.Contains $attributes "aria-hidden" -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\saria-hidden=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+    {{- $icon = replaceRE `(<svg[^>]*?)\saria-hidden=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
   {{- end -}}
-  {{- $icon = replaceRE "<svg" (printf "<svg %s" $attributes) $icon -}}
+  {{- $icon = replaceRE "<svg" (printf "<svg %s" $attributes) $icon 1 -}}
 {{- end -}}
 
 {{- return ($icon | safeHTML) -}}
