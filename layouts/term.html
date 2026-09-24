@@ -9,7 +9,12 @@
         {{ partial "breadcrumb.html" (dict "page" . "enable" true) }}
         <h1 class="hextra-tag-page-title">
           {{- partial "utils/icon.html" (dict "name" "tag" "attributes" `height="1em" class="hextra-tag-page-icon"`) -}}
-          <span>{{ .Title }}</span>
+          {{/* The heading has to match the chip that links here, so it takes
+            the raw term too - see blog/widgets/tags.html. Only the visible
+            heading changes; `.Title` still feeds the breadcrumb and the
+            metadata, where the humanized form reads better.
+          */}}
+          <span>{{ .Data.Term }}</span>
           <span class="hextra-tag-page-count" aria-hidden="true">·</span>
           <span class="hextra-tag-page-count">{{ len .Pages }}</span>
         </h1>

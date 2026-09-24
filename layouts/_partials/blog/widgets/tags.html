@@ -15,7 +15,13 @@
       <div class="hextra-tag-cloud">
         {{- range . -}}
           <a class="hextra-tag-chip" href="{{ .Page.RelPermalink }}">
-            <span>#{{ .Page.LinkTitle }}</span>
+            {{/* `.Data.Term` is the term as written in front matter. A term
+              page carries no explicit title, so Hugo derives `LinkTitle` from
+              the term by humanizing it - which capitalizes the first letter
+              and turns hyphens into spaces, printing `theme-features` as
+              `Theme features` beside a `#`.
+            */}}
+            <span>#{{ .Page.Data.Term }}</span>
             <span class="hextra-tag-count">{{ .Count }}</span>
           </a>
         {{- end -}}
