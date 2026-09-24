@@ -30,10 +30,13 @@
   inlined the same way a `data/icons.yaml` entry is, which is what lets
   `currentColor` and CSS sizing reach it. An `<img>` would reach neither.
 
-  The file is inlined with only its `<script>` blocks, root `class` and
+  The file is inlined with only its `<script>` elements, root `class` and
   intrinsic `width`/`height` removed. Everything else - including an internal
-  `<style>`, whose class names are global once inlined - is emitted verbatim,
-  on the same trust footing as a partial in the same repository.
+  `<style>`, whose class names are global once inlined, and any `on*` event
+  attribute - is emitted verbatim, on the same trust footing as a partial in
+  the same repository. This is not a sanitiser and is not documented as one;
+  the `<script>` removal is there because a script element has no business in
+  an icon, not because the file is treated as hostile.
 */}}
 {{- if and (not $icon) (hasPrefix $name "file:") -}}
   {{- $path := strings.TrimPrefix "file:" $name -}}
@@ -132,7 +135,10 @@
 
 {{/* Anything that did not come from `data/` arrives with markup the theme did
   not write. A pack's own root `class` collides with the theme's, and a
-  `<script>` block has no business in an icon at all.
+  `<script>` element has no business in an icon at all. Both spellings go: SVG
+  is XML, so `<script/>` is legal there, and once inlined into HTML it is not
+  self-closing at all - it opens an element that swallows the rest of the icon
+  and whatever follows it on the page.
 
   Every rewrite below that targets the root element passes a replacement limit
   of 1, because `replaceRE` otherwise rewrites every match in the file and
@@ -144,7 +150,7 @@
 */}}
 {{- $isExternal := or $isRemoteIcon $isFileIcon -}}
 {{- if $isExternal -}}
-  {{- $icon = replaceRE `(?s)<script[^>]*>.*?</script>` "" $icon -}}
+  {{- $icon = replaceRE `(?s)<script[^>]*/>|<script[^>]*>.*?</script>` "" $icon -}}
   {{- $icon = replaceRE `(<svg[^>]*?)\sclass=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
 {{- end -}}
 
