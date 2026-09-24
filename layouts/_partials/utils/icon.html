@@ -2,7 +2,11 @@
 
   `quiet` makes every failure return an empty string instead of calling errorf,
   which is what `utils/icon-exists.html` needs in order to answer "would this
-  name render?" without taking the build down while it asks. Anything that can
+  name render?" without taking the build down while it asks. Every failure
+  returns either way: `errorf` records an error but does not stop the
+  template, so a branch that reported a precise problem and then fell through
+  reached the generic `icon %q not found` at the bottom and reported that too,
+  burying the useful message under it. Anything that can
   fail a normal call fails a quiet one the same way - unknown name, bad remote
   provider, remote fetching disabled, fetch error, missing or non-SVG icon file
   - so the two cannot drift.
@@ -41,12 +45,12 @@
 {{- if and (not $icon) (hasPrefix $name "file:") -}}
   {{- $path := strings.TrimPrefix "file:" $name -}}
   {{- if or (in $path "..") (not (findRE `^[A-Za-z0-9._/-]+$` $path)) -}}
-    {{- if $quiet -}}{{- return "" -}}{{- end -}}
-    {{- errorf "invalid icon file path %q" $path -}}
+    {{- if not $quiet -}}{{- errorf "invalid icon file path %q" $path -}}{{- end -}}
+    {{- return "" -}}
   {{- end -}}
   {{- if not (hasSuffix (lower $path) ".svg") -}}
-    {{- if $quiet -}}{{- return "" -}}{{- end -}}
-    {{- errorf "icon file %q is not an SVG - only SVG files can be used as an icon" $path -}}
+    {{- if not $quiet -}}{{- errorf "icon file %q is not an SVG - only SVG files can be used as an icon" $path -}}{{- end -}}
+    {{- return "" -}}
   {{- end -}}
 
   {{- $resource := false -}}
@@ -57,8 +61,8 @@
     {{- $resource = resources.Get $path -}}
   {{- end -}}
   {{- if not $resource -}}
-    {{- if $quiet -}}{{- return "" -}}{{- end -}}
-    {{- errorf "icon file %q not found - looked for a page resource, then in the assets directory" $path -}}
+    {{- if not $quiet -}}{{- errorf "icon file %q not found - looked for a page resource, then in the assets directory" $path -}}{{- end -}}
+    {{- return "" -}}
   {{- end -}}
 
   {{- $icon = $resource.Content -}}
@@ -99,20 +103,20 @@
 
     {{- if $remoteEnabled -}}
       {{- if not (findRE "^[A-Za-z0-9_-]+$" $remoteProvider) -}}
-        {{- if $quiet -}}{{- return "" -}}{{- end -}}
-        {{- errorf "invalid remote icon provider %q" $remoteProvider -}}
+        {{- if not $quiet -}}{{- errorf "invalid remote icon provider %q" $remoteProvider -}}{{- end -}}
+        {{- return "" -}}
       {{- end -}}
       {{- if or (in $remoteName "..") (not (findRE "^[A-Za-z0-9._/-]+$" $remoteName)) -}}
-        {{- if $quiet -}}{{- return "" -}}{{- end -}}
-        {{- errorf "invalid remote icon name %q" $remoteName -}}
+        {{- if not $quiet -}}{{- errorf "invalid remote icon name %q" $remoteName -}}{{- end -}}
+        {{- return "" -}}
       {{- end -}}
 
       {{- with index $remoteProviders $remoteProvider -}}
         {{- $remoteUrl := printf .url $remoteName -}}
         {{- with try (resources.GetRemote $remoteUrl) -}}
           {{- with .Err -}}
-            {{- if $quiet -}}{{- return "" -}}{{- end -}}
-            {{- errorf "Could not retrieve remote icon %q from %s. Reason: %s." $name $remoteUrl . -}}
+            {{- if not $quiet -}}{{- errorf "Could not retrieve remote icon %q from %s. Reason: %s." $name $remoteUrl . -}}{{- end -}}
+            {{- return "" -}}
           {{- else with .Value -}}
             {{- $icon = .Content -}}
             {{- $isRemoteIcon = true -}}
