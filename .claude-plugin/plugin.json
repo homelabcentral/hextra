@@ -2,7 +2,7 @@
   "name": "hextra",
   "displayName": "Hextra",
   "description": "Author and configure a Hugo site built on the Hextra theme — shortcodes, front matter, hugo.yaml, the blog, and Markdown features.",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "author": {
     "name": "homelabcentral",
     "url": "https://github.com/homelabcentral"
