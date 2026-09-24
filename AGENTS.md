@@ -283,7 +283,7 @@ gh repo set-default --view
 Verify all of it from a container terminal:
 
 ```bash
-echo ${#GH_TOKEN}   # non-zero
+[ -n "$GH_TOKEN" ] && echo set || echo unset   # presence only, never the value
 gh auth status      # should name the account, and say (GH_TOKEN)
 ssh -T git@github-homelabcentral
 ```
@@ -498,6 +498,48 @@ with `claude plugin validate ./ --strict` before releasing.
 
 How changes land in this repo. These are the rules, not suggestions — a change
 that skips them is a change that has to be redone.
+
+### Run everything in the dev container
+
+**Every command for this repository runs inside the container, never on the
+host.** Builds, tests, `make`, `git`, `gh` — all of it.
+
+```bash
+docker exec -w /workspaces/hextra hextra-dev-1 <command>
+```
+
+The host carries a different GitHub account, which is not a collaborator here,
+so host-side `git` and `gh` fail against this repository. Those failures are
+about the machine, not the credentials: never respond to one by changing a
+credential, a remote URL, a credential helper, or anything under `~/.ssh`.
+Move to the container and run the command again.
+
+**`docker exec` cannot push over SSH, by design.** VS Code injects
+`SSH_AUTH_SOCK` only into processes it spawns, so a `docker exec` session has
+no forwarded agent. `~/.ssh/config` is still read and the right key is still
+selected and accepted — a `-v` trace says `Server accepts key` — but offering a
+key only needs its public half, while authenticating needs a signature from the
+private half. That key is passphrase-protected, the passphrase is unlocked from
+the macOS Keychain into the agent, and with no agent and no tty there is nothing
+to sign with, so GitHub falls back to `Permission denied (publickey)`. The same
+push from a **VS Code terminal inside the container** works.
+
+Everything except pushing therefore works through `docker exec`. Hand the push
+over:
+
+```bash
+git push -u origin <branch>
+```
+
+Deleting a remote branch does not need the agent — it is a REST call, so `gh`
+does it from `docker exec`:
+
+```bash
+gh api -X DELETE repos/<owner>/<repo>/git/refs/heads/<branch>
+```
+
+`gh auth status` names the account and prints no token; it is the right first
+check when something authenticates as the wrong identity.
 
 ### Secrets and the `gh` CLI
 
