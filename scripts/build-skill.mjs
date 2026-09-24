@@ -516,7 +516,7 @@ function buildShortcodes(shortcodes, snippets) {
         .join(", ") +
       ".",
     "- **A paired shortcode needs a closing tag.** Self-closing ones must not have one.",
-    '- **Icon names are a closed set.** Any `icon`, `tagIcon`, or `badgeIcon` value must appear in `icons.md`, carry a remote provider prefix (`lucide:`, `tabler:`, `tabler-filled:`, `simple:`, `iconify:`), or be a `file:` path to an SVG in the project. An unknown name is not silent: it fails the build with `icon "name" not found`.',
+    '- **Icon names are a closed set.** Any `icon` or `tagIcon` value must appear in `icons.md`, carry a remote provider prefix (`lucide:`, `tabler:`, `tabler-filled:`, `simple:`, `iconify:`), or be a `file:` path to an SVG in the project. An unknown name is not silent: it fails the build with `icon "name" not found`.',
     "- **Build-time fetching can be switched off.** The shortcodes marked _fetches at build time_ all go quiet when `params.remoteFetch.enable` is `false`.",
     "",
   ];
@@ -581,7 +581,7 @@ function buildIcons(yaml) {
     "",
     `The ${names.length} icons bundled with the theme. Use a name from this list verbatim — an unknown name fails the build with \`icon "name" not found\`, so never guess one.`,
     "",
-    "Valid wherever the theme takes an icon: the `icon` shortcode, and the `icon` parameter on `callout`, `card`, `cta`, `button`, `badge`, `accordion-item`, `timeline-item`, `stat`, `keyword`, `article`, `feature-card`, and the repository cards. Also `tagIcon` on `card`, `badgeIcon` on `timeline-item`, and `params.icon` on a `hugo.yaml` menu entry.",
+    "Valid wherever the theme takes an icon: the `icon` shortcode, and the `icon` parameter on `callout`, `card`, `cta`, `button`, `badge`, `accordion-item`, `timeline-item`, `stat`, `keyword`, `feature-card`, and the repository cards. Also `tagIcon` on `card` and `params.icon` on a `hugo.yaml` menu entry.",
     "",
     "```markdown",
     '{{< icon "sparkles" >}}',
