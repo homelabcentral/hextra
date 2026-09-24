@@ -18,7 +18,7 @@
 <li class="hextra-timeline__item">
   <span class="hextra-timeline__marker" aria-hidden="true">
     {{- with $icon -}}
-      {{- partial "utils/icon" (dict "name" . "attributes" `height=14`) -}}
+      {{- partial "utils/icon" (dict "name" . "page" $.Page "attributes" `height=14`) -}}
     {{- end -}}
   </span>
   <div class="hextra-timeline__content">
@@ -29,7 +29,7 @@
         {{- end -}}
         {{- with $badge -}}
           <div class="hextra-timeline__badge">
-            {{- partial "shortcodes/badge.html" (dict "content" . "color" $badgeColor "border" true) -}}
+            {{- partial "shortcodes/badge.html" (dict "content" . "color" $badgeColor "border" true "page" $.Page) -}}
           </div>
         {{- end -}}
       </div>

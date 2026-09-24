@@ -48,7 +48,7 @@ A shortcode for displaying a feature card.
     <h3 class="hx:text-2xl hx:font-medium hx:leading-6 hx:mb-2 hx:flex hx:items-center">
       {{ with $icon -}}
         <span class="hx:pr-2">
-          {{- partial "utils/icon.html" (dict "name" . "attributes" "height=1.5rem") -}}
+          {{- partial "utils/icon.html" (dict "name" . "page" $.Page "attributes" "height=1.5rem") -}}
         </span>
       {{ end -}}
       <span>{{ $title }}</span>

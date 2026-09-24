@@ -7,6 +7,7 @@ Shared renderer for the `button` and `cta` shortcodes.
 @param {string} target The anchor target attribute.
 @param {string} rel The anchor rel attribute.
 @param {string} icon Optional icon name shown before the label.
+@param {page} page Optional page a `file:` icon resolves against.
 */}}
 
 {{- $url := .url | default "#" -}}
@@ -15,6 +16,7 @@ Shared renderer for the `button` and `cta` shortcodes.
 {{- $target := .target -}}
 {{- $rel := .rel -}}
 {{- $icon := .icon -}}
+{{- $page := .page -}}
 
 {{- $styles := slice "primary" "outline" "ghost" -}}
 {{- if not (in $styles $style) -}}
@@ -34,7 +36,7 @@ Shared renderer for the `button` and `cta` shortcodes.
   {{- with $rel }} rel="{{ . }}"{{ end -}}
 >
   {{- with $icon -}}
-    {{- partial "utils/icon" (dict "name" . "attributes" `height=16 aria-hidden="true"`) -}}
+    {{- partial "utils/icon" (dict "name" . "page" $page "attributes" `height=16 aria-hidden="true"`) -}}
   {{- end -}}
   <span class="hextra-button__label">{{ $label }}</span>
 </a>

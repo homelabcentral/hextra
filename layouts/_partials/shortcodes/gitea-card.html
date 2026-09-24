@@ -7,6 +7,7 @@
   @param {string} repo Required. Repository as "owner/name".
   @param {string} server Required. Instance URL.
   @param {string} icon Icon shown before the title.
+  @param {page} page Optional page a `file:` icon resolves against.
   @param {bool} showThumbnail Fetch and show the owner's avatar.
   @param {string} provider Short name, used in warnings and the image path.
   @param {string} shortcode Name of the calling shortcode, for error messages.
@@ -18,6 +19,7 @@
 {{- $repo := .repo -}}
 {{- $server := .server -}}
 {{- $icon := .icon -}}
+{{- $page := .page -}}
 {{- $showThumbnail := eq (printf "%v" .showThumbnail) "true" -}}
 {{- $provider := .provider | default "gitea" -}}
 {{- $name := .shortcode | default $provider -}}
@@ -47,6 +49,7 @@
   "url" (printf "%s/%s" $server $repo)
   "title" $repo
   "icon" $icon
+  "page" $page
 -}}
 
 {{- $enabled := partial "utils/remote-fetch-enabled.html" . -}}

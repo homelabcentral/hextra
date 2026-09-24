@@ -1,6 +1,7 @@
 {{- $link := .link -}}
 {{- $title := .title -}}
 {{- $icon := .icon -}}
+{{- $page := .page -}}
 {{- $subtitle := .subtitle -}}
 {{- $image := .image -}}
 {{- $alt := .alt | default $title -}}
@@ -71,7 +72,7 @@
   */}}
   <div>
     <span class="hextra-card-icon hx:flex hx:font-semibold hx:items-start hx:gap-2 {{ $padding }} hx:text-neutral-700 hx:hover:text-neutral-900 hx:dark:text-neutral-200 hx:dark:hover:text-neutral-50">
-      {{- with $icon }}{{ partial "utils/icon.html" (dict "name" $icon) -}}{{- end -}}
+      {{- with $icon }}{{ partial "utils/icon.html" (dict "name" $icon "page" $page) -}}{{- end -}}
       {{- $title -}}
     </span>
     {{- with $subtitle -}}
@@ -86,6 +87,7 @@
       "class" "hextra-card-tag"
       "border" $tagBorder
       "icon" $tagIcon
+      "page" $page
       )
     -}}
   {{- end -}}

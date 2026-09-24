@@ -21,7 +21,7 @@ templates.{{< /stat >}}
 <div class="hextra-stat">
   {{- with $icon -}}
     <div class="hextra-stat__icon">
-      {{- partial "utils/icon" (dict "name" . "attributes" `height=20 aria-hidden="true"`) -}}
+      {{- partial "utils/icon" (dict "name" . "page" $.Page "attributes" `height=20 aria-hidden="true"`) -}}
     </div>
   {{- end -}}
   <div class="hextra-stat__value">{{ $value | markdownify }}</div>

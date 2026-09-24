@@ -39,6 +39,7 @@
   (printf "https://galaxy.ansible.com/ui/standalone/roles/%s/%s/" $namespace $name))
   "title" $id
   "icon" $icon
+  "page" .Page
   "language" (cond $isCollection "collection" "role")
 -}}
 
