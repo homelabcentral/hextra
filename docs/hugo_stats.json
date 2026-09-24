@@ -136,6 +136,8 @@
       "hextra-badge--lg",
       "hextra-badge--md",
       "hextra-badge--sm",
+      "hextra-badge--xl",
+      "hextra-badge--xs",
       "hextra-badge-link",
       "hextra-badge__icon",
       "hextra-badge__pill",
