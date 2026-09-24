@@ -84,14 +84,18 @@ test("badges written on consecutive lines share one paragraph and one baseline",
   }
 });
 
-test("a linked badge keeps a 24px target and does not leak the referrer", async ({ page }) => {
+test("a linked badge keeps a 24x24 target and does not leak the referrer", async ({ page }) => {
   const link = page.locator("a.hextra-badge-link").first();
   await expect(link, `no linked badge on ${BADGE_PAGE}`).toHaveCount(1);
 
   // WCAG 2.2 SC 2.5.8 at AA. `accessibility.spec.ts` disables `target-size`,
   // so this is the only place it is checked.
-  const height = await link.evaluate((el) => el.getBoundingClientRect().height);
-  expect(Math.round(height), "linked badge target height").toBeGreaterThanOrEqual(24);
+  const box = await link.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
+  });
+  expect(Math.round(box.height), "linked badge target height").toBeGreaterThanOrEqual(24);
+  expect(Math.round(box.width), "linked badge target width").toBeGreaterThanOrEqual(24);
 
   // The badge opens in a new tab, which without this hands the destination
   // both the referrer and a handle on the opener window.
@@ -170,4 +174,29 @@ test("a file: icon with no viewBox keeps its ratio instead of stretching to 300p
   });
   expect(Math.round(box.height), "icon height").toBe(12);
   expect(Math.round(box.width), "icon width - 300 means the ratio was lost").toBe(12);
+});
+
+test("the 24x24 floor survives the shortest label there is", async ({ page }) => {
+  // The height floor alone passed every badge on the page, because every
+  // linked example had a label long enough to clear 24px on its own. A `sm`
+  // pill around one character is `px-2` plus a 1px border either side plus a
+  // glyph at `.6rem` - about 23px, and the assertion above never saw it.
+  const links = page.locator("a.hextra-badge-link");
+  const count = await links.count();
+  expect(count, `no linked badges on ${BADGE_PAGE}`).toBeGreaterThan(0);
+
+  const boxes = await links.evaluateAll((els) =>
+    els.map((el) => {
+      const rect = el.getBoundingClientRect();
+      return { label: el.textContent?.trim() ?? "", width: rect.width, height: rect.height };
+    })
+  );
+
+  const narrowest = boxes.reduce((a, b) => (a.width <= b.width ? a : b));
+  expect(narrowest.label.length, "no short-labelled linked badge to measure - did the example go?").toBeLessThanOrEqual(2);
+
+  for (const box of boxes) {
+    expect(Math.round(box.width), `target width for ${JSON.stringify(box.label)}`).toBeGreaterThanOrEqual(24);
+    expect(Math.round(box.height), `target height for ${JSON.stringify(box.label)}`).toBeGreaterThanOrEqual(24);
+  }
 });

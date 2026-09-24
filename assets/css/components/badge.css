@@ -58,15 +58,22 @@
 }
 
 /*
-  WCAG 2.2 SC 2.5.8 asks for a 24x24 CSS px target at AA. A `sm` pill is 20px
-  of line box - 22px once the border is added, and 20px flat when `border` is
-  false - so a linked `sm` badge would fail it either way. The floor lives on
-  the link rather than on the pill, which leaves the pill's own proportions
-  alone. `md` and `lg` clear 24px on their own, so this is a no-op for them.
+  WCAG 2.2 SC 2.5.8 asks for a 24x24 CSS px target at AA - both axes, which is
+  why the floor is a pair. A `sm` pill is 20px of line box - 22px once the
+  border is added, and 20px flat when `border` is false - so a linked `sm`
+  badge would fail the height either way. It fails the width too whenever the
+  label is short: `px-2` plus the border plus one or two characters at `.6rem`
+  lands around 23px. `md` and `lg` clear the height on their own but not the
+  width, so `min-w-6` is doing work at every step, and `justify-center` keeps
+  a pill narrower than the floor centred in the target rather than pinned to
+  its start edge.
+
+  The floor lives on the link rather than on the pill, which leaves the pill's
+  own proportions alone.
 
   `accessibility.spec.ts` disables `target-size`, so nothing in the suite
   catches this - see tests/badge.spec.ts, which measures the link box directly.
 */
 .hextra-badge-link {
-  @apply hx:inline-flex hx:items-center hx:align-middle hx:min-h-6;
+  @apply hx:inline-flex hx:items-center hx:justify-center hx:align-middle hx:min-h-6 hx:min-w-6;
 }

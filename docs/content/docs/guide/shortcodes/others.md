@@ -92,7 +92,7 @@ A badge is an inline element, so consecutive badges share a paragraph and the li
 
 `md` is the default, and is what every badge rendered at before `size` existed — adding the parameter moved nothing. The icon tracks the step, so a badge never carries an icon sized for a different one.
 
-A linked `sm` badge keeps a 24&times;24 CSS pixel click target even though its pill is shorter, which is what [WCAG 2.2 SC 2.5.8](https://www.w3.org/TR/WCAG22/#target-size-minimum) asks for at AA.
+A linked `sm` badge keeps a 24&times;24 CSS pixel click target even though its pill is smaller in both directions, which is what [WCAG 2.2 SC 2.5.8](https://www.w3.org/TR/WCAG22/#target-size-minimum) asks for at AA. The floor applies to a short label too, so a one-character badge is still a 24&times;24 target with the pill centred inside it.
 
 #### Icons
 
@@ -214,6 +214,16 @@ The pattern a page header wants — one badge per destination, each with its own
 {{</* badge content="Homebrew cask" color="blue" icon="simple:homebrew" size="lg" link="https://formulae.brew.sh/cask/" */>}}
 {{</* badge content="Homebrew formula" color="green" icon="simple:homebrew" size="lg" link="https://formulae.brew.sh/formula/" */>}}
 {{</* badge content="Direct download" color="orange" icon="document-download" size="lg" link="https://github.com/homelabcentral/hextra/releases" */>}}
+```
+
+A short label does not shrink the target. These two are the narrowest a linked badge gets, and both are still 24&times;24:
+
+{{< badge content="1" size="sm" link="https://github.com/homelabcentral/hextra/releases" >}}
+{{< badge content="v1" color="green" size="sm" link="https://github.com/homelabcentral/hextra/releases" >}}
+
+```
+{{</* badge content="1" size="sm" link="https://github.com/homelabcentral/hextra/releases" */>}}
+{{</* badge content="v1" color="green" size="sm" link="https://github.com/homelabcentral/hextra/releases" */>}}
 ```
 
 ### Options
