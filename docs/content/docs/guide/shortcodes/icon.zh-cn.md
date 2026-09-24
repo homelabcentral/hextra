@@ -46,6 +46,24 @@ your-icon: <svg>您的图标 SVG 内容</svg>
 
 提示：[Iconify Design](https://iconify.design/) 是寻找此类可复制 SVG 图标的优质资源平台。你也可以完全不复制，直接使用下文“远程图标包”中介绍的 `iconify:` 提供商前缀。
 
+### 来自文件的图标
+
+项目中已有的 SVG 不必粘贴进 `data/icons.yaml`。在它的路径前加上 `file:`，主题就会直接从磁盘读取：
+
+{{< icon "file:icons/hexagon.svg" >}}
+
+```
+{{</* icon "file:icons/hexagon.svg" */>}}
+
+{{</* badge content="Badge" icon="file:icons/hexagon.svg" */>}}
+```
+
+该路径先按调用短代码的那个页面包（page bundle）的资源解析，再回退到站点的 `assets/` 目录——`file:icons/hexagon.svg` 会找到 `assets/icons/hexagon.svg`，而与 `index.md` 相邻的徽标用裸文件名即可引用。
+
+文件是内联展开而非外链，这正是它能像其他图标一样工作的原因：由 CSS 决定尺寸，不带 `fill` 或 `stroke` 的 SVG 会通过 `currentColor` 继承周围的文字颜色。主题只改写根 `<svg>` 元素：去掉它的 `width`、`height` 和 `class`，以免与周围的尺寸设置冲突；并移除 `<script>` 元素，`<script>…</script>` 与自闭合的 `<script/>` 两种写法都包括在内。其余内容原样输出——包括内联后类名会变成全局的 `<style>`，以及任何 `on*` 事件属性。这并不是消毒：请把 `file:` 图标当作你自己 `layouts/` 里的模板来看待——它是内联进你页面的、你自己的标记，所以只指向你能掌控的文件。
+
+只支持 SVG，且路径必须真实存在。`.png`，或没有对应文件的名称，会让构建失败并在消息中指出该路径，而不是渲染成空白。
+
 ### 远程图标包
 
 远程图标可以通过提供商前缀按需加载。Hextra 支持以下提供商：
