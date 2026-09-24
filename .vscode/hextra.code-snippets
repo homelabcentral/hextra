@@ -174,9 +174,9 @@
     "scope": "markdown",
     "prefix": "hxbadge",
     "body": [
-      "{{< badge content=\"${1:Badge}\" color=\"${2|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" icon=\"${3:sparkles}\" >}}"
+      "{{< badge content=\"${1:Badge}\" color=\"${2|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" size=\"${3|md,xs,sm,lg,xl|}\" icon=\"${4:sparkles}\" >}}"
     ],
-    "description": "Badge. The old type= names (default/tip/info/warning/error/important) still map onto colors."
+    "description": "Badge. size is xs/sm/md/lg/xl, md being the default. The old type= names (default/tip/info/warning/error/important) still map onto colors."
   },
   "Hextra: badge (inline)": {
     "scope": "markdown",
@@ -190,7 +190,7 @@
     "scope": "markdown",
     "prefix": "hxbadge-link",
     "body": [
-      "{{< badge content=\"${1:Badge}\" color=\"${2|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" link=\"${3:https://example.com}\" border=${4|true,false|} >}}"
+      "{{< badge content=\"${1:Badge}\" color=\"${2|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" size=\"${3|md,xs,sm,lg,xl|}\" link=\"${4:https://example.com}\" border=${5|true,false|} >}}"
     ],
     "description": "Badge wrapped in a link (opens in a new tab)."
   },
@@ -382,8 +382,8 @@
     "scope": "markdown",
     "prefix": "hxtimeline-item",
     "body": [
-      "{{< timeline-item header=\"${1:v1.0}\" subheader=\"${2:First release}\" badge=\"${3:2024}\" badgeColor=\"${4|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" icon=\"${5:star}\" >}}",
-      "${6:Content}",
+      "{{< timeline-item header=\"${1:v1.0}\" subheader=\"${2:First release}\" badge=\"${3:2024}\" badgeColor=\"${4|gray,purple,indigo,blue,green,yellow,orange,amber,red|}\" badgeIcon=\"${5:sparkles}\" icon=\"${6:star}\" >}}",
+      "${7:Content}",
       "{{< /timeline-item >}}"
     ],
     "description": "One timeline entry. badgeColor takes the nine badge colors."

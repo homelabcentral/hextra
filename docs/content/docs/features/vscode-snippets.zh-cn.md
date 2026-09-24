@@ -57,86 +57,86 @@ Content
 
 ### Shortcode
 
-| 前缀                    | 插入内容                                             |
-| ----------------------- | ---------------------------------------------------- |
-| `hxcallout`             | 提示框；type 决定颜色和默认图标                      |
-| `hxcallout-emoji`       | 带自定义 emoji 的提示框                              |
-| `hxcallout-icon`        | 带指定图标名的提示框                                 |
-| `hxcards`               | 含两张卡片的卡片网格容器                             |
-| `hxcard`                | 单张卡片——链接、标题、图标、副标题                   |
-| `hxcard-tag`            | 带徽章标签的卡片——`tagColor`、`tagIcon`、`tagBorder` |
-| `hxcard-image`          | 图片卡片——`method`/`options` 传给 Hugo 图片处理      |
-| `hxtabs`                | 含两个标签页的标签页界面                             |
-| `hxtab`                 | 单个标签页——`name`、`icon`、`selected`               |
-| `hxsteps`               | 使用 h3 标题的编号步骤列表                           |
-| `hxdetails`             | 可折叠区块                                           |
-| `hxfiletree`            | 含一个文件夹和一个文件的文件树                       |
-| `hxfiletree-folder`     | 文件夹节点                                           |
-| `hxfiletree-file`       | 文件节点                                             |
-| `hxgallery`             | 含两个项目的画廊容器                                 |
-| `hxgallery-item`        | 本地画廊图片                                         |
-| `hxgallery-item-remote` | 远程画廊图片，带必需的 `width`/`height`              |
-| `hxbadge`               | 徽章——内容、颜色、图标                               |
-| `hxbadge-inline`        | 徽章，位置参数简写形式                               |
-| `hxbadge-link`          | 包在链接中的徽章                                     |
-| `hxicon`                | 内置 SVG 图标                                        |
-| `hxicon-remote`         | 远程图标——`lucide:` / `tabler:` / `simple:`          |
-| `hxjupyter`             | Jupyter notebook 嵌入                                |
-| `hxpdf`                 | PDF 嵌入                                             |
-| `hxasciinema`           | 带播放选项的 Asciinema 录像                          |
-| `hxterm`                | 术语表词条                                           |
-| `hxinclude`             | 内联引入另一页面的内容                               |
-| `hxaccordion`           | 含两个折叠区块的手风琴容器                           |
-| `hxaccordion-item`      | 单个手风琴区块                                       |
-| `hxarticle`             | 指向站内另一页面的卡片 —— 标题、摘要、封面           |
-| `hxbutton`              | 通过 `href` 生成的按钮式链接                         |
-| `hxbutton-page`         | 通过 `pageRef` 链接到站内页面的按钮                  |
-| `hxcta`                 | 行动号召按钮                                         |
-| `hxlead`                | 导语段落                                             |
-| `hxborderless`          | 无单元格边框的参考表格                               |
-| `hxkeywords`            | 含两个关键词的关键词容器                             |
-| `hxkeyword`             | 单个关键词                                           |
-| `hxstats`               | 含两项指标的指标网格                                 |
-| `hxstat`                | 单项指标                                             |
-| `hxtimeline`            | 含一个条目的时间线容器                               |
-| `hxtimeline-item`       | 单个时间线条目 —— `badge`、`badgeColor`、`icon`      |
-| `hxswatches`            | 由位置参数十六进制色值组成的调色板                   |
-| `hxlist`                | 按 `where`/`value` 过滤的页面列表                    |
-| `hxad`                  | 在此处插入一个广告 — 需要配置 `params.ads`           |
-| `hxadprovider`          | 指定广告网络、格式与对齐方式的广告                   |
-| `hxchart`               | 由内联配置生成的 Chart.js 图表                       |
-| `hxtypeit`              | 打字机效果，每行一条字符串                           |
-| `hxvideo`               | 带播放控件的自托管视频                               |
-| `hxvideo-autoplay`      | 背景式视频 —— autoplay 隐含 muted                    |
-| `hxyoutube`             | 点击后才加载播放器的 YouTube 嵌入                    |
-| `hxemail`               | 经过混淆的 mailto 链接                               |
-| `hxgithub`              | GitHub 仓库卡片                                      |
-| `hxgitlab`              | 按命名空间路径的 GitLab 项目卡片                     |
-| `hxgitlab-id`           | 按数字 ID 的 GitLab 项目卡片                         |
-| `hxgitea`               | Gitea 仓库卡片                                       |
-| `hxforgejo`             | Forgejo 仓库卡片                                     |
-| `hxcodeberg`            | Codeberg 仓库卡片                                    |
-| `hxhuggingface`         | Hugging Face 模型卡片                                |
-| `hxhuggingface-dataset` | Hugging Face 数据集卡片                              |
-| `hxansible`             | Ansible Galaxy 角色卡片                              |
-| `hxansible-collection`  | Ansible Galaxy 集合卡片                              |
-| `hxgist`                | 以主题代码块渲染的 GitHub gist                       |
-| `hxgist-live`           | 在读者浏览器中刷新的 gist                            |
-| `hxcodeimporter`        | 将 URL 上的文件作为代码块引入                        |
-| `hxcodeimporter-lines`  | 带行号与高亮的引入片段                               |
-| `hxcodeimporter-live`   | 在读者浏览器中刷新的引入文件                         |
-| `hxltr`                 | 在 RTL 页面中强制从左到右                            |
-| `hxrtl`                 | 在 LTR 页面中强制从右到左                            |
-| `hxhero`                | `hextra-home` 页面的完整 hero 区块                   |
-| `hxhero-container`      | 带侧边图片的 hero 容器                               |
-| `hxhero-headline`       | Hero 主标题                                          |
-| `hxhero-subtitle`       | Hero 副标题                                          |
-| `hxhero-badge`          | 主标题上方的药丸徽章                                 |
-| `hxhero-button`         | Hero 行动号召按钮                                    |
-| `hxhero-section`        | 首页布局的章节标题                                   |
-| `hxfeature-grid`        | 含两张卡片的特性网格                                 |
-| `hxfeature-card`        | 特性卡片                                             |
-| `hxfeature-card-image`  | 带背景图和渐变的特性卡片                             |
+| 前缀                    | 插入内容                                                     |
+| ----------------------- | ------------------------------------------------------------ |
+| `hxcallout`             | 提示框；type 决定颜色和默认图标                              |
+| `hxcallout-emoji`       | 带自定义 emoji 的提示框                                      |
+| `hxcallout-icon`        | 带指定图标名的提示框                                         |
+| `hxcards`               | 含两张卡片的卡片网格容器                                     |
+| `hxcard`                | 单张卡片——链接、标题、图标、副标题                           |
+| `hxcard-tag`            | 带徽章标签的卡片——`tagColor`、`tagIcon`、`tagBorder`         |
+| `hxcard-image`          | 图片卡片——`method`/`options` 传给 Hugo 图片处理              |
+| `hxtabs`                | 含两个标签页的标签页界面                                     |
+| `hxtab`                 | 单个标签页——`name`、`icon`、`selected`                       |
+| `hxsteps`               | 使用 h3 标题的编号步骤列表                                   |
+| `hxdetails`             | 可折叠区块                                                   |
+| `hxfiletree`            | 含一个文件夹和一个文件的文件树                               |
+| `hxfiletree-folder`     | 文件夹节点                                                   |
+| `hxfiletree-file`       | 文件节点                                                     |
+| `hxgallery`             | 含两个项目的画廊容器                                         |
+| `hxgallery-item`        | 本地画廊图片                                                 |
+| `hxgallery-item-remote` | 远程画廊图片，带必需的 `width`/`height`                      |
+| `hxbadge`               | 徽章——内容、颜色、图标                                       |
+| `hxbadge-inline`        | 徽章，位置参数简写形式                                       |
+| `hxbadge-link`          | 包在链接中的徽章                                             |
+| `hxicon`                | 内置 SVG 图标                                                |
+| `hxicon-remote`         | 远程图标——`lucide:` / `tabler:` / `simple:`                  |
+| `hxjupyter`             | Jupyter notebook 嵌入                                        |
+| `hxpdf`                 | PDF 嵌入                                                     |
+| `hxasciinema`           | 带播放选项的 Asciinema 录像                                  |
+| `hxterm`                | 术语表词条                                                   |
+| `hxinclude`             | 内联引入另一页面的内容                                       |
+| `hxaccordion`           | 含两个折叠区块的手风琴容器                                   |
+| `hxaccordion-item`      | 单个手风琴区块                                               |
+| `hxarticle`             | 指向站内另一页面的卡片 —— 标题、摘要、封面                   |
+| `hxbutton`              | 通过 `href` 生成的按钮式链接                                 |
+| `hxbutton-page`         | 通过 `pageRef` 链接到站内页面的按钮                          |
+| `hxcta`                 | 行动号召按钮                                                 |
+| `hxlead`                | 导语段落                                                     |
+| `hxborderless`          | 无单元格边框的参考表格                                       |
+| `hxkeywords`            | 含两个关键词的关键词容器                                     |
+| `hxkeyword`             | 单个关键词                                                   |
+| `hxstats`               | 含两项指标的指标网格                                         |
+| `hxstat`                | 单项指标                                                     |
+| `hxtimeline`            | 含一个条目的时间线容器                                       |
+| `hxtimeline-item`       | 单个时间线条目 —— `badge`、`badgeColor`、`badgeIcon`、`icon` |
+| `hxswatches`            | 由位置参数十六进制色值组成的调色板                           |
+| `hxlist`                | 按 `where`/`value` 过滤的页面列表                            |
+| `hxad`                  | 在此处插入一个广告 — 需要配置 `params.ads`                   |
+| `hxadprovider`          | 指定广告网络、格式与对齐方式的广告                           |
+| `hxchart`               | 由内联配置生成的 Chart.js 图表                               |
+| `hxtypeit`              | 打字机效果，每行一条字符串                                   |
+| `hxvideo`               | 带播放控件的自托管视频                                       |
+| `hxvideo-autoplay`      | 背景式视频 —— autoplay 隐含 muted                            |
+| `hxyoutube`             | 点击后才加载播放器的 YouTube 嵌入                            |
+| `hxemail`               | 经过混淆的 mailto 链接                                       |
+| `hxgithub`              | GitHub 仓库卡片                                              |
+| `hxgitlab`              | 按命名空间路径的 GitLab 项目卡片                             |
+| `hxgitlab-id`           | 按数字 ID 的 GitLab 项目卡片                                 |
+| `hxgitea`               | Gitea 仓库卡片                                               |
+| `hxforgejo`             | Forgejo 仓库卡片                                             |
+| `hxcodeberg`            | Codeberg 仓库卡片                                            |
+| `hxhuggingface`         | Hugging Face 模型卡片                                        |
+| `hxhuggingface-dataset` | Hugging Face 数据集卡片                                      |
+| `hxansible`             | Ansible Galaxy 角色卡片                                      |
+| `hxansible-collection`  | Ansible Galaxy 集合卡片                                      |
+| `hxgist`                | 以主题代码块渲染的 GitHub gist                               |
+| `hxgist-live`           | 在读者浏览器中刷新的 gist                                    |
+| `hxcodeimporter`        | 将 URL 上的文件作为代码块引入                                |
+| `hxcodeimporter-lines`  | 带行号与高亮的引入片段                                       |
+| `hxcodeimporter-live`   | 在读者浏览器中刷新的引入文件                                 |
+| `hxltr`                 | 在 RTL 页面中强制从左到右                                    |
+| `hxrtl`                 | 在 LTR 页面中强制从右到左                                    |
+| `hxhero`                | `hextra-home` 页面的完整 hero 区块                           |
+| `hxhero-container`      | 带侧边图片的 hero 容器                                       |
+| `hxhero-headline`       | Hero 主标题                                                  |
+| `hxhero-subtitle`       | Hero 副标题                                                  |
+| `hxhero-badge`          | 主标题上方的药丸徽章                                         |
+| `hxhero-button`         | Hero 行动号召按钮                                            |
+| `hxhero-section`        | 首页布局的章节标题                                           |
+| `hxfeature-grid`        | 含两张卡片的特性网格                                         |
+| `hxfeature-card`        | 特性卡片                                                     |
+| `hxfeature-card-image`  | 带背景图和渐变的特性卡片                                     |
 
 ### Front matter
 

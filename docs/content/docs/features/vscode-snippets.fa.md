@@ -99,7 +99,7 @@ Content
 | `hxstats`               | شبکه آمار با دو عدد                                                |
 | `hxstat`                | یک عدد آماری                                                       |
 | `hxtimeline`            | ظرف خط زمانی با یک ورودی                                           |
-| `hxtimeline-item`       | یک ورودی خط زمانی — `badge`، `badgeColor`، `icon`                  |
+| `hxtimeline-item`       | یک ورودی خط زمانی — `badge`، `badgeColor`، `badgeIcon`، `icon`     |
 | `hxswatches`            | پالت رنگ از کدهای هگز موضعی                                        |
 | `hxlist`                | فهرست صفحه‌ها، فیلترشده با `where`/`value`                         |
 | `hxad`                  | یک تبلیغ در این نقطه — به تنظیم `params.ads` نیاز دارد             |

@@ -15,7 +15,7 @@ Use `timeline` as the container and one `timeline-item` for each entry.
 The theme began as a small set of layouts for a personal documentation site.
 {{< /timeline-item >}}
 
-{{< timeline-item header="Search and dark mode" badge="2024" badgeColor="blue" icon="search" >}}
+{{< timeline-item header="Search and dark mode" badge="2024" badgeColor="blue" badgeIcon="sparkles" icon="search" >}}
 Full-text search landed alongside a system-aware colour scheme.
 
 - FlexSearch index built at compile time
@@ -38,7 +38,7 @@ component.
 The theme began as a small set of layouts for a personal documentation site.
 {{</* /timeline-item */>}}
 
-{{</* timeline-item header="Accessibility pass" badge="Now" badgeColor="green" icon="badge-check" */>}}
+{{</* timeline-item header="Accessibility pass" badge="Now" badgeColor="green" badgeIcon="badge-check" icon="badge-check" */>}}
 Keyboard navigation, focus rings and colour contrast reviewed.
 {{</* /timeline-item */>}}
 
@@ -55,6 +55,7 @@ Keyboard navigation, focus rings and colour contrast reviewed.
 | `subheader`  | Optional secondary line below the title. Markdown is supported.                                  |
 | `badge`      | Optional short text shown as a badge next to the title.                                          |
 | `badgeColor` | Badge colour. Accepts the same values as the [Badge](../others#badge) shortcode. Default `gray`. |
+| `badgeIcon`  | Optional icon shown inside the badge. Takes any name the rail `icon` takes.                      |
 | `icon`       | Optional icon shown on the rail. See [Icon](../icon) for available names.                        |
 
 The body is written in Markdown, so lists, links, code blocks and other

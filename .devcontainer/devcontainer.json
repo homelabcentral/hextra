@@ -134,7 +134,19 @@
   // The apt-get update is deliberate even though `playwright install
   // --with-deps` directly above runs one of its own; depending on that as an
   // implicit side effect would break the moment the Playwright step moves.
-  "postCreateCommand": "sudo chown -R \"$(id -u):$(id -g)\" node_modules && npm install && npx playwright install --with-deps chromium || exit 1; { sudo apt-get update && sudo apt-get install -y --no-install-recommends asciinema; } || echo 'devcontainer: asciinema unavailable (optional, docs casts only)'; go install github.com/charmbracelet/freeze@v0.2.2 || echo 'devcontainer: freeze unavailable (optional, snippet SVGs only)'; gh repo set-default homelabcentral/hextra 2>/dev/null || true;",
+  // This runs on every create, and "Rebuild Container" always creates. What it
+  // downloads is held across rebuilds by three named volumes declared in
+  // docker-compose.yml - the Playwright browser, the Go module cache and
+  // /go/bin - because none of them change between rebuilds and all three would
+  // otherwise be fetched again. Docker creates a named volume root-owned, so
+  // they are chowned here, once, before anything writes to them.
+  //
+  // `--with-deps` stays: the browser now comes from the volume, but the OS
+  // packages it needs live in the container filesystem and do go away. Same
+  // for asciinema, so its guard only helps when postCreateCommand is re-run
+  // rather than on a rebuild; freeze is the one that skips outright, from
+  // /go/bin.
+  "postCreateCommand": "sudo chown -R \"$(id -u):$(id -g)\" node_modules /home/vscode/.cache/ms-playwright /go/pkg /go/bin && npm install && npx playwright install --with-deps chromium || exit 1; command -v asciinema >/dev/null 2>&1 || { sudo apt-get update && sudo apt-get install -y --no-install-recommends asciinema; } || echo 'devcontainer: asciinema unavailable (optional, docs casts only)'; command -v freeze >/dev/null 2>&1 || go install github.com/charmbracelet/freeze@v0.2.2 || echo 'devcontainer: freeze unavailable (optional, snippet SVGs only)'; gh repo set-default homelabcentral/hextra 2>/dev/null || true;",
   // Docker Desktop's VirtioFS periodically serves uid 0 for the *root inode* of
   // a bind mount. Measured in this container: 32 of 300 reads (~11%), in ~1s
   // windows roughly every 25s. Children are never affected - 0 of 300 on both

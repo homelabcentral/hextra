@@ -39,4 +39,4 @@
   {{- $tabs = $temp -}}
 {{- end -}}
 
-{{- partial "shortcodes/tabs" (dict "tabs" $tabs "enableSync" $enableSync "id" .Ordinal) -}}
+{{- partial "shortcodes/tabs" (dict "tabs" $tabs "enableSync" $enableSync "id" .Ordinal "page" .Page) -}}

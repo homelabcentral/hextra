@@ -15,16 +15,25 @@
   A remote name costs one fetch here, which `utils/icon.html` then reuses from
   Hugo's resource cache when the caller renders it.
 
+  `page` exists for the same reason: a `file:` path resolves against the page
+  bundle before the assets directory, so a guard asked without the page the
+  render is given answers a different question and reports an icon sitting
+  beside its `index.md` as missing. Pass whatever the matching
+  `utils/icon.html` call is passed - both, or neither.
+
   @param {string} name The icon name to check.
+  @param {page} page Optional page a `file:` icon resolves against. Must match
+  the page given to the `utils/icon.html` call this guards.
   @returns {bool}
 
   @example {{ if partial "utils/icon-exists.html" (dict "name" $icon)
 }}
 */}}
 {{- $name := .name | default "" -}}
+{{- $page := .page -}}
 {{- $exists := false -}}
 {{- with $name -}}
-  {{- $rendered := partial "utils/icon.html" (dict "name" . "quiet" true) -}}
+  {{- $rendered := partial "utils/icon.html" (dict "name" . "page" $page "quiet" true) -}}
   {{- $exists = ne (printf "%s" $rendered) "" -}}
 {{- end -}}
 {{- return $exists -}}

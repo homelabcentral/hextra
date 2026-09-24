@@ -59,12 +59,23 @@ services:
       # TZ is read at process start, so changing it needs a container rebuild,
       # not a Reload Window.
       - TZ=${HOST_TZ:-Etc/UTC}
+      # Put the Playwright browser download somewhere a named volume can hold.
+      # The default is ~/.cache/ms-playwright, inside the container filesystem,
+      # which a rebuild discards - so every rebuild re-downloaded Chromium.
+      - PLAYWRIGHT_BROWSERS_PATH=/home/vscode/.cache/ms-playwright
     volumes:
       - ..:/workspaces/hextra:cached
       # Named volume masks node_modules so the container keeps its own
       # Linux-native binaries (lightningcss etc.) instead of sharing the
       # host's Darwin ones through the bind mount.
       - node_modules:/workspaces/hextra/node_modules
+      # Everything else postCreateCommand downloads, kept across rebuilds. All
+      # three live in the container filesystem by default, which a rebuild
+      # discards - so Chromium, the Go module cache and the freeze binary were
+      # fetched again every time, and none of them change between rebuilds.
+      - playwright_browsers:/home/vscode/.cache/ms-playwright
+      - go_pkg:/go/pkg
+      - go_bin:/go/bin
       # Host Docker socket so act (`make ci*`) can start job containers.
       # Those run as SIBLINGS of this container on the host daemon, not
       # inside it - paths act mounts must exist on the host.
@@ -105,3 +116,8 @@ services:
 volumes:
   # Per-container node_modules; the host keeps its own copy on disk.
   node_modules:
+  # Rebuild caches. Docker creates a named volume root-owned, so each is
+  # chowned once in postCreateCommand before anything writes to it.
+  playwright_browsers:
+  go_pkg:
+  go_bin:

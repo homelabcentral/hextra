@@ -26,7 +26,7 @@
 {{- $url := printf "https://github.com/%s" $repo -}}
 {{- $showThumbnail := eq (printf "%v" (.Get "showThumbnail")) "true" -}}
 
-{{- $card := dict "url" $url "title" $repo "icon" "github" -}}
+{{- $card := dict "url" $url "title" $repo "icon" "github" "page" .Page -}}
 {{- $avatar := "" -}}
 
 {{- /* Turns every API call off, for builds that must not reach the network. */ -}}

@@ -4,6 +4,7 @@
   @param {string} subheader Optional secondary line below the title.
   @param {string} badge Optional short text shown as a badge next to the title.
   @param {string} badgeColor Optional badge colour, see the badge shortcode.
+  @param {string} badgeIcon Optional icon shown inside the badge.
   @param {string} icon Optional icon shown on the timeline rail.
 
   @example {{< timeline-item header="v1.0" badge="2024" icon="star" >}}Content{{< /timeline-item >}}
@@ -12,13 +13,14 @@
 {{- $subheader := .Get "subheader" -}}
 {{- $badge := .Get "badge" -}}
 {{- $badgeColor := .Get "badgeColor" | default "gray" -}}
+{{- $badgeIcon := .Get "badgeIcon" -}}
 {{- $icon := .Get "icon" -}}
 
 
 <li class="hextra-timeline__item">
   <span class="hextra-timeline__marker" aria-hidden="true">
     {{- with $icon -}}
-      {{- partial "utils/icon" (dict "name" . "attributes" `height=14`) -}}
+      {{- partial "utils/icon" (dict "name" . "page" $.Page "attributes" `height=14`) -}}
     {{- end -}}
   </span>
   <div class="hextra-timeline__content">
@@ -29,7 +31,7 @@
         {{- end -}}
         {{- with $badge -}}
           <div class="hextra-timeline__badge">
-            {{- partial "shortcodes/badge.html" (dict "content" . "color" $badgeColor "border" true) -}}
+            {{- partial "shortcodes/badge.html" (dict "content" . "color" $badgeColor "icon" $badgeIcon "border" true "page" $.Page) -}}
           </div>
         {{- end -}}
       </div>

@@ -16,6 +16,7 @@
   @param {string} icon Provider icon name.
   @param {string} thumbnail Optional image URL shown above the card body.
   @param {string} thumbnailFit How the thumbnail fills its box: cover (default) or contain.
+  @param {page} page Optional page a `file:` icon resolves against.
 
   @example {{ partial "components/repo-card.html" (dict "url" $url "title" $name)
 }}
@@ -27,6 +28,7 @@
 {{- $stars := .stars -}}
 {{- $forks := .forks -}}
 {{- $icon := .icon -}}
+{{- $page := .page -}}
 {{- $thumbnail := .thumbnail -}}{{/* Stars and forks are the common case, so they stay first-class parameters;
   providers that count something else (likes, downloads) pass `metrics`.
 */}}{{/* Tested against nil rather than for truthiness: zero stars is a fact about the
@@ -55,7 +57,7 @@
   <span class="hextra-repo-card__body">
     <span class="hextra-repo-card__title">
       {{- with $icon -}}
-        {{- partial "utils/icon" (dict "name" . "attributes" `height=16 aria-hidden="true"`) -}}
+        {{- partial "utils/icon" (dict "name" . "page" $page "attributes" `height=16 aria-hidden="true"`) -}}
       {{- end -}}
       <span>{{ $title }}</span>
     </span>
@@ -73,7 +75,7 @@
         {{- end -}}
         {{- range $metrics -}}
           <span>
-            {{- partial "utils/icon" (dict "name" .icon "attributes" `height=16 aria-hidden="true"`) -}}
+            {{- partial "utils/icon" (dict "name" .icon "page" $page "attributes" `height=16 aria-hidden="true"`) -}}
             {{- partial "inline/compact-number.html" .value }} <span class="hx:sr-only">{{ .label }}</span>
           </span>
         {{- end -}}

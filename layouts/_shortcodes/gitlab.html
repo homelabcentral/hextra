@@ -49,6 +49,7 @@
   "url" (cond (ne $project "") (printf "%s/%s" $baseURL $project) $baseURL)
   "title" (cond (ne $project "") $project (printf "project %s" $ref))
   "icon" "gitlab"
+  "page" .Page
 -}}
 
 {{- $enabled := partial "utils/remote-fetch-enabled.html" . -}}

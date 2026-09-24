@@ -2,19 +2,74 @@
 
   `quiet` makes every failure return an empty string instead of calling errorf,
   which is what `utils/icon-exists.html` needs in order to answer "would this
-  name render?" without taking the build down while it asks. Anything that can
+  name render?" without taking the build down while it asks. Every failure
+  returns either way: `errorf` records an error but does not stop the
+  template, so a branch that reported a precise problem and then fell through
+  reached the generic `icon %q not found` at the bottom and reported that too,
+  burying the useful message under it. Anything that can
   fail a normal call fails a quiet one the same way - unknown name, bad remote
-  provider, remote fetching disabled, fetch error - so the two cannot drift.
+  provider, remote fetching disabled, fetch error, missing or non-SVG icon file
+  - so the two cannot drift.
+
+  `page` is optional and only matters for the `file:` prefix: it is the page a
+  relative path should resolve against as a page resource before the assets
+  directory is tried. Callers that have a page in hand pass it; the rest get
+  the assets lookup alone.
 */}}
 {{- $siteData := partial "utils/hugo-compat/site-data.html" . -}}
-{{- $name := .name -}}
+{{- $name := .name | default "" -}}
+{{- $page := .page -}}
 {{- $quiet := .quiet | default false -}}
 {{- $icon := index $siteData.icons $name -}}
 {{- $isRemoteIcon := false -}}
+{{- $isFileIcon := false -}}
 
 {{- if not $icon -}}
   {{/* Vendored icons (see scripts/vendor-codeblock-icons.mjs) — avoids remote fetches for built-in code block icons */}}
   {{- $icon = index (index $siteData "icons-vendored" | default dict) $name -}}
+{{- end -}}
+
+{{/* `file:` reads a project SVG rather than a pack. It sits before the remote
+  providers because it fetches nothing: the file belongs to the site, so it is
+  inlined the same way a `data/icons.yaml` entry is, which is what lets
+  `currentColor` and CSS sizing reach it. An `<img>` would reach neither.
+
+  The file is inlined with only its `<script>` elements, root `class` and
+  intrinsic `width`/`height` removed. Everything else - including an internal
+  `<style>`, whose class names are global once inlined, and any `on*` event
+  attribute - is emitted verbatim, on the same trust footing as a partial in
+  the same repository. This is not a sanitiser and is not documented as one;
+  the `<script>` removal is there because a script element has no business in
+  an icon, not because the file is treated as hostile.
+*/}}
+{{- if and (not $icon) (hasPrefix $name "file:") -}}
+  {{- $path := strings.TrimPrefix "file:" $name -}}
+  {{- if or (in $path "..") (not (findRE `^[A-Za-z0-9._/-]+$` $path)) -}}
+    {{- if not $quiet -}}{{- errorf "invalid icon file path %q" $path -}}{{- end -}}
+    {{- return "" -}}
+  {{- end -}}
+  {{- if not (hasSuffix (lower $path) ".svg") -}}
+    {{- if not $quiet -}}{{- errorf "icon file %q is not an SVG - only SVG files can be used as an icon" $path -}}{{- end -}}
+    {{- return "" -}}
+  {{- end -}}
+
+  {{- $resource := false -}}
+  {{- with $page -}}
+    {{- $resource = .Resources.Get $path -}}
+  {{- end -}}
+  {{- if not $resource -}}
+    {{- $resource = resources.Get $path -}}
+  {{- end -}}
+  {{- if not $resource -}}
+    {{- if not $quiet -}}{{- errorf "icon file %q not found - looked for a page resource, then in the assets directory" $path -}}{{- end -}}
+    {{- return "" -}}
+  {{- end -}}
+
+  {{- $icon = $resource.Content -}}
+  {{- $isFileIcon = true -}}
+  {{- if and (not (strings.Contains $icon "fill=")) (not (strings.Contains $icon "stroke=")) -}}
+    {{- $icon = replaceRE "<svg" `<svg fill="currentColor"` $icon 1 -}}
+  {{- end -}}
 {{- end -}}
 
 {{- if not $icon -}}
@@ -48,25 +103,25 @@
 
     {{- if $remoteEnabled -}}
       {{- if not (findRE "^[A-Za-z0-9_-]+$" $remoteProvider) -}}
-        {{- if $quiet -}}{{- return "" -}}{{- end -}}
-        {{- errorf "invalid remote icon provider %q" $remoteProvider -}}
+        {{- if not $quiet -}}{{- errorf "invalid remote icon provider %q" $remoteProvider -}}{{- end -}}
+        {{- return "" -}}
       {{- end -}}
       {{- if or (in $remoteName "..") (not (findRE "^[A-Za-z0-9._/-]+$" $remoteName)) -}}
-        {{- if $quiet -}}{{- return "" -}}{{- end -}}
-        {{- errorf "invalid remote icon name %q" $remoteName -}}
+        {{- if not $quiet -}}{{- errorf "invalid remote icon name %q" $remoteName -}}{{- end -}}
+        {{- return "" -}}
       {{- end -}}
 
       {{- with index $remoteProviders $remoteProvider -}}
         {{- $remoteUrl := printf .url $remoteName -}}
         {{- with try (resources.GetRemote $remoteUrl) -}}
           {{- with .Err -}}
-            {{- if $quiet -}}{{- return "" -}}{{- end -}}
-            {{- errorf "Could not retrieve remote icon %q from %s. Reason: %s." $name $remoteUrl . -}}
+            {{- if not $quiet -}}{{- errorf "Could not retrieve remote icon %q from %s. Reason: %s." $name $remoteUrl . -}}{{- end -}}
+            {{- return "" -}}
           {{- else with .Value -}}
             {{- $icon = .Content -}}
             {{- $isRemoteIcon = true -}}
             {{- if and (not (strings.Contains $icon "fill=")) (not (strings.Contains $icon "stroke=")) -}}
-              {{- $icon = replaceRE "<svg" `<svg fill="currentColor"` $icon -}}
+              {{- $icon = replaceRE "<svg" `<svg fill="currentColor"` $icon 1 -}}
             {{- end -}}
           {{- end -}}
         {{- end -}}
@@ -82,15 +137,90 @@
 
 {{- $icon = $icon | safeHTML -}}
 
-{{- if $isRemoteIcon -}}
-  {{- $icon = replaceRE `(<svg[^>]*?)\sclass=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+{{/* Anything that did not come from `data/` arrives with markup the theme did
+  not write. A pack's own root `class` collides with the theme's, and a
+  `<script>` element has no business in an icon at all. Both spellings go: SVG
+  is XML, so `<script/>` is legal there, and once inlined into HTML it is not
+  self-closing at all - it opens an element that swallows the rest of the icon
+  and whatever follows it on the page.
+
+  This is the only rewrite that should reach the whole file.
+*/}}
+{{- $isExternal := or $isRemoteIcon $isFileIcon -}}
+{{- if $isExternal -}}
+  {{- $icon = replaceRE `(?s)<script[^>]*/>|<script[^>]*>.*?</script>` "" $icon -}}
+{{- end -}}
+
+{{/* Every other rewrite edits exactly one element: the root `<svg>`.
+
+  `<svg>` nests - an editor export routinely carries inner ones - and a pattern
+  run over the whole file reaches the wrong one as soon as the root does not
+  carry the attribute being removed and an inner element does. A replacement
+  limit does not save it: "the first match" is then the nested element, which
+  is how an inner graphic ends up stripped of its own sizing while the root
+  keeps its. Anchoring is not enough either, since the root tag is not always
+  at the start of the file - a prolog or a comment can precede it.
+
+  So the root tag is lifted out once, rewritten on its own, and spliced back
+  over the single occurrence it came from. Within one tag every attribute
+  appears at most once, so the patterns below need neither limits nor capture
+  groups.
+*/}}
+{{- $root := "" -}}
+{{- with findRE `<svg[^>]*>` $icon 1 -}}
+  {{- $root = index . 0 -}}
+{{- end -}}
+{{- $rewritten := $root -}}
+
+{{- if $isExternal -}}
+  {{- $rewritten = replaceRE `\sclass=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
+{{- end -}}
+
+{{/* A file icon is sized by CSS, so its intrinsic `width`/`height` always go -
+  including when the caller passes no attributes at all. A remote icon keeps
+  the existing behaviour, where they go only if a caller is overriding them.
+
+  Stripping both off a root element that carries no `viewBox` leaves the
+  browser with no intrinsic ratio at all, and the `width: auto` half of the
+  CSS box then resolves against the 300px default width of a replaced element
+  - a 12px-tall icon drawn 300px wide, which bursts the pill. Icon packs all
+  ship a `viewBox`, but a hand-written or older exported file frequently
+  carries `width="24" height="24"` and nothing else, so the ratio is carried
+  into a `viewBox` before the attributes go. When they are not two plain
+  lengths to carry over - `100%`, `2em`, or one of them simply absent - they
+  stay where they are and CSS sizes around them.
+
+  `\swidth=` cannot catch the `stroke-width` every outline icon carries: the
+  hyphen is not whitespace.
+*/}}
+{{- if $isFileIcon -}}
+  {{- $strip := true -}}
+  {{- if not (strings.Contains $rewritten "viewBox") -}}
+    {{- $width := "" -}}
+    {{- $height := "" -}}
+    {{- with findRE `\swidth=("[0-9.]+(px)?"|'[0-9.]+(px)?'|[0-9.]+(px)?)` $rewritten 1 -}}
+      {{- $width = replaceRE `[^0-9.]` "" (index . 0) -}}
+    {{- end -}}
+    {{- with findRE `\sheight=("[0-9.]+(px)?"|'[0-9.]+(px)?'|[0-9.]+(px)?)` $rewritten 1 -}}
+      {{- $height = replaceRE `[^0-9.]` "" (index . 0) -}}
+    {{- end -}}
+    {{- if and $width $height -}}
+      {{- $rewritten = replaceRE `^<svg` (printf `<svg viewBox="0 0 %s %s"` $width $height) $rewritten -}}
+    {{- else -}}
+      {{- $strip = false -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $strip -}}
+    {{- $rewritten = replaceRE `\swidth=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
+    {{- $rewritten = replaceRE `\sheight=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
+  {{- end -}}
 {{- end -}}
 
 {{- if .attributes -}}
   {{- $attributes := .attributes -}}
   {{- if $isRemoteIcon -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+    {{- $rewritten = replaceRE `\swidth=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
+    {{- $rewritten = replaceRE `\sheight=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
   {{- end -}}
   {{/* 235 of the icons in data/icons.yaml already carry aria-hidden, so a
     caller passing its own would otherwise emit the attribute twice. Drop the
@@ -98,9 +228,13 @@
     for remote icons above.
   */}}
   {{- if strings.Contains $attributes "aria-hidden" -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\saria-hidden=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+    {{- $rewritten = replaceRE `\saria-hidden=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
   {{- end -}}
-  {{- $icon = replaceRE "<svg" (printf "<svg %s" $attributes) $icon -}}
+  {{- $rewritten = replaceRE `^<svg` (printf "<svg %s" $attributes) $rewritten -}}
+{{- end -}}
+
+{{- if and $root (ne $rewritten $root) -}}
+  {{- $icon = replace $icon $root $rewritten 1 -}}
 {{- end -}}
 
 {{- return ($icon | safeHTML) -}}

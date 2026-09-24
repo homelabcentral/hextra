@@ -1,3 +1,109 @@
+/*
+  Badge sizes are absolute, not derived from `em`. `md` is what every badge
+  rendered at before `size` existed - `.65rem` text in a 1.5rem pill with a
+  12px icon - so adding the scale moves nothing on an existing site. The other
+  four step outward from it.
+
+  The line box runs 16 / 20 / 24 / 32 / 40 and the icon 8 / 10 / 12 / 16 / 20,
+  both widening their step as they go rather than spacing evenly: the middle of
+  the scale is where badges sit beside body text and wants fine control, while
+  the ends are chosen deliberately and want to look different from their
+  neighbour. `xs` is a marginal annotation - a count, a version, a state - and
+  `xl` a header badge that reads at the size of the prose around it.
+
+  The icon box constrains height only, with `w-auto` on the svg. That is what
+  the template's old hardcoded `height=12` did: a wordmark or any other
+  non-square icon keeps its aspect ratio instead of letterboxing into a square.
+  Sizing it here rather than in the template is the point of the split - a
+  hardcoded pixel height in Go had no way to know which size step it was in.
+*/
+
 .hextra-badge {
-  @apply hx:inline-flex hx:items-center;
+  @apply hx:inline-flex hx:items-center hx:align-middle;
+}
+
+.hextra-badge__pill {
+  @apply hx:inline-flex hx:items-center hx:rounded-full;
+}
+
+.hextra-badge__icon {
+  @apply hx:inline-flex hx:shrink-0 hx:items-center;
+
+  > svg {
+    @apply hx:h-full hx:w-auto;
+  }
+}
+
+.hextra-badge--xs {
+  .hextra-badge__pill {
+    @apply hx:gap-0.5 hx:px-1.5 hx:text-[.55rem] hx:leading-4;
+  }
+
+  .hextra-badge__icon {
+    @apply hx:h-2;
+  }
+}
+
+.hextra-badge--sm {
+  .hextra-badge__pill {
+    @apply hx:gap-1 hx:px-2 hx:text-[.6rem] hx:leading-5;
+  }
+
+  .hextra-badge__icon {
+    @apply hx:h-2.5;
+  }
+}
+
+.hextra-badge--md {
+  .hextra-badge__pill {
+    @apply hx:gap-1 hx:px-2.5 hx:text-[.65rem] hx:leading-6;
+  }
+
+  .hextra-badge__icon {
+    @apply hx:h-3;
+  }
+}
+
+.hextra-badge--lg {
+  .hextra-badge__pill {
+    @apply hx:gap-1.5 hx:px-3.5 hx:text-sm hx:leading-8;
+  }
+
+  .hextra-badge__icon {
+    @apply hx:h-4;
+  }
+}
+
+.hextra-badge--xl {
+  .hextra-badge__pill {
+    @apply hx:gap-2 hx:px-4 hx:text-base hx:leading-10;
+  }
+
+  .hextra-badge__icon {
+    @apply hx:h-5;
+  }
+}
+
+/*
+  WCAG 2.2 SC 2.5.8 asks for a 24x24 CSS px target at AA - both axes, which is
+  why the floor is a pair. An `xs` pill is 18px of line box once its border is
+  added and a `sm` one 22px, so a linked badge at either step fails the height
+  on its own. All five fail the width whenever the label is short: `px-2` plus
+  the border plus one or two characters lands around 23px even at `sm`. So
+  `min-w-6` is doing work at every step and `min-h-6` at the bottom two, and
+  `justify-center` keeps a pill smaller than the floor centred in the target
+  rather than pinned to its start edge.
+
+  This is also what makes `xs` safe to offer: the pill is well under the
+  minimum target, and the only reason that is allowed is that the target is the
+  link, not the pill.
+
+  The floor lives on the link rather than on the pill, which leaves the pill's
+  own proportions alone.
+
+  `accessibility.spec.ts` disables `target-size`, so nothing in the suite
+  catches this - see tests/badge.spec.ts, which measures the link box directly.
+*/
+.hextra-badge-link {
+  @apply hx:inline-flex hx:items-center hx:justify-center hx:align-middle hx:min-h-6 hx:min-w-6;
 }

@@ -20,7 +20,7 @@ sites{{< /keyword >}}
 
 <span class="hextra-keyword">
   {{- with $icon -}}
-    {{- partial "utils/icon" (dict "name" . "attributes" `height=14 aria-hidden="true"`) -}}
+    {{- partial "utils/icon" (dict "name" . "page" $.Page "attributes" `height=14 aria-hidden="true"`) -}}
   {{- end -}}
   <span class="hextra-keyword__text">{{ .InnerDeindent | .Page.RenderString }}</span>
 </span>

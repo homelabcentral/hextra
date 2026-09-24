@@ -1,6 +1,7 @@
 {{- $link := .link -}}
 {{- $title := .title -}}
 {{- $icon := .icon -}}
+{{- $page := .page -}}
 {{- $subtitle := .subtitle -}}
 {{- $image := .image -}}
 {{- $alt := .alt | default $title -}}
@@ -10,7 +11,8 @@
 {{- $lqip := .lqip -}}
 {{- $tag := .tag -}}
 {{- $tagColor := .tagColor | default .tagType | default "" -}}{{- /* Compatibility with previous parameter. */ -}}
-{{- $tagBorder := not (eq .tagBorder false) | default true }}
+{{- /* Not `not (eq X false) | default true`: `default` treats false as empty, so that form always returned true and the documented parameter did nothing. Comparing the formatted value is nil-safe - a missing parameter prints `<nil>`, which is not "false", so the default stays true. */ -}}
+{{- $tagBorder := ne (printf "%v" .tagBorder) "false" -}}
 {{- $tagIcon := .tagIcon -}}
 
 {{ $linkClass := "hx:hover:border-hextra-accent-500 hx:bg-transparent hx:shadow-xs hx:dark:border-neutral-800 hx:hover:bg-neutral-50 hx:hover:shadow-md hx:dark:hover:border-hextra-accent-500 hx:dark:hover:bg-neutral-900" }}
@@ -70,7 +72,7 @@
   */}}
   <div>
     <span class="hextra-card-icon hx:flex hx:font-semibold hx:items-start hx:gap-2 {{ $padding }} hx:text-neutral-700 hx:hover:text-neutral-900 hx:dark:text-neutral-200 hx:dark:hover:text-neutral-50">
-      {{- with $icon }}{{ partial "utils/icon.html" (dict "name" $icon) -}}{{- end -}}
+      {{- with $icon }}{{ partial "utils/icon.html" (dict "name" $icon "page" $page) -}}{{- end -}}
       {{- $title -}}
     </span>
     {{- with $subtitle -}}
@@ -85,6 +87,7 @@
       "class" "hextra-card-tag"
       "border" $tagBorder
       "icon" $tagIcon
+      "page" $page
       )
     -}}
   {{- end -}}

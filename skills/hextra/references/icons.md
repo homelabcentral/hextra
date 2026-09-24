@@ -5,7 +5,7 @@
 
 The 272 icons bundled with the theme. Use a name from this list verbatim — an unknown name fails the build with `icon "name" not found`, so never guess one.
 
-Valid wherever the theme takes an icon: the `icon` shortcode, and the `icon` parameter on `callout`, `card`, `cta`, `button`, `badge`, `accordion-item`, `timeline-item`, `stat`, `keyword`, `article`, `feature-card`, and the repository cards. Also `tagIcon` on `card`, `badgeIcon` on `timeline-item`, and `params.icon` on a `hugo.yaml` menu entry.
+Valid wherever the theme takes an icon: the `icon` shortcode, and the `icon` parameter on `callout`, `card`, `cta`, `button`, `badge`, `accordion-item`, `timeline-item`, `stat`, `keyword`, `feature-card`, and the repository cards. Also `tagIcon` on `card`, `badgeIcon` on `timeline-item`, and `params.icon` on a `hugo.yaml` menu entry.
 
 ```markdown
 {{< icon "sparkles" >}}
@@ -13,6 +13,8 @@ Valid wherever the theme takes an icon: the `icon` shortcode, and the `icon` par
 ```
 
 A name containing a colon is fetched from a remote provider instead — `lucide:`, `tabler:`, `tabler-filled:` and `simple:` take that pack's own name, `iconify:` takes a `set/icon` pair, as in `iconify:simple-icons/reddit`. Remote fetching needs no configuration; it is on by default. Set `params.icons.remote.enable: false` to turn it off, or `params.icons.remote.providers` to add a provider or repin an existing one. See the `icon` entry in `shortcodes.md`.
+
+`file:` is the third form and fetches nothing: it names an SVG in the project, resolved first as a resource of the current page bundle and then against the site's `assets/` directory, as in `file:icons/hexagon.svg` for `assets/icons/hexagon.svg`. The file is inlined, so CSS sizes it and an SVG with no `fill` or `stroke` of its own inherits the surrounding text colour. Only SVG works; a missing file or a non-SVG path fails the build.
 
 ## Available names
 

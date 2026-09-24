@@ -1,6 +1,7 @@
 {{- $content := .content -}}
 {{- $emoji := .emoji -}}
 {{- $icon := .icon -}}
+{{- $page := .page -}}
 
 {{- $defaultClass := "hx:border-orange-400 hx:bg-orange-50 hx:text-orange-700 hx:dark:border-orange-500/70 hx:dark:bg-orange-950/60 hx:dark:text-orange-400" -}}
 
@@ -15,7 +16,7 @@
       </div>
     {{- else -}}
       {{- with $icon -}}
-        {{ partial "utils/icon.html" (dict "name" . "attributes" `height=1.2em class="hx:inline-block hx:align-middle"`) -}}
+        {{ partial "utils/icon.html" (dict "name" . "page" $page "attributes" `height=1.2em class="hx:inline-block hx:align-middle"`) -}}
       {{- end -}}
     {{- end -}}
   </div>
