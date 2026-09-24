@@ -18,11 +18,13 @@ next: /docs/guide/deploy-site
 {{< badge content="color" color="green" >}}
 {{< badge content="link" link="https://github.com/homelabcentral/hextra/releases" >}}
 {{< badge content="icon" icon="sparkles" >}}
+
 ### 使用
 
 #### 默认
 
 {{< badge "徽章" >}}
+
 ```
 {{</* badge "徽章" */>}}
 ```
@@ -38,6 +40,7 @@ next: /docs/guide/deploy-site
 {{< badge content="徽章" color="amber" >}}
 {{< badge content="徽章" color="orange" >}}
 {{< badge content="徽章" color="red" >}}
+
 ```
 {{</* badge content="徽章" */>}}
 {{</* badge content="徽章" color="purple" */>}}
@@ -59,6 +62,7 @@ next: /docs/guide/deploy-site
 {{< badge content="徽章" color="amber" border=false >}}
 {{< badge content="徽章" color="orange" border=false >}}
 {{< badge content="徽章" color="red" border=false >}}
+
 ```
 {{</* badge content="徽章" border=false */>}}
 {{</* badge content="徽章" color="purple" border=false */>}}
@@ -115,6 +119,7 @@ next: /docs/guide/deploy-site
 
 {{< badge content="徽章" icon="sparkles" >}}
 {{< badge content="Releases" link="https://github.com/homelabcentral/hextra/releases" icon="github" >}}
+
 ```
 {{</* badge content="徽章" icon="sparkles" */>}}
 {{</* badge content="Releases" link="https://github.com/homelabcentral/hextra/releases" icon="github" */>}}
@@ -126,8 +131,8 @@ next: /docs/guide/deploy-site
 | --------- | ---------------------------------------------------------------------------------------------------------- |
 | `content` | 徽章的文字。                                                                                               |
 | `link`    | 徽章的链接。                                                                                               |
-| `icon`    | 徽章的图标。可以是内置名称、远程的 `provider:name`，或指向项目内 SVG 的 `file:<path>`。                     |
-| `size`    | 徽章的尺寸。<br/> `xs`, `sm`, `md` (默认), `lg`, `xl`.                                                      |
+| `icon`    | 徽章的图标。可以是内置名称、远程的 `provider:name`，或指向项目内 SVG 的 `file:<path>`。                    |
+| `size`    | 徽章的尺寸。<br/> `xs`, `sm`, `md` (默认), `lg`, `xl`.                                                     |
 | `color`   | 徽章的颜色。 <br/> `gray` (默认), `purple`, `indigo`, `blue`, `green`, `yellow`, `amber`, `orange`, `red`. |
 | `class`   | 徽章的等级。                                                                                               |
 | `border`  | 添加或删除边框 (默认：true).                                                                               |

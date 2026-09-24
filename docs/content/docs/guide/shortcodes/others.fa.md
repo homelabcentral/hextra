@@ -18,11 +18,13 @@ next: /docs/guide/deploy-site
 {{< badge content="color" color="green" >}}
 {{< badge content="link" link="https://github.com/homelabcentral/hextra/releases" >}}
 {{< badge content="icon" icon="sparkles" >}}
+
 ### الاستخدام
 
 #### تقصير
 
 {{< badge "Badge" >}}
+
 ```
 {{</* badge "Badge" */>}}
 ```
@@ -38,6 +40,7 @@ next: /docs/guide/deploy-site
 {{< badge content="Badge" color="amber" >}}
 {{< badge content="Badge" color="orange" >}}
 {{< badge content="Badge" color="red" >}}
+
 ```
 {{</* badge content="Badge" */>}}
 {{</* badge content="Badge" color="purple" */>}}
@@ -59,6 +62,7 @@ next: /docs/guide/deploy-site
 {{< badge content="Badge" color="amber" border=false >}}
 {{< badge content="Badge" color="orange" border=false >}}
 {{< badge content="Badge" color="red" border=false >}}
+
 ```
 {{</* badge content="Badge" border=false */>}}
 {{</* badge content="Badge" color="purple" border=false */>}}
@@ -115,6 +119,7 @@ next: /docs/guide/deploy-site
 
 {{< badge content="Badge" icon="sparkles" >}}
 {{< badge content="Releases" link="https://github.com/homelabcentral/hextra/releases" icon="github" >}}
+
 ```
 {{</* badge content="Badge" icon="sparkles" */>}}
 {{</* badge content="Releases" link="https://github.com/homelabcentral/hextra/releases" icon="github" */>}}
@@ -126,8 +131,8 @@ next: /docs/guide/deploy-site
 | --------- | --------------------------------------------------------------------------------------------------------- |
 | `content` | نص الشارة.                                                                                                |
 | `link`    | رابط الشارة.                                                                                              |
-| `icon`    | آیکون نشان. یک نام بسته‌ای، یک `provider:name` راه دور، یا `file:<path>` برای یک SVG در پروژه خودتان.      |
-| `size`    | اندازه نشان.<br/> `xs`, `sm`, `md` (پیش‌فرض), `lg`, `xl`.                                                  |
+| `icon`    | آیکون نشان. یک نام بسته‌ای، یک `provider:name` راه دور، یا `file:<path>` برای یک SVG در پروژه خودتان.     |
+| `size`    | اندازه نشان.<br/> `xs`, `sm`, `md` (پیش‌فرض), `lg`, `xl`.                                                 |
 | `color`   | `gray` (تقصير), `purple`, `indigo`, `blue`, `green`, `yellow`, `amber`, `orange`, `red`.<br/> لون الشارة. |
 | `class`   | فئة الشارة.                                                                                               |
 | `border`  | إضافة أو إزالة الحدود (افتراضي: true                                                                      |

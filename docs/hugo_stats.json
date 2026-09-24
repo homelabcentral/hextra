@@ -953,6 +953,7 @@
       "hx:xl:block",
       "hx:z-20",
       "hx:z-[-1]",
+      "inner-mark",
       "katex",
       "katex-base",
       "katex-display",

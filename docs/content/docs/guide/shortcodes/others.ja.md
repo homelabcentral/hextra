@@ -18,11 +18,13 @@ next: /docs/guide/deploy-site
 {{< badge content="color" color="green" >}}
 {{< badge content="link" link="https://github.com/homelabcentral/hextra/releases" >}}
 {{< badge content="icon" icon="sparkles" >}}
+
 ### 使用法
 
 #### デフォルト
 
 {{< badge "Badge" >}}
+
 ```
 {{</* badge "Badge" */>}}
 ```
@@ -38,6 +40,7 @@ next: /docs/guide/deploy-site
 {{< badge content="Badge" color="amber" >}}
 {{< badge content="Badge" color="orange" >}}
 {{< badge content="Badge" color="red" >}}
+
 ```
 {{</* badge content="Badge" */>}}
 {{</* badge content="Badge" color="purple" */>}}
@@ -59,6 +62,7 @@ next: /docs/guide/deploy-site
 {{< badge content="Badge" color="amber" border=false >}}
 {{< badge content="Badge" color="orange" border=false >}}
 {{< badge content="Badge" color="red" border=false >}}
+
 ```
 {{</* badge content="Badge" border=false */>}}
 {{</* badge content="Badge" color="purple" border=false */>}}
@@ -115,6 +119,7 @@ next: /docs/guide/deploy-site
 
 {{< badge content="Badge" icon="sparkles" >}}
 {{< badge content="Releases" link="https://github.com/homelabcentral/hextra/releases" icon="github" >}}
+
 ```
 {{</* badge content="Badge" icon="sparkles" */>}}
 {{</* badge content="Releases" link="https://github.com/homelabcentral/hextra/releases" icon="github" */>}}
@@ -126,8 +131,8 @@ next: /docs/guide/deploy-site
 | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `content`  | バッジのテキスト。                                                                                                       |
 | `link`     | バッジのリンク。                                                                                                         |
-| `icon`     | バッジのアイコン。バンドル名、リモートの `provider:name`、またはプロジェクト内の SVG を指す `file:<path>`。               |
-| `size`     | バッジのサイズ。<br/> `xs`, `sm`, `md` (デフォルト), `lg`, `xl`.                                                          |
+| `icon`     | バッジのアイコン。バンドル名、リモートの `provider:name`、またはプロジェクト内の SVG を指す `file:<path>`。              |
+| `size`     | バッジのサイズ。<br/> `xs`, `sm`, `md` (デフォルト), `lg`, `xl`.                                                         |
 | `color`    | The color of the badge. <br/> `gray` (default), `purple`, `indigo`, `blue`, `green`, `yellow`, `amber`, `orange`, `red`. |
 | `class`    | バッジのクラス。                                                                                                         |
 | `border`   | 境界線を追加または削除します (デフォルト: true)。                                                                        |
