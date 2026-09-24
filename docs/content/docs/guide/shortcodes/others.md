@@ -106,17 +106,19 @@ A linked `xs` or `sm` badge keeps a 24&times;24 CSS pixel click target even thou
 {{< badge content="Remote" icon="simple:hugo" >}}
 {{< badge content="Project file" icon="file:icons/hexagon.svg" >}}
 {{< badge content="No viewBox" icon="file:icons/no-viewbox.svg" >}}
+{{< badge content="Nested" icon="file:icons/nested.svg" >}}
 
 ```
 {{</* badge content="Bundled" icon="sparkles" */>}}
 {{</* badge content="Remote" icon="simple:hugo" */>}}
 {{</* badge content="Project file" icon="file:icons/hexagon.svg" */>}}
 {{</* badge content="No viewBox" icon="file:icons/no-viewbox.svg" */>}}
+{{</* badge content="Nested" icon="file:icons/nested.svg" */>}}
 ```
 
 `icon` takes any name the [Icon](/docs/guide/shortcodes/icon) shortcode takes: an entry from `data/icons.yaml`, a remote `provider:name`, or `file:` followed by the path to an SVG in your own project.
 
-A `file:` path resolves first as a resource of the current page bundle, then against the site's `assets/` directory — `file:icons/hexagon.svg` finds `assets/icons/hexagon.svg`. The file is inlined rather than linked, so it is sized by the badge's `size` step like any other icon, and an SVG that carries no `fill` or `stroke` of its own inherits the badge's text colour through `currentColor`. Its own `width`, `height` and root `class` are dropped so they cannot fight the theme; anything else in the file, including an internal `<style>`, is emitted as written. A file with no `viewBox` keeps its proportions anyway — the `width` and `height` it does carry are turned into one before they are dropped, and a file that carries neither keeps them, because an SVG with no intrinsic ratio at all would be drawn 300px wide.
+A `file:` path resolves first as a resource of the current page bundle, then against the site's `assets/` directory — `file:icons/hexagon.svg` finds `assets/icons/hexagon.svg`. The file is inlined rather than linked, so it is sized by the badge's `size` step like any other icon, and an SVG that carries no `fill` or `stroke` of its own inherits the badge's text colour through `currentColor`. Its own `width`, `height` and root `class` are dropped so they cannot fight the theme; anything else in the file, including an internal `<style>`, is emitted as written. Only the root `<svg>` element is touched: a file that nests an inner `<svg>`, as drawing-tool exports often do, keeps that inner element's own sizing, class and colour. A file with no `viewBox` keeps its proportions anyway — the `width` and `height` it does carry are turned into one before they are dropped, and a file that carries neither keeps them, because an SVG with no intrinsic ratio at all would be drawn 300px wide.
 
 Only SVG files work. A path to a PNG, or to a file that is not there, fails the build rather than rendering blank.
 

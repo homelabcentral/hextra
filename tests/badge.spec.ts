@@ -202,3 +202,37 @@ test("the 24x24 floor survives the shortest label there is", async ({ page }) =>
     expect(Math.round(box.height), `target height for ${JSON.stringify(box.label)}`).toBeGreaterThanOrEqual(24);
   }
 });
+
+test("only the root svg is rewritten - a nested one keeps its own markup", async ({ page }) => {
+  // docs/assets/icons/nested.svg has a root carrying `viewBox` and no sizing,
+  // wrapped around an inner <svg> that carries `width`, `height` and a class.
+  // Running the strips over the whole file reaches the inner element, because
+  // it is the first match for an attribute the root does not have - and a
+  // replacement limit makes that worse rather than better, since "the first
+  // match" is then the nested element. The result is an inner graphic resized
+  // to the caller's height while the root is left alone.
+  const badge = page.locator(".hextra-badge", { hasText: "Nested" }).first();
+  await expect(badge, `no nested file: badge on ${BADGE_PAGE}`).toHaveCount(1);
+
+  const root = badge.locator(".hextra-badge__icon > svg");
+  await expect(root, "the file: icon was not inlined as an <svg>").toHaveCount(1);
+  await expect(root, "the root lost its viewBox").toHaveAttribute("viewBox", "0 0 24 24");
+  await expect(root, "the root should take the badge's text colour").toHaveAttribute("fill", "currentColor");
+  await expect(root, "the caller's attribute did not reach the root").toHaveAttribute("aria-hidden", "true");
+
+  const inner = root.locator("svg");
+  await expect(inner, "the nested <svg> was dropped").toHaveCount(1);
+
+  const attrs = await inner.evaluate((el) => ({
+    width: el.getAttribute("width"),
+    height: el.getAttribute("height"),
+    className: el.getAttribute("class"),
+    fill: el.getAttribute("fill"),
+    ariaHidden: el.getAttribute("aria-hidden"),
+  }));
+  expect(attrs.width, "the nested element was stripped of its width").toBe("16");
+  expect(attrs.height, "the nested element was stripped of its height").toBe("16");
+  expect(attrs.className, "the nested element lost its own class").toBe("inner-mark");
+  expect(attrs.fill, "currentColor was injected into the nested element").toBeNull();
+  expect(attrs.ariaHidden, "the caller's attributes reached the nested element").toBeNull();
+});

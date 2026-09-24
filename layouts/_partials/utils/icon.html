@@ -144,18 +144,36 @@
   self-closing at all - it opens an element that swallows the rest of the icon
   and whatever follows it on the page.
 
-  Every rewrite below that targets the root element passes a replacement limit
-  of 1, because `replaceRE` otherwise rewrites every match in the file and
-  `<svg>` nests - an editor export routinely carries inner ones. Without the
-  limit each of those is given `fill="currentColor"`, stripped of its own
-  sizing and handed the caller's attributes, so an inner graphic is recoloured
-  and resized to the caller's `height=1em`. The `<script>` strip is the one
-  that should reach every match, and so takes no limit.
+  This is the only rewrite that should reach the whole file.
 */}}
 {{- $isExternal := or $isRemoteIcon $isFileIcon -}}
 {{- if $isExternal -}}
   {{- $icon = replaceRE `(?s)<script[^>]*/>|<script[^>]*>.*?</script>` "" $icon -}}
-  {{- $icon = replaceRE `(<svg[^>]*?)\sclass=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
+{{- end -}}
+
+{{/* Every other rewrite edits exactly one element: the root `<svg>`.
+
+  `<svg>` nests - an editor export routinely carries inner ones - and a pattern
+  run over the whole file reaches the wrong one as soon as the root does not
+  carry the attribute being removed and an inner element does. A replacement
+  limit does not save it: "the first match" is then the nested element, which
+  is how an inner graphic ends up stripped of its own sizing while the root
+  keeps its. Anchoring is not enough either, since the root tag is not always
+  at the start of the file - a prolog or a comment can precede it.
+
+  So the root tag is lifted out once, rewritten on its own, and spliced back
+  over the single occurrence it came from. Within one tag every attribute
+  appears at most once, so the patterns below need neither limits nor capture
+  groups.
+*/}}
+{{- $root := "" -}}
+{{- with findRE `<svg[^>]*>` $icon 1 -}}
+  {{- $root = index . 0 -}}
+{{- end -}}
+{{- $rewritten := $root -}}
+
+{{- if $isExternal -}}
+  {{- $rewritten = replaceRE `\sclass=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
 {{- end -}}
 
 {{/* A file icon is sized by CSS, so its intrinsic `width`/`height` always go -
@@ -171,39 +189,38 @@
   into a `viewBox` before the attributes go. When they are not two plain
   lengths to carry over - `100%`, `2em`, or one of them simply absent - they
   stay where they are and CSS sizes around them.
+
+  `\swidth=` cannot catch the `stroke-width` every outline icon carries: the
+  hyphen is not whitespace.
 */}}
 {{- if $isFileIcon -}}
-  {{- $root := "" -}}
-  {{- with findRE `<svg[^>]*>` $icon 1 -}}
-    {{- $root = index . 0 -}}
-  {{- end -}}
   {{- $strip := true -}}
-  {{- if not (strings.Contains $root "viewBox") -}}
+  {{- if not (strings.Contains $rewritten "viewBox") -}}
     {{- $width := "" -}}
     {{- $height := "" -}}
-    {{- with findRE `\swidth=("[0-9.]+(px)?"|'[0-9.]+(px)?'|[0-9.]+(px)?)` $root 1 -}}
+    {{- with findRE `\swidth=("[0-9.]+(px)?"|'[0-9.]+(px)?'|[0-9.]+(px)?)` $rewritten 1 -}}
       {{- $width = replaceRE `[^0-9.]` "" (index . 0) -}}
     {{- end -}}
-    {{- with findRE `\sheight=("[0-9.]+(px)?"|'[0-9.]+(px)?'|[0-9.]+(px)?)` $root 1 -}}
+    {{- with findRE `\sheight=("[0-9.]+(px)?"|'[0-9.]+(px)?'|[0-9.]+(px)?)` $rewritten 1 -}}
       {{- $height = replaceRE `[^0-9.]` "" (index . 0) -}}
     {{- end -}}
     {{- if and $width $height -}}
-      {{- $icon = replaceRE `<svg` (printf `<svg viewBox="0 0 %s %s"` $width $height) $icon 1 -}}
+      {{- $rewritten = replaceRE `^<svg` (printf `<svg viewBox="0 0 %s %s"` $width $height) $rewritten -}}
     {{- else -}}
       {{- $strip = false -}}
     {{- end -}}
   {{- end -}}
   {{- if $strip -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
+    {{- $rewritten = replaceRE `\swidth=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
+    {{- $rewritten = replaceRE `\sheight=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
   {{- end -}}
 {{- end -}}
 
 {{- if .attributes -}}
   {{- $attributes := .attributes -}}
   {{- if $isRemoteIcon -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
+    {{- $rewritten = replaceRE `\swidth=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
+    {{- $rewritten = replaceRE `\sheight=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
   {{- end -}}
   {{/* 235 of the icons in data/icons.yaml already carry aria-hidden, so a
     caller passing its own would otherwise emit the attribute twice. Drop the
@@ -211,9 +228,13 @@
     for remote icons above.
   */}}
   {{- if strings.Contains $attributes "aria-hidden" -}}
-    {{- $icon = replaceRE `(<svg[^>]*?)\saria-hidden=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon 1 -}}
+    {{- $rewritten = replaceRE `\saria-hidden=("[^"]*"|'[^']*'|[^\s>]+)` "" $rewritten -}}
   {{- end -}}
-  {{- $icon = replaceRE "<svg" (printf "<svg %s" $attributes) $icon 1 -}}
+  {{- $rewritten = replaceRE `^<svg` (printf "<svg %s" $attributes) $rewritten -}}
+{{- end -}}
+
+{{- if and $root (ne $rewritten $root) -}}
+  {{- $icon = replace $icon $root $rewritten 1 -}}
 {{- end -}}
 
 {{- return ($icon | safeHTML) -}}
