@@ -12,7 +12,7 @@
   @param {string} class Extra classes for the outer wrapper.
   @param {bool} border Draw the outline.
   @param {string} icon Icon name, including a `file:` path.
-  @param {string} size One of sm, md (default), lg.
+  @param {string} size One of xs, sm, md (default), lg, xl.
   @param {page} page Optional page a `file:` icon resolves against.
 
   The wrapper is a span, not a div: a div inside a Markdown paragraph closes the
@@ -29,7 +29,7 @@
 {{- $page := .page -}}
 {{- $size := .size | default "md" -}}
 
-{{- $sizes := slice "sm" "md" "lg" -}}
+{{- $sizes := slice "xs" "sm" "md" "lg" "xl" -}}
 {{- if not (in $sizes $size) -}}
   {{- warnf "badge: unknown size %q, falling back to 'md'" $size -}}
   {{- $size = "md" -}}

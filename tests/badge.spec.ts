@@ -24,9 +24,11 @@ const BADGE_PAGE = "/docs/guide/shortcodes/others/";
 // `leading-6` + 2 = 26px, and has been since before `size` existed. Measuring
 // the line-height instead would pass while the edge vanished.
 const STEPS = [
+  { size: "xs", pill: 18, icon: 8 },
   { size: "sm", pill: 22, icon: 10 },
   { size: "md", pill: 26, icon: 12 },
   { size: "lg", pill: 34, icon: 16 },
+  { size: "xl", pill: 42, icon: 20 },
 ];
 
 test.beforeEach(async ({ page }) => {

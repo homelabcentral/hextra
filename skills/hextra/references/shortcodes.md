@@ -95,17 +95,17 @@ A shortcode to create a badge.
 | `content` | string | The content of the badge. |
 | `icon` | string | The icon of the badge. A bundled or remote icon name, or `file:<path>` for an SVG in the page bundle or the assets directory. |
 | `link` | string | The link of the badge. |
-| `size` | string | The size of the badge. One of `sm`, `md`, `lg`. Default `md`. |
+| `size` | string | The size of the badge. One of `xs`, `sm`, `md`, `lg`, `xl`. Default `md`. |
 | `type` | string | **Deprecated.** Earlier name for `color`; still accepted. |
 
 Positional: The content of the badge.
 
 ```markdown
-{{< badge content="Badge" color="gray" size="sm" icon="sparkles" >}}
+{{< badge content="Badge" color="gray" size="xs" icon="sparkles" >}}
 
 {{< badge "Badge" >}}
 
-{{< badge content="Badge" color="gray" size="sm" link="https://example.com" border=true >}}
+{{< badge content="Badge" color="gray" size="xs" link="https://example.com" border=true >}}
 ```
 
 ### stats

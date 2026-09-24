@@ -80,19 +80,25 @@ A badge is an inline element, so consecutive badges share a paragraph and the li
 
 #### Sizes
 
+{{< badge content="Extra small" size="xs" icon="sparkles" >}}
 {{< badge content="Small" size="sm" icon="sparkles" >}}
 {{< badge content="Medium" size="md" icon="sparkles" >}}
 {{< badge content="Large" size="lg" icon="sparkles" >}}
+{{< badge content="Extra large" size="xl" icon="sparkles" >}}
 
 ```
+{{</* badge content="Extra small" size="xs" icon="sparkles" */>}}
 {{</* badge content="Small" size="sm" icon="sparkles" */>}}
 {{</* badge content="Medium" size="md" icon="sparkles" */>}}
 {{</* badge content="Large" size="lg" icon="sparkles" */>}}
+{{</* badge content="Extra large" size="xl" icon="sparkles" */>}}
 ```
 
-`md` is the default, and is what every badge rendered at before `size` existed — adding the parameter moved nothing. The icon tracks the step, so a badge never carries an icon sized for a different one.
+`md` is the default, and is what every badge rendered at before `size` existed — adding the parameter moved nothing. The icon tracks the step, so a badge never carries an icon sized for a different one. An unknown size is not an error: it warns at build time and renders `md`.
 
-A linked `sm` badge keeps a 24&times;24 CSS pixel click target even though its pill is smaller in both directions, which is what [WCAG 2.2 SC 2.5.8](https://www.w3.org/TR/WCAG22/#target-size-minimum) asks for at AA. The floor applies to a short label too, so a one-character badge is still a 24&times;24 target with the pill centred inside it.
+The two ends are there for the two jobs the middle does badly. `xs` is a marginal annotation — a count, a version, a state beside a heading — and `xl` a header badge meant to read at the size of the prose around it.
+
+A linked `xs` or `sm` badge keeps a 24&times;24 CSS pixel click target even though its pill is smaller in both directions, which is what [WCAG 2.2 SC 2.5.8](https://www.w3.org/TR/WCAG22/#target-size-minimum) asks for at AA. The floor applies to a short label too, so a one-character badge is still a 24&times;24 target with the pill centred inside it — which is what makes a pill as small as `xs` safe to link.
 
 #### Icons
 
@@ -126,7 +132,7 @@ Only SVG files work. A path to a PNG, or to a file that is not there, fails the 
 
 #### Colors, icons and sizes together
 
-`color`, `icon` and `size` are independent, so any combination works. The same nine colors at each of the three sizes, each carrying a different icon:
+`color`, `icon` and `size` are independent, so any combination works. The same nine colors at three of the five sizes, each carrying a different icon:
 
 {{< badge content="Tag" color="gray" icon="tag" size="sm" >}}
 {{< badge content="New" color="purple" icon="sparkles" size="sm" >}}
@@ -233,7 +239,7 @@ A short label does not shrink the target. These two are the narrowest a linked b
 | `content` | The text of the badge.                                                                                                   |
 | `link`    | The link of the badge.                                                                                                   |
 | `icon`    | The icon of the badge. A bundled name, a remote `provider:name`, or `file:<path>` for an SVG in your own project.        |
-| `size`    | The size of the badge. <br/> `sm`, `md` (default), `lg`.                                                                 |
+| `size`    | The size of the badge. <br/> `xs`, `sm`, `md` (default), `lg`, `xl`.                                                     |
 | `color`   | The color of the badge. <br/> `gray` (default), `purple`, `indigo`, `blue`, `green`, `yellow`, `amber`, `orange`, `red`. |
 | `class`   | The class of the badge.                                                                                                  |
 | `border`  | Adds or removes the border (default: true).                                                                              |
