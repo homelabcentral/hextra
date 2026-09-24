@@ -206,13 +206,13 @@ The three icon sources behave identically once resolved — a bundled name, a re
 
 The pattern a page header wants — one badge per destination, each with its own colour and mark, written on consecutive lines and left to wrap on its own:
 
-{{< badge content="Homebrew cask" color="blue" icon="simple:homebrew" size="lg" link="https://formulae.brew.sh/cask/" >}}
-{{< badge content="Homebrew formula" color="green" icon="simple:homebrew" size="lg" link="https://formulae.brew.sh/formula/" >}}
+{{< badge content="Homebrew cask" color="blue" icon="iconify:devicon-plain/homebrew" size="lg" link="https://formulae.brew.sh/cask/" >}}
+{{< badge content="Homebrew formula" color="green" icon="iconify:devicon-plain/homebrew" size="lg" link="https://formulae.brew.sh/formula/" >}}
 {{< badge content="Direct download" color="orange" icon="document-download" size="lg" link="https://github.com/homelabcentral/hextra/releases" >}}
 
 ```
-{{</* badge content="Homebrew cask" color="blue" icon="simple:homebrew" size="lg" link="https://formulae.brew.sh/cask/" */>}}
-{{</* badge content="Homebrew formula" color="green" icon="simple:homebrew" size="lg" link="https://formulae.brew.sh/formula/" */>}}
+{{</* badge content="Homebrew cask" color="blue" icon="iconify:devicon-plain/homebrew" size="lg" link="https://formulae.brew.sh/cask/" */>}}
+{{</* badge content="Homebrew formula" color="green" icon="iconify:devicon-plain/homebrew" size="lg" link="https://formulae.brew.sh/formula/" */>}}
 {{</* badge content="Direct download" color="orange" icon="document-download" size="lg" link="https://github.com/homelabcentral/hextra/releases" */>}}
 ```
 
