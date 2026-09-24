@@ -147,3 +147,27 @@ test("a file: icon is inlined, stripped of its own sizing, and takes the text co
   const height = await svg.evaluate((el) => el.getBoundingClientRect().height);
   expect(Math.round(height), "the file icon is not sized by its size step").toBe(12);
 });
+
+test("a file: icon with no viewBox keeps its ratio instead of stretching to 300px", async ({ page }) => {
+  // docs/assets/icons/no-viewbox.svg ships width="16" height="16" and no
+  // viewBox, which is what a hand-written or older exported file looks like.
+  // Strip both and nothing intrinsic is left, so the `width: auto` half of
+  // the icon box resolves against the 300px default width of a replaced
+  // element: a 12px-tall icon drawn 300px wide, taking the pill with it.
+  // hexagon.svg carries a viewBox, so the file: test above passes either way.
+  const badge = page.locator(".hextra-badge", { hasText: "No viewBox" }).first();
+  await expect(badge, `no viewBox-less file: badge on ${BADGE_PAGE}`).toHaveCount(1);
+
+  const svg = badge.locator(".hextra-badge__icon svg");
+  await expect(svg, "the file: icon was not inlined as an <svg>").toHaveCount(1);
+  await expect(svg, "the intrinsic ratio was not carried into a viewBox").toHaveAttribute("viewBox", "0 0 16 16");
+  await expect(svg, "intrinsic width survived").not.toHaveAttribute("width", /.*/);
+  await expect(svg, "intrinsic height survived").not.toHaveAttribute("height", /.*/);
+
+  const box = await svg.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
+  });
+  expect(Math.round(box.height), "icon height").toBe(12);
+  expect(Math.round(box.width), "icon width - 300 means the ratio was lost").toBe(12);
+});

@@ -143,10 +143,42 @@
 {{/* A file icon is sized by CSS, so its intrinsic `width`/`height` always go -
   including when the caller passes no attributes at all. A remote icon keeps
   the existing behaviour, where they go only if a caller is overriding them.
+
+  Stripping both off a root element that carries no `viewBox` leaves the
+  browser with no intrinsic ratio at all, and the `width: auto` half of the
+  CSS box then resolves against the 300px default width of a replaced element
+  - a 12px-tall icon drawn 300px wide, which bursts the pill. Icon packs all
+  ship a `viewBox`, but a hand-written or older exported file frequently
+  carries `width="24" height="24"` and nothing else, so the ratio is carried
+  into a `viewBox` before the attributes go. When they are not two plain
+  lengths to carry over - `100%`, `2em`, or one of them simply absent - they
+  stay where they are and CSS sizes around them.
 */}}
 {{- if $isFileIcon -}}
-  {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
-  {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+  {{- $root := "" -}}
+  {{- with findRE `<svg[^>]*>` $icon 1 -}}
+    {{- $root = index . 0 -}}
+  {{- end -}}
+  {{- $strip := true -}}
+  {{- if not (strings.Contains $root "viewBox") -}}
+    {{- $width := "" -}}
+    {{- $height := "" -}}
+    {{- with findRE `\swidth=("[0-9.]+(px)?"|'[0-9.]+(px)?'|[0-9.]+(px)?)` $root 1 -}}
+      {{- $width = replaceRE `[^0-9.]` "" (index . 0) -}}
+    {{- end -}}
+    {{- with findRE `\sheight=("[0-9.]+(px)?"|'[0-9.]+(px)?'|[0-9.]+(px)?)` $root 1 -}}
+      {{- $height = replaceRE `[^0-9.]` "" (index . 0) -}}
+    {{- end -}}
+    {{- if and $width $height -}}
+      {{- $icon = replaceRE `<svg` (printf `<svg viewBox="0 0 %s %s"` $width $height) $icon 1 -}}
+    {{- else -}}
+      {{- $strip = false -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $strip -}}
+    {{- $icon = replaceRE `(<svg[^>]*?)\swidth=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+    {{- $icon = replaceRE `(<svg[^>]*?)\sheight=("[^"]*"|'[^']*'|[^\s>]+)` `$1` $icon -}}
+  {{- end -}}
 {{- end -}}
 
 {{- if .attributes -}}
