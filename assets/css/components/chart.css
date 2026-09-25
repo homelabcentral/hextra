@@ -20,9 +20,11 @@
 
   Two real properties, not custom properties. The ramp is emitted as oklch -
   `--hx-color-neutral-800` is `oklch(26.9% 0 0)` - and a custom property hands
-  back that text verbatim, which Chart.js's colour parser does not understand.
-  Reading `color` and `border-top-color` instead makes the browser resolve the
-  token first: a computed colour always serialises as `rgb()`, which it does.
+  back that text verbatim, so nothing has resolved the token. Reading `color`
+  and `border-top-color` makes the browser resolve it. It does not make the
+  browser rewrite it: a computed colour is serialised in the colour space it
+  was authored in, so these arrive as `oklch(...)` too, and `scripts/chart.html`
+  converts them before Chart.js sees them.
 
   `border-color` is free to carry the grid here because Tailwind's preflight
   sets every border to `0 solid`, so a colour with no width draws nothing. The

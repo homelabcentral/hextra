@@ -27,22 +27,43 @@
     // and choosing here is what put the wrong mode's ink on the panel; reading
     // the computed value cannot disagree with what is on screen.
     //
-    // Two real properties rather than custom properties, because the ramp is
-    // emitted as oklch and a custom property would hand back that text
-    // verbatim, which Chart.js's colour parser does not understand. A computed
-    // `color` or `border-top-color` is resolved by the browser first and always
-    // serialises as `rgb()`. That also means neither can come back empty, so
-    // there is nothing here to fall back to - a missing stylesheet degrades to
-    // the inherited text colour rather than to a hardcoded pair that has to be
-    // kept in step with the CSS by hand.
+    // Two real properties rather than custom properties, because a custom
+    // property hands its text back verbatim and the ramp is authored in oklch.
+    // Reading `color` and `border-top-color` makes the browser resolve the
+    // token first - but not into `rgb()`. Chromium serialises a computed colour
+    // in the colour space it was written in, so `--hx-color-neutral-800` still
+    // arrives as `oklch(0.269 0 0)`. `tests/helpers/color.ts` documents the same
+    // behaviour at length, and resolves colours the way below for the same
+    // reason.
+    //
+    // Chart.js does not parse oklch. Where it hands a colour straight to the 2D
+    // context Chromium's own parser accepts it, but `@kurkle/color` - which
+    // backs every colour animation and `getHoverColor` - does not, and silently
+    // drops the value. So convert once, here, by round-tripping the string
+    // through a canvas `fillStyle`: the browser gives it back as `#rrggbb` or
+    // `rgba(...)`, which every path in the library understands.
+    const swatch = document.createElement("canvas").getContext("2d");
+
+    const toRGB = (value) => {
+      if (!swatch || !value) return value;
+      // Assigning an unparseable value leaves `fillStyle` at its previous
+      // setting, so seed it transparent: a colour the browser rejects then
+      // reads back as transparent rather than as an opaque black that would
+      // paint. Hand the original string on in that case and let Chart.js try.
+      swatch.fillStyle = "rgba(0, 0, 0, 0)";
+      swatch.fillStyle = value;
+      const resolved = swatch.fillStyle;
+      return resolved === "rgba(0, 0, 0, 0)" ? value : resolved;
+    };
+
     const palette = (el) => {
       const style = getComputedStyle(el || document.documentElement);
       return {
-        text: style.color,
+        text: toRGB(style.color),
         // The longhand, not `borderColor`: the shorthand serialises to an empty
         // string when the four sides disagree, and nothing here guarantees they
         // never will.
-        grid: style.borderTopColor,
+        grid: toRGB(style.borderTopColor),
       };
     };
 
