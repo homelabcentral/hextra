@@ -1,7 +1,15 @@
+/* The one shared border pair, at 1px, like every other container. This drew
+   `neutral-200` / `neutral-800` until now - a different weight of edge from
+   the code blocks and the cards, and from the grid colour two rules down,
+   which is that same pair by another name.
+
+   The fill is deliberately not a level pair: `neutral-900` in dark rather than
+   the `neutral-950` that would make this Raised, because the axis contrast
+   figures below are measured against it. */
 .hextra-chart {
   @apply hx:my-6 hx:rounded-lg hx:border hx:p-4;
-  @apply hx:border-neutral-200 hx:bg-neutral-50;
-  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
+  @apply hx:border-neutral-300 hx:bg-neutral-50;
+  @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-900;
 }
 
 /*
