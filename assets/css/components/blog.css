@@ -294,8 +294,8 @@
    `neutral-900`) it separated from the card by only 1.04 in light, which left
    a non-filling image looking like it floated on the card itself. Chrome is a
    true mirror pair, so both modes now read at the same weight (1.21 / 1.31).
-   `.hextra-article-card__cover` and `.hextra-repo-card` thumbnails are still
-   on Overlay. */
+   `.hextra-article-card__cover` and `.hextra-repo-card__thumbnail` sit on the
+   same level for the same reason - every cover slot in the theme is Chrome. */
 .hextra-blog-card-cover {
   @apply hx:block hx:overflow-hidden hx:bg-neutral-200 hx:dark:bg-neutral-800;
 }

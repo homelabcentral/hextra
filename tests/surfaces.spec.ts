@@ -38,10 +38,11 @@ const LEVELS: Record<Level, { light: string; dark: string }> = {
 
 const BORDER = { light: "--hx-color-neutral-300", dark: "--hx-color-neutral-700" };
 
-// Which side of the Raised/Overlay line a component falls on follows from what
-// it holds: body text goes on Raised with the code blocks, and a slot that
-// holds a cover goes on Overlay so an image that does not fill its column still
-// reads as a surface above the card.
+// Which level a component falls on follows from what it holds: body text goes
+// on Raised with the code blocks, and a slot that holds a cover goes on Chrome
+// so an image that does not fill its column still reads as a surface above the
+// card. Overlay is one step short of that against a `neutral-50` card - 1.04 in
+// light - which is why the cover slots are not there.
 const SURFACES: Surface[] = [
   { name: "code block", path: "/docs/guide/configuration/", selector: ".hextra-code-block pre", level: "raised" },
   { name: "blog card", path: "/blog/", selector: ".hextra-blog-card", level: "raised" },

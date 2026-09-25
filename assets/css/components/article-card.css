@@ -26,14 +26,14 @@
   }
 }
 
-/* The Overlay level, matching `.hextra-repo-card`'s thumbnail: it is what shows
-   through a cover that does not fill its column, so it has to be a real
-   surface rather than the page. Note `.hextra-blog-card-h-cover` no longer
-   matches - it moved to Chrome (`neutral-200` / `neutral-800`) for a stronger
-   step against its card; see the comment in `blog.css`. */
+/* The Chrome level, matching `.hextra-blog-card-h-cover` and
+   `.hextra-repo-card`'s thumbnail: it is what shows through a cover that does
+   not fill its column, so it has to be a real surface rather than the page.
+   See the comment in `blog.css` for why every cover slot sits here rather than
+   on Overlay. */
 .hextra-article-card__cover {
   @apply hx:shrink-0 hx:w-48 hx:sm:w-72;
-  @apply hx:bg-neutral-100 hx:dark:bg-neutral-900;
+  @apply hx:bg-neutral-200 hx:dark:bg-neutral-800;
 
   img {
     @apply hx:size-full hx:object-cover;

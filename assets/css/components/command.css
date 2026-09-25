@@ -136,9 +136,9 @@
    fills its slot completely, so the frame's colour is the only one visible -
    painting it here meant the two had to be kept equal by hand, and they drifted
    the moment `.hextra-blog-card-cover` moved to Chrome while this rule stayed
-   on Overlay. Transparent makes each slot govern both of its cover kinds:
-   `neutral-200` / `neutral-800` for the blog card's two slots, `neutral-100` /
-   `neutral-900` for the article card's. */
+   on Overlay. Transparent makes each slot govern both of its cover kinds, so
+   a text cover lands on `neutral-200` / `neutral-800` wherever an image cover
+   would - and follows any slot that is retuned later without a second edit. */
 .hextra-blog-card-cover .hextra-command__frame,
 .hextra-blog-card-h-cover .hextra-command__frame,
 .hextra-article-card__cover .hextra-command__frame {

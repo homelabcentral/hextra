@@ -32,10 +32,13 @@
 */
 .hextra-repo-card__thumbnail {
   @apply hx:block hx:w-full hx:shrink-0 hx:sm:w-56;
-  /* The Overlay level, matching `.hextra-article-card__cover`: it is what
-     shows through an avatar or preview that does not fill its column, so it
-     has to read as a surface above the card rather than the Chrome level. */
-  @apply hx:bg-neutral-100 hx:dark:bg-neutral-900;
+  /* The Chrome level, matching `.hextra-article-card__cover` and the blog
+     card's two cover slots: it is what shows through an avatar or preview that
+     does not fill its column, so it has to read as a surface above the card.
+     Overlay was a separation of only 1.04 from the `neutral-50` card in light,
+     weak enough that a contained image looked like it floated on the card;
+     Chrome is a true mirror pair, so both modes read alike at 1.21 and 1.31. */
+  @apply hx:bg-neutral-200 hx:dark:bg-neutral-800;
 
   img {
     @apply hx:block hx:size-full;
