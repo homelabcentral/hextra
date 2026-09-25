@@ -70,8 +70,20 @@
     sets no `aspect-ratio`, so anyone wanting the aligned look should give the
     images a common ratio rather than reinstate the gap.
   */}}
+  {{/* The title holds one colour and does not react to hover. `neutral-900` /
+    `neutral-100` is the pair `typography.css` gives every heading, a true
+    mirror at 16.73 and 17.32 against the card, so a title reads the same
+    weight in both modes.
+
+    It used to carry a hover pair as well - `700`/`900` in light against
+    `200`/`50` in dark. Those were not mirrors, so dark rested far brighter
+    than light did dark, and its hover step was 1.21 against light's 1.73:
+    light visibly darkened while dark barely moved. The hover now belongs to
+    the icon alone, which goes from its resting alpha to `currentColor` - this
+    colour - in `cards.css`. The card's own border hover is unaffected.
+  */}}
   <div>
-    <span class="hextra-card-icon hx:flex hx:font-semibold hx:items-start hx:gap-2 {{ $padding }} hx:text-neutral-700 hx:hover:text-neutral-900 hx:dark:text-neutral-200 hx:dark:hover:text-neutral-50">
+    <span class="hextra-card-icon hx:flex hx:font-semibold hx:items-start hx:gap-2 {{ $padding }} hx:text-neutral-900 hx:dark:text-neutral-100">
       {{- with $icon }}{{ partial "utils/icon.html" (dict "name" $icon "page" $page) -}}{{- end -}}
       {{- $title -}}
     </span>
