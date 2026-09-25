@@ -340,7 +340,7 @@ modes: light raises by getting lighter, dark by getting darker.
 | Page                                                  | `hextra-bg`   | `hextra-bg`   |
 | Raised — code blocks, cards                           | `neutral-50`  | `neutral-950` |
 | Overlay — dropdowns, menus, collapsibles, cover slots | `neutral-100` | `neutral-900` |
-| Chrome — filename bars, hover                         | `neutral-200` | `neutral-800` |
+| Chrome — filename bars, hover, blog cover slots       | `neutral-200` | `neutral-800` |
 | Borders                                               | `neutral-300` | `neutral-700` |
 
 Overlays are their own level on purpose: a floating menu sits slightly darker
@@ -360,6 +360,13 @@ still reads as a surface above the card - and the `command` shortcode's frame
 is Overlay for the same reason, being a cover made of text. A card and its own
 cover slot must never land on the same value; in dark the step is `neutral-950`
 against `neutral-900`.
+
+The blog card's two cover slots (`.hextra-blog-card-cover` and
+`.hextra-blog-card-h-cover`) are the exception: they sit on Chrome, not
+Overlay. Overlay against `neutral-50` is a separation of 1.04 in light, weak
+enough that a letterboxed cover read as floating on the card; Chrome is also a
+true mirror pair, so the two modes match at 1.21 and 1.31 rather than 1.04 and
+1.10. The article card and repo card thumbnails stay on Overlay.
 
 One border pair, everywhere, at 1px: `neutral-300` in light, `neutral-700` in
 dark. Code blocks, cards, collapsibles and the command frame all draw the same

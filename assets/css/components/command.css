@@ -85,17 +85,13 @@
    there is nothing to measure and nothing to wait for. */
 .hextra-command__frame {
   @apply hx:w-full hx:overflow-hidden hx:rounded-lg hx:border;
-  /* Without a fill the frame is transparent and takes the colour of whatever
-     is behind it: the page as an article hero, `.hextra-blog-card-cover` in a
-     card.
+  /* This fill applies where the frame stands on its own - inline in prose, and
+     as an article hero - so it needs a surface of its own against the page:
+     Overlay, a step above the page and above the `neutral-50` cards elsewhere.
 
-     Light is `neutral-100`, the Overlay level `.hextra-blog-card-cover` uses,
-     so an image cover and a text cover sit on the same surface - and a step
-     above the cards that hold them, which stay at `neutral-50` with the code
-     blocks. Without that step the cover rendered in the card's exact colour,
-     with nothing to separate them once the frame's own border was dropped
-     inside card slots. Dark never had the problem: the card drops to
-     `neutral-950` while the frame stays at `neutral-900`. */
+     Inside a card cover slot it is overridden to transparent instead, so the
+     slot's colour governs both a text cover and an image one; see the rule at
+     the bottom of this file. */
   @apply hx:border-neutral-300 hx:bg-neutral-100;
   @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-900;
   @apply hx:my-6;
@@ -134,11 +130,19 @@
    - `.hextra-blog-card` (blog.css) and `.hextra-article-card`
    (article-card.css) - so the frame's edge sits flush inside it and reads as a
    doubled border. The frame keeps its own edge everywhere else, including as a
-   hero, where there is no card around it. */
+   hero, where there is no card around it.
+
+   The fill goes too, so the slot's own surface shows through. A text cover
+   fills its slot completely, so the frame's colour is the only one visible -
+   painting it here meant the two had to be kept equal by hand, and they drifted
+   the moment `.hextra-blog-card-cover` moved to Chrome while this rule stayed
+   on Overlay. Transparent makes each slot govern both of its cover kinds:
+   `neutral-200` / `neutral-800` for the blog card's two slots, `neutral-100` /
+   `neutral-900` for the article card's. */
 .hextra-blog-card-cover .hextra-command__frame,
 .hextra-blog-card-h-cover .hextra-command__frame,
 .hextra-article-card__cover .hextra-command__frame {
-  @apply hx:rounded-none hx:border-0;
+  @apply hx:rounded-none hx:border-0 hx:bg-transparent hx:dark:bg-transparent;
 }
 
 /* Hero covers sit between the breadcrumb and the title, where the image variant

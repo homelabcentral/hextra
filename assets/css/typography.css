@@ -41,7 +41,7 @@
     font-family: var(--font-code);
   }
   :where(code):not(:where(.hextra-code-block code, [class~="not-prose"], [class~="not-prose"] *)) {
-    @apply hx:border-black/4 hx:bg-black/3 hx:wrap-break-word hx:rounded-md hx:border hx:py-0.5 hx:px-[.25em] hx:text-[.9em] hx:dark:border-white/10 hx:dark:bg-white/10;
+    @apply hx:border-black/4 hx:bg-black/8 hx:wrap-break-word hx:rounded-md hx:border hx:py-0.5 hx:px-[.25em] hx:text-[.9em] hx:dark:border-white/10 hx:dark:bg-white/10;
     font-family: var(--font-code);
   }
   :where(table):not(:where(.hextra-code-block table, [class~="not-prose"], [class~="not-prose"] *)) {
