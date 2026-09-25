@@ -1,4 +1,19 @@
-@import "tailwindcss" prefix(hx);
+/* `theme(static)` emits every theme variable, not only the ones a utility in
+   `docs/hugo_stats.json` happens to reference.
+
+   Tailwind tree-shakes theme variables by default, which is right for a site
+   and wrong for a theme: what a *downstream* site uses is not knowable from
+   this repository's own pages. Before this, ten colour ramps survived - the
+   ones the callouts, alerts, badges and Jupyter states pull from - and the
+   other seventeen did not exist at runtime, so `var(--hx-color-sky-500)` in a
+   site's `custom.css` resolved to nothing. The chart series palette in
+   `components/chart.css` is the first thing in the theme to reference a ramp
+   no component paints with, and it would have been the first thing to break.
+
+   Cost is about 15KB uncompressed in the `:root` block, nearly all of it
+   repeated variable names, so gzip takes most of it back. No utility is
+   generated that was not generated before, and no rendered output changes. */
+@import "tailwindcss" prefix(hx) theme(static);
 
 @custom-variant dark (&:where(.dark, .dark *));
 
