@@ -335,13 +335,13 @@ red/amber/blue/green carry meaning; those live in `alert.css`, `jupyter.css`,
 **Surface levels.** Pick by role, not by eye. Note the direction inverts between
 modes: light raises by getting lighter, dark by getting darker.
 
-| Role                                                  | Light         | Dark          |
-| ----------------------------------------------------- | ------------- | ------------- |
-| Page                                                  | `hextra-bg`   | `hextra-bg`   |
-| Raised — code blocks, cards                           | `neutral-50`  | `neutral-950` |
-| Overlay — dropdowns, menus, collapsibles, cover slots | `neutral-100` | `neutral-900` |
-| Chrome — filename bars, hover                         | `neutral-200` | `neutral-800` |
-| Borders                                               | `neutral-300` | `neutral-700` |
+| Role                                       | Light         | Dark          |
+| ------------------------------------------ | ------------- | ------------- |
+| Page                                       | `hextra-bg`   | `hextra-bg`   |
+| Raised — code blocks, cards                | `neutral-50`  | `neutral-950` |
+| Overlay — dropdowns, menus, collapsibles   | `neutral-100` | `neutral-900` |
+| Chrome — filename bars, hover, cover slots | `neutral-200` | `neutral-800` |
+| Borders                                    | `neutral-300` | `neutral-700` |
 
 Overlays are their own level on purpose: a floating menu sits slightly darker
 than the page in light mode so it reads as above it, which is how Material and
@@ -352,14 +352,22 @@ Overlay too, not their own Panel level. They used to share the code block's
 `neutral-50` in light, which made a collapsed block read as another code block
 rather than as something sitting above the text.
 
-Which side of the Raised/Overlay line a thing falls on follows from what it
-holds. Body text goes on Raised, with the code blocks: `.hextra-blog-card`,
+Which side of the line a thing falls on follows from what it holds. Body text
+goes on Raised, with the code blocks: `.hextra-blog-card`,
 `.hextra-article-card` and `.hextra-repo-card` all do. The slot a cover or
-thumbnail sits in goes on Overlay, so an image that does not fill its column
-still reads as a surface above the card - and the `command` shortcode's frame
-is Overlay for the same reason, being a cover made of text. A card and its own
-cover slot must never land on the same value; in dark the step is `neutral-950`
-against `neutral-900`.
+thumbnail sits in goes one level further, on Chrome, so an image that does not
+fill its column still reads as a surface above the card: that is
+`.hextra-blog-card-cover`, `.hextra-blog-card-h-cover`,
+`.hextra-article-card__cover` and `.hextra-repo-card__thumbnail`. Overlay is
+where they used to sit, and against a `neutral-50` card it is a separation of
+only 1.04 in light - weak enough that a contained image looked like it floated
+on the card. Chrome is a true mirror pair, so both modes read alike at 1.21 and
+1.31. A card and its own cover slot must never land on the same value.
+
+The `command` shortcode's frame is a cover made of text, so inside a card slot
+it is transparent and takes that slot's colour. Standing on its own - inline in
+prose, or as a post hero - it keeps Overlay, because there it sits on the page
+rather than on a card.
 
 One border pair, everywhere, at 1px: `neutral-300` in light, `neutral-700` in
 dark. Code blocks, cards, collapsibles and the command frame all draw the same

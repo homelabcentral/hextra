@@ -19,56 +19,148 @@
 
 <script>
   (() => {
-    // Charts are drawn onto a canvas, which inherits no colour, so the ink has
-    // to be handed to Chart.js as a literal value. Take it from the element the
-    // chart is drawn in: `components/chart.css` sets --hextra-chart-ink and
-    // --hextra-chart-grid on the panel, and the same rule that flips the panel
-    // between light and dark flips them. Asking the DOM which mode is current
+    // Charts are drawn onto a canvas, which paints nothing it inherits, so the
+    // ink has to be handed to Chart.js as a literal value. Take it from the
+    // canvas itself: `components/chart.css` gives `.hextra-chart__canvas` a
+    // `color` and a `border-color`, and the same rule that flips the panel
+    // between light and dark flips both. Asking the DOM which mode is current
     // and choosing here is what put the wrong mode's ink on the panel; reading
     // the computed value cannot disagree with what is on screen.
     //
-    // The fallbacks matter only when the stylesheet has not been rebuilt, since
-    // these properties ship in the compiled CSS.
+    // Two real properties rather than custom properties, because a custom
+    // property hands its text back verbatim and the ramp is authored in oklch.
+    // Reading `color` and `border-top-color` makes the browser resolve the
+    // token first - but not into `rgb()`. Chromium serialises a computed colour
+    // in the colour space it was written in, so `--hx-color-neutral-800` still
+    // arrives as `oklch(0.269 0 0)`. `tests/helpers/color.ts` documents the same
+    // behaviour at length, and resolves colours the way below for the same
+    // reason.
+    //
+    // Chart.js does not parse oklch. Where it hands a colour straight to the 2D
+    // context Chromium's own parser accepts it, but `@kurkle/color` - which
+    // backs every colour animation and `getHoverColor` - does not, and silently
+    // drops the value. So convert once, here, by round-tripping the string
+    // through a canvas `fillStyle`: the browser gives it back as `#rrggbb` or
+    // `rgba(...)`, which every path in the library understands.
+    const swatch = document.createElement("canvas").getContext("2d");
+
+    const toRGB = (value) => {
+      if (!swatch || !value) return value;
+      // Assigning an unparseable value leaves `fillStyle` at its previous
+      // setting, so seed it transparent: a colour the browser rejects then
+      // reads back as transparent rather than as an opaque black that would
+      // paint. Hand the original string on in that case and let Chart.js try.
+      swatch.fillStyle = "rgba(0, 0, 0, 0)";
+      swatch.fillStyle = value;
+      const resolved = swatch.fillStyle;
+      return resolved === "rgba(0, 0, 0, 0)" ? value : resolved;
+    };
+
+    // Reached when there is no panel to read: `draw()` sets the library
+    // defaults from `document.querySelector(".hextra-chart__canvas")`, which is
+    // null on a page whose charts have not been written into the DOM yet.
+    // Falling through to `document.documentElement` is not a fallback - its
+    // `border-top-color` computes to `currentColor`, so the grid would come
+    // back as the body text colour and draw solid near-black lines across the
+    // plot. These are `.hextra-chart__canvas`'s own colours, hardcoded: the
+    // neutral-800/200 ink and the neutral-300/700 border pair.
+    //
+    // Picking by mode is what reading the computed value exists to avoid, and
+    // it is wrong here for the same reason - but with no element to read there
+    // is nothing to be right about, and this branch only ever seeds defaults
+    // that `themeScales` then overwrites per chart from its own canvas.
     const FALLBACK_INK = { light: "#262626", dark: "#e5e5e5" };
-    const FALLBACK_GRID = { light: "rgba(0,0,0,0.12)", dark: "rgba(255,255,255,0.14)" };
+    const FALLBACK_GRID = { light: "#d4d4d4", dark: "#404040" };
+
+    // The series palette is `--hextra-chart-series-1` upwards on the same
+    // element - seventeen hues, a different step of each per mode. Custom
+    // properties are the right shape here where they were the wrong shape for
+    // the ink: there is no real property that carries seventeen colours, and
+    // `toRGB` now handles the oklch text they hand back.
+    const SERIES_COUNT = 17;
+
+    // Matches `chart.css` so a chart still draws in colour if the stylesheet
+    // is missing. Same caveat as the two above: hand-kept, and only reached
+    // when there is nothing to read.
+    const FALLBACK_SERIES = {
+      light: ["#155dfc", "#a36100", "#009767", "#e30076", "#0092b5", "#9810fa", "#f05100", "#4b7d00", "#009588", "#c600db", "#0084cc", "#dd7400", "#e70044", "#4f39f6", "#00a544", "#e40014", "#7f22fe"],
+      dark: ["#54a2ff", "#fac800", "#00d294", "#fb64b6", "#00d2ef", "#c07eff", "#ff8b1a", "#9de500", "#00d3bd", "#ec6cff", "#00bcfe", "#fcbb00", "#ff667f", "#7d87ff", "#05df72", "#ff6568", "#a685ff"],
+    };
 
     const palette = (el) => {
-      const style = getComputedStyle(el || document.documentElement);
       const mode = document.documentElement.classList.contains("dark") ? "dark" : "light";
+      if (!el) return { text: FALLBACK_INK[mode], grid: FALLBACK_GRID[mode], series: FALLBACK_SERIES[mode] };
+
+      const style = getComputedStyle(el);
+
+      const series = [];
+      for (let i = 1; i <= SERIES_COUNT; i += 1) {
+        const value = toRGB(style.getPropertyValue(`--hextra-chart-series-${i}`).trim());
+        if (value) series.push(value);
+      }
+
       return {
-        text: style.getPropertyValue("--hextra-chart-ink").trim() || FALLBACK_INK[mode],
-        grid: style.getPropertyValue("--hextra-chart-grid").trim() || FALLBACK_GRID[mode],
+        text: toRGB(style.color) || FALLBACK_INK[mode],
+        // The longhand, not `borderColor`: the shorthand serialises to an empty
+        // string when the four sides disagree, and nothing here guarantees they
+        // never will.
+        grid: toRGB(style.borderTopColor) || FALLBACK_GRID[mode],
+        // An override may stop short of seventeen; only an empty list is a failure.
+        series: series.length ? series : FALLBACK_SERIES[mode],
       };
+    };
+
+    // Types that colour each data point rather than each dataset.
+    const perPoint = new Set(["pie", "doughnut", "polarArea"]);
+
+    // `toRGB` yields `#rrggbb` for an opaque colour and `rgba(r, g, b, a)` when
+    // the source carried alpha, so the old `${color}33` - hex digits glued onto
+    // whatever arrived - only worked while the palette was hardcoded hex. Parse
+    // instead, and emit `rgba()`, which both the 2D context and `@kurkle/color`
+    // accept.
+    const withAlpha = (color, alpha) => {
+      const hex = /^#([0-9a-f]{6})$/i.exec(color);
+      if (hex) {
+        const n = parseInt(hex[1], 16);
+        return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+      }
+      const rgb = /^rgba?\(([^)]+)\)$/.exec(color);
+      if (rgb) {
+        const [r, g, b] = rgb[1].split(",").map((v) => parseFloat(v));
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      }
+      return color;
     };
 
     // Chart.js ships an auto-colour plugin, but it opts out as soon as
     // Chart.defaults.borderColor is customised - which the theme code above
     // does - leaving every dataset the near-transparent built-in default. So
-    // assign a palette explicitly. Readable on both backgrounds, and ordered
-    // so the first few series stay distinguishable when desaturated.
-    const series = ["#38bdf8", "#f472b6", "#a78bfa", "#34d399", "#fbbf24", "#fb7185", "#22d3ee", "#c084fc"];
-
-    // Types that colour each data point rather than each dataset.
-    const perPoint = new Set(["pie", "doughnut", "polarArea"]);
-
-    const applyColors = (config) => {
+    // assign the panel's own series palette explicitly.
+    //
+    // `own` is what the shortcode declared, captured before this ever ran. It
+    // has to be consulted rather than `ds.borderColor`, for the reason the
+    // scales keep their own record: by the second draw `ds.borderColor` holds
+    // what this function wrote on the first, so a `!ds.borderColor` guard would
+    // pin every chart to the colours of whichever mode it was first drawn in.
+    const applyColors = (config, series, own) => {
       const datasets = (config.data && config.data.datasets) || [];
       datasets.forEach((ds, i) => {
         const type = ds.type || config.type;
         const color = series[i % series.length];
+        const authoredDs = (own && own[i]) || {};
 
         if (perPoint.has(type)) {
-          if (!ds.backgroundColor) {
+          if (!authoredDs.backgroundColor) {
             const count = (ds.data || []).length;
             ds.backgroundColor = Array.from({ length: count }, (_, j) => series[j % series.length]);
           }
           return;
         }
 
-        if (!ds.borderColor) ds.borderColor = color;
-        if (!ds.backgroundColor) {
+        if (!authoredDs.borderColor) ds.borderColor = color;
+        if (!authoredDs.backgroundColor) {
           // Filled marks read better solid; line areas need to stay see-through.
-          ds.backgroundColor = type === "line" || type === "radar" ? `${color}33` : color;
+          ds.backgroundColor = type === "line" || type === "radar" ? withAlpha(color, 0.2) : color;
         }
       });
     };
@@ -106,20 +198,33 @@
     // that same object, so by the second draw it carries whatever the plugin
     // wrote on the first, and reading it from the chart would preserve the
     // previous theme's ink as though the author had asked for it.
+    //
+    // The datasets need the same record for the same reason, now that the
+    // series palette differs between modes: `applyColors` writes onto the very
+    // object it would otherwise read its "did the author set this?" answer
+    // from. So capture both here, and before anything has been written.
     const authored = new Map();
 
     const captureAuthored = (id, config) => {
       if (authored.has(id)) return;
+
       const scales = (config.options && config.options.scales) || {};
-      const seen = {};
+      const seenScales = {};
       for (const [scaleId, scale] of Object.entries(scales)) {
-        seen[scaleId] = {
+        seenScales[scaleId] = {
           ticks: scale.ticks?.color,
           grid: scale.grid?.color,
           title: scale.title?.color,
         };
       }
-      authored.set(id, seen);
+
+      const datasets = (config.data && config.data.datasets) || [];
+      const seenDatasets = datasets.map((ds) => ({
+        borderColor: ds.borderColor,
+        backgroundColor: ds.backgroundColor,
+      }));
+
+      authored.set(id, { scales: seenScales, datasets: seenDatasets });
     };
 
     const themeScales = {
@@ -138,7 +243,7 @@
         // mid-update and takes every chart after it on the page down with it.
         chart.options.color = colors.text;
 
-        const own = authored.get(chart.canvas.id) || {};
+        const own = (authored.get(chart.canvas.id) || {}).scales || {};
 
         for (const [id, scale] of Object.entries(scales)) {
           const mine = own[id] || {};
@@ -162,7 +267,7 @@
       if (typeof Chart === "undefined") return;
       // Only a starting point for anything the plugin below does not reach;
       // every chart then overrides it from its own panel.
-      const colors = palette(document.querySelector(".hextra-chart"));
+      const colors = palette(document.querySelector(".hextra-chart__canvas"));
       Chart.defaults.color = colors.text;
       Chart.defaults.borderColor = colors.grid;
       // Empty only if the stylesheet has not applied yet; leaving Chart.js to
@@ -176,9 +281,12 @@
         const canvas = document.getElementById(entry.id);
         if (!canvas) continue;
 
-        applyColors(entry.config);
-        applyInteraction(entry.config);
+        // Capture first: `applyColors` writes the colours this records the
+        // absence of, so running it second would record our own output as the
+        // author's and freeze the first mode's palette in place.
         captureAuthored(entry.id, entry.config);
+        applyColors(entry.config, palette(canvas).series, authored.get(entry.id).datasets);
+        applyInteraction(entry.config);
 
         // Chart.js cannot restyle in place; destroy and rebuild on theme change.
         const existing = instances.get(entry.id);

@@ -23,19 +23,29 @@
   color: currentColor;
 }
 
+/* Symmetric alpha in both modes. It used to run black at 20% against white at
+   40%, so the same icon read at 1.59 against the card in light and 3.81 in
+   dark - light was a ghost while dark was a real mark. At 40% both, light
+   reaches 2.83 and the two modes read as one component.
+
+   Note 2.83 is still short of the 3:1 WCAG AA floor for non-text contrast;
+   black/42 is where light crosses it. These icons sit beside a text label
+   that names the card, so nothing depends on the icon alone - but an icon
+   that ever carries meaning by itself needs the higher value.
+
+   The dark half lives here as a `dark:` variant rather than in its own
+   `.dark ...` rule. That rule was more specific than the `:hover` one above
+   and came after it, so it won in dark mode - which is the only reason the
+   `.dark ... :hover` rule below had to exist. */
 .hextra-card .hextra-card-icon svg {
+  @apply hx:text-black/40 hx:dark:text-white/40;
   width: 1.5rem;
-  color: #00000033;
   transition: color 0.3s ease;
 }
 
 .hextra-card p {
   margin-top: 0.5rem;
   position: relative;
-}
-
-.dark .hextra-card .hextra-card-icon svg {
-  color: #ffffff66;
 }
 
 .dark .hextra-card:hover .hextra-card-icon svg {

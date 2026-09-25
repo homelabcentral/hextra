@@ -17,7 +17,7 @@ import { formatColor, resolveColor, resolveToken, sameColor, type RGBA } from ".
 // `--hx-color-neutral-300` fails only when the component stops being
 // `neutral-300`, which is the claim the table actually makes.
 
-type Level = "raised" | "overlay";
+type Level = "raised" | "overlay" | "chrome";
 
 type Surface = {
   name: string;
@@ -34,14 +34,19 @@ type Surface = {
 const LEVELS: Record<Level, { light: string; dark: string }> = {
   raised: { light: "--hx-color-neutral-50", dark: "--hx-color-neutral-950" },
   overlay: { light: "--hx-color-neutral-100", dark: "--hx-color-neutral-900" },
+  chrome: { light: "--hx-color-neutral-200", dark: "--hx-color-neutral-800" },
 };
 
 const BORDER = { light: "--hx-color-neutral-300", dark: "--hx-color-neutral-700" };
 
-// Which side of the Raised/Overlay line a component falls on follows from what
-// it holds: body text goes on Raised with the code blocks, and a slot that
-// holds a cover goes on Overlay so an image that does not fill its column still
-// reads as a surface above the card.
+// Which level a component falls on follows from what it holds: body text goes
+// on Raised with the code blocks, and a slot that holds a cover goes on Chrome
+// so an image that does not fill its column still reads as a surface above the
+// card. Overlay is one step short of that against a `neutral-50` card - 1.04 in
+// light - which is why the cover slots are on Chrome and not there.
+//
+// The cover slots are borderless by design: the card draws the edge, and a
+// second one inside it would read as a frame around the image.
 const SURFACES: Surface[] = [
   { name: "code block", path: "/docs/guide/configuration/", selector: ".hextra-code-block pre", level: "raised" },
   { name: "blog card", path: "/blog/", selector: ".hextra-blog-card", level: "raised" },
@@ -54,6 +59,14 @@ const SURFACES: Surface[] = [
   { name: "details shortcode", path: "/docs/guide/shortcodes/details/", selector: ".content details", level: "overlay" },
   { name: "command frame", path: "/docs/guide/shortcodes/command/", selector: ".hextra-command__frame", level: "overlay" },
   { name: "series box", path: "/blog/guide-blog-layout/", selector: ".hextra-series", level: "overlay" },
+  // `/blog/` renders the vertical card and the tag pages the horizontal one -
+  // `params.blog.list.card.layout` and `.termLayout` in `docs/hugo.yaml`. Both
+  // cover slots have to be reached, because they are two rules in `blog.css`
+  // and only one of them is on the page the other test below checks.
+  { name: "blog card cover", path: "/blog/", selector: ".hextra-blog-card-cover", level: "chrome", borderless: true },
+  { name: "blog card cover (horizontal)", path: "/tags/release/", selector: ".hextra-blog-card-h-cover", level: "chrome", borderless: true },
+  { name: "article card cover", path: "/docs/guide/shortcodes/article/", selector: ".hextra-article-card__cover", level: "chrome", borderless: true },
+  { name: "repo card thumbnail", path: "/docs/guide/shortcodes/github/", selector: ".hextra-repo-card__thumbnail", level: "chrome", borderless: true },
 ];
 
 const COLOR_SCHEMES = ["light", "dark"] as const;
@@ -107,7 +120,7 @@ for (const colorScheme of COLOR_SCHEMES) {
   // updating the table - still fails here rather than silently redefining what
   // the level means.
   test(`components on one level share a surface (${mode})`, async ({ page }) => {
-    const byLevel: Record<Level, { name: string; color: RGBA }[]> = { raised: [], overlay: [] };
+    const byLevel: Record<Level, { name: string; color: RGBA }[]> = { raised: [], overlay: [], chrome: [] };
 
     for (const surface of SURFACES) {
       const locator = await firstOf(page, surface, colorScheme);
@@ -124,10 +137,18 @@ for (const colorScheme of COLOR_SCHEMES) {
       }
     }
 
-    // And the two levels must stay distinct, or "raised" and "overlay" are one
-    // level with two names. This is the assertion that would have failed while
-    // the collapsibles shared `neutral-50` with the code blocks.
-    expect(sameColor(byLevel.raised[0].color, byLevel.overlay[0].color), `Raised and Overlay resolved to the same colour in ${mode} (${formatColor(byLevel.raised[0].color)})`).toBe(false);
+    // And the levels must stay distinct from each other, or they are one level
+    // with three names. This is the assertion that would have failed while the
+    // collapsibles shared `neutral-50` with the code blocks, and the one that
+    // fails if a cover slot drifts back down onto Overlay.
+    const pairs: [Level, Level][] = [
+      ["raised", "overlay"],
+      ["overlay", "chrome"],
+      ["raised", "chrome"],
+    ];
+    for (const [a, b] of pairs) {
+      expect(sameColor(byLevel[a][0].color, byLevel[b][0].color), `${a} and ${b} resolved to the same colour in ${mode} (${formatColor(byLevel[a][0].color)})`).toBe(false);
+    }
   });
 }
 

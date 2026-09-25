@@ -288,13 +288,16 @@
   content: "";
 }
 
-/* The Overlay level: `neutral-100` in light, `neutral-900` in dark - the same
-   pair as the theme selector's panel (`theme-toggle.html`), so a cover and the
-   light/dark menu read as the same surface. It is what shows through the
-   letterboxing of a contained cover image, so it has to be a real surface
-   rather than the page. */
+/* The Chrome level: `neutral-200` in light, `neutral-800` in dark. It is what
+   shows through the letterboxing of a contained cover image, so it has to be a
+   real surface rather than the page - and at Overlay (`neutral-100` /
+   `neutral-900`) it separated from the card by only 1.04 in light, which left
+   a non-filling image looking like it floated on the card itself. Chrome is a
+   true mirror pair, so both modes now read at the same weight (1.21 / 1.31).
+   `.hextra-article-card__cover` and `.hextra-repo-card__thumbnail` sit on the
+   same level for the same reason - every cover slot in the theme is Chrome. */
 .hextra-blog-card-cover {
-  @apply hx:block hx:overflow-hidden hx:bg-neutral-100 hx:dark:bg-neutral-900;
+  @apply hx:block hx:overflow-hidden hx:bg-neutral-200 hx:dark:bg-neutral-800;
 }
 
 /* Dynamic height: the image keeps its natural aspect ratio at full card
@@ -342,7 +345,7 @@
 }
 
 .hextra-blog-card-h-cover {
-  @apply hx:w-2/5 hx:shrink-0 hx:overflow-hidden hx:bg-neutral-100 hx:max-sm:hidden hx:dark:bg-neutral-900;
+  @apply hx:w-2/5 hx:shrink-0 hx:overflow-hidden hx:bg-neutral-200 hx:max-sm:hidden hx:dark:bg-neutral-800;
 }
 
 /* Contained, not cropped: covers are often UI screenshots, which lose their

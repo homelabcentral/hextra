@@ -54,6 +54,11 @@ endif
 SAY  := printf "$(BLUE)==>$(RESET) $(BOLD)%s$(RESET)\n"
 OK   := printf "$(GREEN)  ok$(RESET) %s\n"
 WARN := printf "$(YELLOW)  !!$(RESET) %s\n"
+ERR  := printf "$(RED)  xx$(RESET) %s\n"
+# A labelled row inside a diagnostic: `$(ROW) "label" "value"`. The width is
+# the same everywhere so the values line up down the page and a run reads as a
+# table rather than as prose.
+ROW  := printf "  %-14s %s\n"
 
 # ----------------------------------------------------------------------- help
 
@@ -463,9 +468,11 @@ ci-pages: ci-preflight ## Run the Pages build job locally (deploy is GitHub-only
 # collaborator". `gh-preflight` turns that into one clear line instead.
 #
 # Nothing here ever reads, echoes or masks GH_TOKEN. `gh api user` asks GitHub
-# who the credential belongs to and prints only a login; `gh auth status` is
-# silenced because it renders a masked token, and a masked token is still a
-# disclosure. See AGENTS.md > Working conventions > Secrets and the gh CLI.
+# who the credential belongs to and prints only a login. `gh auth status` is
+# run but never shown raw - it renders a masked token, and a masked token is
+# still a disclosure - so its output goes through an allowlist of four labels
+# that carry no secret. See AGENTS.md > Working conventions > Secrets and the
+# gh CLI.
 #
 # Branch state is read from local tracking refs rather than `git ls-remote`.
 # origin is an SSH remote and a plain `docker exec` carries no forwarded agent,
@@ -495,10 +502,24 @@ define CONFIRM
 	fi
 endef
 
-# Two read-only diagnostics. Neither reads, echoes, masks or length-checks
-# GH_TOKEN: presence is tested with [ -n ] and identity is asked of GitHub,
-# which answers with a login. `gh auth status` is never shown because it
-# renders a masked token, and a masked token is still a disclosure.
+# Read-only diagnostics. None of them reads, echoes, masks or length-checks
+# GH_TOKEN: presence is tested with [ -n ], which is the only shell form that
+# cannot print the value, and identity is asked of GitHub, which answers with
+# a login.
+#
+# `gh auth status` is captured and filtered rather than printed. It renders a
+# masked token, and a masked token is still a disclosure, so the filter is an
+# allowlist of four labels that carry nothing secret - account, protocol and
+# scopes. An allowlist and not a `grep -v Token`, for two reasons: `Token
+# scopes:` also contains the word, so a deny list either loses the scopes or
+# keeps the token depending on how it is written; and a future gh release that
+# renames a label makes an allowlist print less, while it makes a deny list
+# print more.
+#
+# The marker `gh` puts in front of each line is stripped with `s/^[^A-Za-z]*//`
+# rather than a character class. `✓` is three bytes of UTF-8, and sed in the C
+# locale matches a bracket expression byte by byte, so `[-✓]` splits it and
+# leaves the remaining bytes in the output as mojibake.
 
 .PHONY: gh-auth
 gh-auth: ## Check gh is authenticated as the account that owns this repository
@@ -522,19 +543,29 @@ gh-auth: ## Check gh is authenticated as the account that owns this repository
 	 if [ -z "$$login" ]; then \
 	   printf "  %-14s $(RED)%s$(RESET)\n" "identity" "not authenticated"; \
 	   if [ -n "$${GH_TOKEN:-}" ]; then \
-	     $(WARN) "GH_TOKEN is set but GitHub rejected it - expired or revoked. Reissue it"; \
+	     $(ERR) "GH_TOKEN is set but GitHub rejected it - expired or revoked. Reissue it"; \
 	   else \
-	     $(WARN) "no credential at all - see GH_TOKEN above"; \
+	     $(ERR) "no credential at all - see GH_TOKEN above"; \
 	   fi; \
 	   exit 1; \
 	 elif [ "$$login" != "$(GH_OWNER)" ]; then \
 	   printf "  %-14s $(RED)%s$(RESET)\n" "identity" "$$login"; \
-	   $(WARN) "this repository belongs to $(GH_OWNER) - $$login is not a collaborator"; \
+	   $(ERR) "this repository belongs to $(GH_OWNER) - $$login is not a collaborator"; \
 	   $(WARN) "gh pr create would fail with 'must be a collaborator'"; \
 	   $(WARN) "run make inside the dev container - the host gh is a different account"; \
 	   exit 1; \
 	 else \
 	   printf "  %-14s $(GREEN)%s$(RESET)\n" "identity" "$$login"; \
+	 fi
+	@status="$$(gh auth status 2>&1 || true)"; \
+	 safe="$$(printf '%s\n' "$$status" \
+	   | grep -E 'Active account|Logged in to|Git operations protocol|Token scopes' \
+	   | sed 's/^[^A-Za-z]*//' || true)"; \
+	 if [ -n "$$safe" ]; then \
+	   printf '%s\n' "$$safe" | while IFS= read -r line; do $(ROW) "" "$$line"; done; \
+	 else \
+	   $(ROW) "" "gh auth status matched none of the expected labels"; \
+	   $(ROW) "" "(gh may have renamed them - the filter fails closed on purpose)"; \
 	 fi
 	@$(OK) "gh can write to $(GH_OWNER)"
 
@@ -550,25 +581,157 @@ git-auth: ## Check git identity and that origin is reachable for pushing
 	fi
 	@url="$$(git remote get-url origin 2>/dev/null || true)"; \
 	 if [ -z "$$url" ]; then \
-	   printf "  %-14s $(RED)%s$(RESET)\n" "origin" "no remote"; exit 1; fi; \
+	   printf "  %-14s $(RED)%s$(RESET)\n" "origin" "no remote"; \
+	   $(ERR) "nothing to push to - git remote add origin <url>"; exit 1; fi; \
 	 printf "  %-14s %s\n" "origin" "$$url"
 	@if [ -n "$${SSH_AUTH_SOCK:-}" ] && [ -S "$${SSH_AUTH_SOCK:-}" ]; then \
 	   printf "  %-14s $(GREEN)%s$(RESET)\n" "ssh-agent" "forwarded"; \
 	 else \
 	   printf "  %-14s $(YELLOW)%s$(RESET)\n" "ssh-agent" "not forwarded"; \
-	   printf "  %-14s %s\n" "" "VS Code forwards it to terminals it opens; a plain"; \
-	   printf "  %-14s %s\n" "" "'docker exec' does not - push from a VS Code terminal"; \
+	   $(ROW) "" "'make ssh-auth' explains this one and tells it from a bad key"; \
 	 fi
 	@if git ls-remote --exit-code --heads origin >/dev/null 2>&1; then \
 	   printf "  %-14s $(GREEN)%s$(RESET)\n" "push access" "origin reachable"; \
 	   $(OK) "git can push to origin"; \
 	 else \
 	   printf "  %-14s $(RED)%s$(RESET)\n" "push access" "origin unreachable"; \
+	   $(ERR) "git cannot reach origin - a push would fail"; \
 	   $(WARN) "the host keys are mounted read-only and the agent does the signing"; \
 	   $(WARN) "so this usually means the agent is missing rather than a bad key"; \
-	   $(WARN) "check: ssh -T $$(git remote get-url origin | sed 's|:.*||')"; \
+	   $(WARN) "run 'make ssh-auth' - it tells the four failure modes apart"; \
 	   exit 1; \
 	 fi
+
+# `ssh -T` is the only check that proves a push would work. `git ls-remote` in
+# git-auth above proves the same thing for this one remote; this proves it per
+# host, reports which account the key maps to, and tells the four failure
+# modes apart - which is what turns "Permission denied (publickey)" from a
+# credential scare into a one-line answer.
+#
+# Three things about it that read as bugs and are not:
+#
+#   `ssh -T git@github.com` exits 1 on SUCCESS. GitHub authenticates you and
+#   then refuses the shell, which is a non-zero exit. So the output is matched,
+#   never the status, and every invocation carries `|| true` so `set -e` does
+#   not take the recipe down on a successful check.
+#
+#   BatchMode=yes is mandatory, not tidiness. Without it an unknown host key or
+#   a passphrase-protected key opens a prompt, and a prompt inside `docker exec
+#   make` blocks until the terminal is killed. With it those become errors this
+#   can classify.
+#
+#   Host key checking is left alone. `accept-new` would write to known_hosts,
+#   and ~/.ssh is mounted read-only in the container, so it would fail anyway -
+#   and silently weakening host verification inside a diagnostic is the wrong
+#   trade. An unknown host key is reported as what it is.
+#
+# Nothing here prints key material. `ssh-add -l` lists fingerprints and
+# comments; only the count is shown. The remote's own host alias is checked
+# alongside github.com because that alias is what `git push` actually resolves,
+# and the two can disagree - a working github.com and a broken alias is exactly
+# the state a wrong ~/.ssh/config produces.
+
+.PHONY: ssh-auth
+ssh-auth: ## Check SSH can authenticate to GitHub: agent, identities, ssh -T per host
+	@$(SAY) "ssh authentication"
+	@command -v ssh >/dev/null 2>&1 || { \
+	  printf "  %-14s $(RED)%s$(RESET)\n" "ssh" "not installed"; \
+	  $(ERR) "no ssh client - git push over SSH cannot work from here"; exit 1; }
+	@$(ROW) "ssh" "$$(ssh -V 2>&1 | head -1)"
+	@if [ -z "$${SSH_AUTH_SOCK:-}" ] || [ ! -S "$${SSH_AUTH_SOCK:-}" ]; then \
+	   printf "  %-14s $(YELLOW)%s$(RESET)\n" "ssh-agent" "not forwarded"; \
+	   $(ROW) "" "VS Code injects SSH_AUTH_SOCK only into terminals it opens, so a"; \
+	   $(ROW) "" "plain 'docker exec' has no agent. The key is passphrase-protected"; \
+	   $(ROW) "" "and unlocked from the macOS Keychain into the agent, so with no"; \
+	   $(ROW) "" "agent there is nothing able to sign - expect a publickey denial"; \
+	   $(ROW) "" "below. Push from a VS Code terminal inside the container instead."; \
+	 else \
+	   n="$$(ssh-add -l 2>/dev/null | grep -c . || true)"; \
+	   if [ "$$n" -gt 0 ]; then \
+	     printf "  %-14s $(GREEN)%s$(RESET)\n" "ssh-agent" "forwarded ($$n identities)"; \
+	   else \
+	     printf "  %-14s $(YELLOW)%s$(RESET)\n" "ssh-agent" "forwarded but holding no identities"; \
+	     $(ROW) "" "the socket is there but empty - 'ssh-add' a key on the host"; \
+	   fi; \
+	 fi
+	@hosts="github.com"; \
+	 url="$$(git remote get-url origin 2>/dev/null || true)"; \
+	 case "$$url" in \
+	   *@*:*) alias="$${url#*@}"; alias="$${alias%%:*}"; \
+	          [ "$$alias" = "github.com" ] || hosts="$$hosts $$alias" ;; \
+	   *) $(ROW) "origin" "not an SSH remote - only github.com is checked" ;; \
+	 esac; \
+	 fail=0; \
+	 for h in $$hosts; do \
+	   out="$$(ssh -T -o BatchMode=yes -o ConnectTimeout=10 "git@$$h" 2>&1 || true)"; \
+	   case "$$out" in \
+	     *"successfully authenticated"*) \
+	       who="$$(printf '%s' "$$out" | sed -n 's/^Hi \([^!]*\)!.*/\1/p' | head -1)"; \
+	       printf "  %-14s $(GREEN)%s$(RESET)\n" "$$h" "authenticated as $${who:-unknown}" ;; \
+	     *"Permission denied"*) \
+	       printf "  %-14s $(RED)%s$(RESET)\n" "$$h" "permission denied (publickey)"; \
+	       $(ROW) "" "GitHub was reached and rejected every key offered. With no"; \
+	       $(ROW) "" "agent this is expected and is not a broken key - see above."; \
+	       fail=1 ;; \
+	     *"Host key verification failed"*|*"Host key for"*) \
+	       printf "  %-14s $(RED)%s$(RESET)\n" "$$h" "host key not trusted"; \
+	       $(ROW) "" "not in known_hosts, and BatchMode will not prompt. Connect once"; \
+	       $(ROW) "" "from an interactive shell on the host to record it."; \
+	       fail=1 ;; \
+	     *"Could not resolve hostname"*) \
+	       printf "  %-14s $(RED)%s$(RESET)\n" "$$h" "hostname does not resolve"; \
+	       $(ROW) "" "if this is an alias it needs a Host block in ~/.ssh/config,"; \
+	       $(ROW) "" "which is mounted read-only into the container from the host"; \
+	       fail=1 ;; \
+	     *"imed out"*|*"Connection refused"*|*"Network is unreachable"*) \
+	       printf "  %-14s $(RED)%s$(RESET)\n" "$$h" "unreachable"; \
+	       $(ROW) "" "port 22 blocked or offline - try ssh.github.com:443"; \
+	       fail=1 ;; \
+	     *) \
+	       printf "  %-14s $(RED)%s$(RESET)\n" "$$h" "unrecognised response"; \
+	       $(ROW) "" "$$(printf '%s' "$$out" | head -1)"; \
+	       fail=1 ;; \
+	   esac; \
+	 done; \
+	 if [ "$$fail" -eq 0 ]; then $(OK) "ssh can authenticate to every host origin uses"; \
+	 else $(ERR) "ssh cannot authenticate - git push over SSH will fail"; exit 1; fi
+
+# Runs the three diagnostics in the order a failure cascades: identity, then
+# the transport push uses, then the API `gh` uses. Each is a real target, so
+# any one can be run alone; this only aggregates and reports how many failed.
+#
+# `-k` is not used and $(MAKE) is called per target rather than as
+# prerequisites, because prerequisites stop at the first failure and the whole
+# point is to see all three states at once - a broken agent and a wrong gh
+# account are different problems with different fixes, and finding them one
+# run at a time is how an afternoon disappears.
+#
+# Each sub-make has its stderr dropped. The only thing it carries is make's own
+# `*** [target] Error 1`, which says nothing this target does not say better in
+# the summary; every diagnostic line the three checks produce goes to stdout,
+# and each one captures the stderr of the commands it runs. A check that dies
+# outright still exits non-zero and is still counted, so nothing is hidden -
+# only re-reported.
+
+.PHONY: auth
+auth: ## Run every authentication check and summarise: git identity, ssh, gh
+	@fail=0; total=3; \
+	 $(MAKE) --no-print-directory git-auth 2>/dev/null || fail=$$((fail + 1)); echo; \
+	 $(MAKE) --no-print-directory ssh-auth 2>/dev/null || fail=$$((fail + 1)); echo; \
+	 $(MAKE) --no-print-directory gh-auth  2>/dev/null || fail=$$((fail + 1)); echo; \
+	 $(SAY) "summary"; \
+	 if [ "$$fail" -eq 0 ]; then \
+	   $(OK) "$$total of $$total checks passed - commit, push and gh are all ready"; \
+	 else \
+	   $(ERR) "$$fail of $$total checks failed"; \
+	   $(WARN) "almost every failure here is about which machine the command ran on,"; \
+	   $(WARN) "not about a bad credential. Never respond by changing a credential, a"; \
+	   $(WARN) "remote URL, a credential helper or anything under ~/.ssh. Try again in"; \
+	   $(WARN) "the container first:"; \
+	   $(WARN) "  docker exec -w /workspaces/hextra hextra-dev-1 make auth"; \
+	   exit 1; \
+	 fi
+
 
 .PHONY: gh-preflight
 gh-preflight:

@@ -4,8 +4,13 @@
   @apply hx:my-6;
 }
 
+/* Chrome, matching the cover slots in `blog.css`, `article-card.css` and
+   `repo-card.css`: this is a slot that shows through an image which does not
+   fill it, which is the same job. It was `neutral-100` / `neutral-800` -
+   Overlay in light and Chrome in dark, so the two modes did not read at the
+   same weight. */
 .hextra-gallery__item {
-  @apply hx:relative hx:m-0 hx:overflow-hidden hx:rounded-md hx:bg-neutral-100 hx:break-inside-avoid hx:dark:bg-neutral-800;
+  @apply hx:relative hx:m-0 hx:overflow-hidden hx:rounded-md hx:bg-neutral-200 hx:break-inside-avoid hx:dark:bg-neutral-800;
 }
 
 .hextra-gallery__link {

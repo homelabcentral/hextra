@@ -1,31 +1,127 @@
+/* The one shared border pair, at 1px, like every other container. This drew
+   `neutral-200` / `neutral-800` until now - a different weight of edge from
+   the code blocks and the cards, and from the grid colour two rules down,
+   which is that same pair by another name.
+
+   The fill is deliberately not a level pair: `neutral-900` in dark rather than
+   the `neutral-950` that would make this Raised, because the axis contrast
+   figures below are measured against it. */
 .hextra-chart {
   @apply hx:my-6 hx:rounded-lg hx:border hx:p-4;
-  @apply hx:border-neutral-200 hx:bg-neutral-50;
-  @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
-
-  /* A canvas inherits no colour, so `scripts/chart.html` reads these two off
-     the container with getComputedStyle and paints the axis numbers, their
-     titles and the grid with them.
-
-     They live here, beside the panel they are drawn on, rather than as a
-     light/dark pair in JavaScript. JavaScript has to decide which mode is
-     current before it can pick a colour, and every way of asking that question
-     - a class on <html>, a media query, a stored preference - can answer for a
-     different moment than the one the panel was painted in, which is how the
-     ink ends up being the other mode's. A custom property cannot: the rule
-     that flips the panel flips the ink, in the same cascade, at the same time.
-
-     Ink is one step softer than body text: axis numbers are reference marks,
-     not prose, and full-contrast numerals fight the series for attention. */
-  --hextra-chart-ink: #262626; /* neutral-800 on the neutral-50 panel: 13.8:1 */
-  --hextra-chart-grid: rgba(0, 0, 0, 0.12);
+  @apply hx:border-neutral-300 hx:bg-neutral-50;
+  @apply hx:dark:border-neutral-700 hx:dark:bg-neutral-900;
 }
 
-.dark .hextra-chart {
-  --hextra-chart-ink: #e5e5e5; /* neutral-200 on the neutral-900 panel: 12.6:1 */
-  --hextra-chart-grid: rgba(255, 255, 255, 0.14);
-}
+/*
+  A canvas paints nothing it inherits, so `scripts/chart.html` reads the ink
+  and the grid colour off this element with getComputedStyle and hands them to
+  Chart.js as literal values.
 
+  They are declared here, in the same cascade as the panel, rather than picked
+  in JavaScript. JavaScript has to decide which mode is current before it can
+  choose a colour, and every way of asking that question - a class on <html>, a
+  media query, a stored preference - can answer for a different moment than the
+  one the panel was painted in, which is how the ink ended up being the other
+  mode's. A CSS rule cannot disagree with what is on screen: the rule that
+  flips the panel flips these, at the same time, and the observer in the script
+  redraws each chart against the values that are live when it runs.
+
+  Two real properties, not custom properties. The ramp is emitted as oklch -
+  `--hx-color-neutral-800` is `oklch(26.9% 0 0)` - and a custom property hands
+  back that text verbatim, so nothing has resolved the token. Reading `color`
+  and `border-top-color` makes the browser resolve it. It does not make the
+  browser rewrite it: a computed colour is serialised in the colour space it
+  was authored in, so these arrive as `oklch(...)` too, and `scripts/chart.html`
+  converts them before Chart.js sees them.
+
+  `border-color` is free to carry the grid here because Tailwind's preflight
+  sets every border to `0 solid`, so a colour with no width draws nothing. The
+  panel's own visible border lives on `.hextra-chart` above and is untouched.
+
+  Ink is one step softer than body text: axis numbers are reference marks, not
+  prose, and full-contrast numerals fight the series for attention. The grid is
+  the theme's one border pair, which is what a grid line is.
+*/
 .hextra-chart__canvas {
   @apply hx:w-full;
+  /* neutral-800 on the neutral-50 panel: 13.8:1 - neutral-200 on neutral-900: 12.6:1 */
+  @apply hx:text-neutral-800 hx:dark:text-neutral-200;
+  @apply hx:border-neutral-300 hx:dark:border-neutral-700;
+
+  /*
+    The series palette - the colour of the lines, bars and slices themselves.
+
+    Here rather than in `scripts/chart.html` for the reason the ink is here:
+    the rule that flips the panel flips these, in the same cascade, so the
+    script never has to decide which mode is current. It reads them off this
+    element alongside `color` and `border-top-color`, and converts all of them
+    the same way. A site overrides any of them from `custom.css` without
+    touching a template.
+
+    All seventeen of Tailwind's chromatic ramps, one step of each per mode, so
+    a chart with a dozen series still gets a dozen distinct hues before the
+    list wraps. Ordered by farthest-point on the hue circle rather than by the
+    ramp order - each entry is the hue furthest from every hue already placed -
+    because most charts have two or three series and those have to separate
+    first. Light takes the 600 step against the near-white panel and dark the
+    400 step against the dark one, the same inversion the surfaces make.
+
+    Every entry clears 3:1 against its own panel, the WCAG AA bar for a
+    graphical object (light / dark):
+
+       1 blue      5.03 /  6.83    7 orange    3.43 /  7.62   13 rose      4.50 /  6.37
+       2 yellow    4.71 / 11.40    8 lime      4.78 / 11.60   14 indigo    6.17 /  5.79
+       3 emerald   3.56 /  9.12    9 teal      3.55 /  9.46   15 green     3.13 / 10.09
+       4 pink      4.43 /  6.49   10 fuchsia   4.55 /  6.96   16 red       4.66 /  6.24
+       5 cyan      3.49 /  9.76   11 sky       3.88 /  8.17   17 violet    5.63 /  6.33
+       6 purple    5.30 /  6.53   12 amber     3.05 / 10.42
+
+    yellow and lime are the two that take 700 rather than 600 in light:
+    yellow-600 is 2.81:1 on `neutral-50` and lime-600 2.95:1, both under the
+    bar. Every other hue clears it at 600, and no hue needed a step darker
+    than 400 in dark.
+
+    These reference ramps no component paints with, which is why `styles.css`
+    imports Tailwind with `theme(static)`. Without it nine of the seventeen -
+    emerald, pink, cyan, lime, teal, fuchsia, sky, rose and violet - are not
+    emitted at all, and the tree-shaking is per variable rather than per ramp,
+    so a step nothing else uses goes missing even from a ramp that survives.
+  */
+  --hextra-chart-series-1: var(--hx-color-blue-600);
+  --hextra-chart-series-2: var(--hx-color-yellow-700);
+  --hextra-chart-series-3: var(--hx-color-emerald-600);
+  --hextra-chart-series-4: var(--hx-color-pink-600);
+  --hextra-chart-series-5: var(--hx-color-cyan-600);
+  --hextra-chart-series-6: var(--hx-color-purple-600);
+  --hextra-chart-series-7: var(--hx-color-orange-600);
+  --hextra-chart-series-8: var(--hx-color-lime-700);
+  --hextra-chart-series-9: var(--hx-color-teal-600);
+  --hextra-chart-series-10: var(--hx-color-fuchsia-600);
+  --hextra-chart-series-11: var(--hx-color-sky-600);
+  --hextra-chart-series-12: var(--hx-color-amber-600);
+  --hextra-chart-series-13: var(--hx-color-rose-600);
+  --hextra-chart-series-14: var(--hx-color-indigo-600);
+  --hextra-chart-series-15: var(--hx-color-green-600);
+  --hextra-chart-series-16: var(--hx-color-red-600);
+  --hextra-chart-series-17: var(--hx-color-violet-600);
+}
+
+.dark .hextra-chart__canvas {
+  --hextra-chart-series-1: var(--hx-color-blue-400);
+  --hextra-chart-series-2: var(--hx-color-yellow-400);
+  --hextra-chart-series-3: var(--hx-color-emerald-400);
+  --hextra-chart-series-4: var(--hx-color-pink-400);
+  --hextra-chart-series-5: var(--hx-color-cyan-400);
+  --hextra-chart-series-6: var(--hx-color-purple-400);
+  --hextra-chart-series-7: var(--hx-color-orange-400);
+  --hextra-chart-series-8: var(--hx-color-lime-400);
+  --hextra-chart-series-9: var(--hx-color-teal-400);
+  --hextra-chart-series-10: var(--hx-color-fuchsia-400);
+  --hextra-chart-series-11: var(--hx-color-sky-400);
+  --hextra-chart-series-12: var(--hx-color-amber-400);
+  --hextra-chart-series-13: var(--hx-color-rose-400);
+  --hextra-chart-series-14: var(--hx-color-indigo-400);
+  --hextra-chart-series-15: var(--hx-color-green-400);
+  --hextra-chart-series-16: var(--hx-color-red-400);
+  --hextra-chart-series-17: var(--hx-color-violet-400);
 }
