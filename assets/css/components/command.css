@@ -41,18 +41,22 @@
   @apply hx:flex hx:items-baseline hx:gap-[0.6em];
 }
 
-/* accent-600 in light, not accent-500: the prompt sits on the frame's
-   `neutral-50`, where accent-500 measures 2.60:1 - under the 3:1 floor even
-   for large text. accent-600 is 3.81:1 there (`toc.css` records 3.71:1 for the
-   same value against the page, which is marginally darker).
+/* accent-600 in light, not accent-500. The prompt sits on two surfaces, not
+   one: the frame's own `neutral-100` when it stands alone, and the cover
+   slot's `neutral-200` when it is a card cover, where the frame goes
+   transparent (see the rule at the bottom of this file). accent-500 is 2.52:1
+   and 2.18:1 on those - under the 3:1 floor even for large text. accent-600 is
+   3.72:1 and 3.22:1. `toc.css` records 3.71:1 for the same value against the
+   page, which sits between the two.
 
-   That clears 3:1 but not 4.5:1, which is a deliberate call rather than an
-   oversight. The glyph is decorative punctuation, marked `aria-hidden`, and it
-   scales with the container: `clamp(0.7rem, ..., 4rem)` as a cover and
-   `clamp(0.9rem, ..., 2.5rem)` inline, so most of that range is large text at
-   the 3:1 bar. At the bottom of the range it is not, and accent-700 would have
-   covered that case - it was traded for keeping the prompt recognisably the
-   accent rather than a near-navy. Dark mode passes at 8.21:1 either way. */
+   Both clear 3:1 but neither clears 4.5:1, which is a deliberate call rather
+   than an oversight. The glyph is decorative punctuation, marked
+   `aria-hidden`, and it scales with the container: `clamp(0.7rem, ..., 4rem)`
+   as a cover and `clamp(0.9rem, ..., 2.5rem)` inline, so most of that range is
+   large text at the 3:1 bar. At the bottom of the range it is not, and
+   accent-700 would have covered that case - it was traded for keeping the
+   prompt recognisably the accent rather than a near-navy. Dark mode passes on
+   both surfaces, at 8.08:1 on `neutral-900` and 6.89:1 on `neutral-800`. */
 .hextra-command__prompt {
   @apply hx:shrink-0 hx:select-none hx:text-hextra-accent-600 hx:dark:text-hextra-accent-400;
 }
