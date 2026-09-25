@@ -19,25 +19,30 @@
 
 <script>
   (() => {
-    // Charts are drawn onto a canvas, which inherits no colour, so the ink has
-    // to be handed to Chart.js as a literal value. Take it from the element the
-    // chart is drawn in: `components/chart.css` sets --hextra-chart-ink and
-    // --hextra-chart-grid on the panel, and the same rule that flips the panel
-    // between light and dark flips them. Asking the DOM which mode is current
+    // Charts are drawn onto a canvas, which paints nothing it inherits, so the
+    // ink has to be handed to Chart.js as a literal value. Take it from the
+    // canvas itself: `components/chart.css` gives `.hextra-chart__canvas` a
+    // `color` and a `border-color`, and the same rule that flips the panel
+    // between light and dark flips both. Asking the DOM which mode is current
     // and choosing here is what put the wrong mode's ink on the panel; reading
     // the computed value cannot disagree with what is on screen.
     //
-    // The fallbacks matter only when the stylesheet has not been rebuilt, since
-    // these properties ship in the compiled CSS.
-    const FALLBACK_INK = { light: "#262626", dark: "#e5e5e5" };
-    const FALLBACK_GRID = { light: "rgba(0,0,0,0.12)", dark: "rgba(255,255,255,0.14)" };
-
+    // Two real properties rather than custom properties, because the ramp is
+    // emitted as oklch and a custom property would hand back that text
+    // verbatim, which Chart.js's colour parser does not understand. A computed
+    // `color` or `border-top-color` is resolved by the browser first and always
+    // serialises as `rgb()`. That also means neither can come back empty, so
+    // there is nothing here to fall back to - a missing stylesheet degrades to
+    // the inherited text colour rather than to a hardcoded pair that has to be
+    // kept in step with the CSS by hand.
     const palette = (el) => {
       const style = getComputedStyle(el || document.documentElement);
-      const mode = document.documentElement.classList.contains("dark") ? "dark" : "light";
       return {
-        text: style.getPropertyValue("--hextra-chart-ink").trim() || FALLBACK_INK[mode],
-        grid: style.getPropertyValue("--hextra-chart-grid").trim() || FALLBACK_GRID[mode],
+        text: style.color,
+        // The longhand, not `borderColor`: the shorthand serialises to an empty
+        // string when the four sides disagree, and nothing here guarantees they
+        // never will.
+        grid: style.borderTopColor,
       };
     };
 
@@ -162,7 +167,7 @@
       if (typeof Chart === "undefined") return;
       // Only a starting point for anything the plugin below does not reach;
       // every chart then overrides it from its own panel.
-      const colors = palette(document.querySelector(".hextra-chart"));
+      const colors = palette(document.querySelector(".hextra-chart__canvas"));
       Chart.defaults.color = colors.text;
       Chart.defaults.borderColor = colors.grid;
       // Empty only if the stylesheet has not applied yet; leaving Chart.js to

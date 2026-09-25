@@ -2,30 +2,39 @@
   @apply hx:my-6 hx:rounded-lg hx:border hx:p-4;
   @apply hx:border-neutral-200 hx:bg-neutral-50;
   @apply hx:dark:border-neutral-800 hx:dark:bg-neutral-900;
-
-  /* A canvas inherits no colour, so `scripts/chart.html` reads these two off
-     the container with getComputedStyle and paints the axis numbers, their
-     titles and the grid with them.
-
-     They live here, beside the panel they are drawn on, rather than as a
-     light/dark pair in JavaScript. JavaScript has to decide which mode is
-     current before it can pick a colour, and every way of asking that question
-     - a class on <html>, a media query, a stored preference - can answer for a
-     different moment than the one the panel was painted in, which is how the
-     ink ends up being the other mode's. A custom property cannot: the rule
-     that flips the panel flips the ink, in the same cascade, at the same time.
-
-     Ink is one step softer than body text: axis numbers are reference marks,
-     not prose, and full-contrast numerals fight the series for attention. */
-  --hextra-chart-ink: #262626; /* neutral-800 on the neutral-50 panel: 13.8:1 */
-  --hextra-chart-grid: rgba(0, 0, 0, 0.12);
 }
 
-.dark .hextra-chart {
-  --hextra-chart-ink: #e5e5e5; /* neutral-200 on the neutral-900 panel: 12.6:1 */
-  --hextra-chart-grid: rgba(255, 255, 255, 0.14);
-}
+/*
+  A canvas paints nothing it inherits, so `scripts/chart.html` reads the ink
+  and the grid colour off this element with getComputedStyle and hands them to
+  Chart.js as literal values.
 
+  They are declared here, in the same cascade as the panel, rather than picked
+  in JavaScript. JavaScript has to decide which mode is current before it can
+  choose a colour, and every way of asking that question - a class on <html>, a
+  media query, a stored preference - can answer for a different moment than the
+  one the panel was painted in, which is how the ink ended up being the other
+  mode's. A CSS rule cannot disagree with what is on screen: the rule that
+  flips the panel flips these, at the same time, and the observer in the script
+  redraws each chart against the values that are live when it runs.
+
+  Two real properties, not custom properties. The ramp is emitted as oklch -
+  `--hx-color-neutral-800` is `oklch(26.9% 0 0)` - and a custom property hands
+  back that text verbatim, which Chart.js's colour parser does not understand.
+  Reading `color` and `border-top-color` instead makes the browser resolve the
+  token first: a computed colour always serialises as `rgb()`, which it does.
+
+  `border-color` is free to carry the grid here because Tailwind's preflight
+  sets every border to `0 solid`, so a colour with no width draws nothing. The
+  panel's own visible border lives on `.hextra-chart` above and is untouched.
+
+  Ink is one step softer than body text: axis numbers are reference marks, not
+  prose, and full-contrast numerals fight the series for attention. The grid is
+  the theme's one border pair, which is what a grid line is.
+*/
 .hextra-chart__canvas {
   @apply hx:w-full;
+  /* neutral-800 on the neutral-50 panel: 13.8:1 - neutral-200 on neutral-900: 12.6:1 */
+  @apply hx:text-neutral-800 hx:dark:text-neutral-200;
+  @apply hx:border-neutral-300 hx:dark:border-neutral-700;
 }
