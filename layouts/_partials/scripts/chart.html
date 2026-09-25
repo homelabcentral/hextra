@@ -56,14 +56,33 @@
       return resolved === "rgba(0, 0, 0, 0)" ? value : resolved;
     };
 
+    // Reached when there is no panel to read: `draw()` sets the library
+    // defaults from `document.querySelector(".hextra-chart__canvas")`, which is
+    // null on a page whose charts have not been written into the DOM yet.
+    // Falling through to `document.documentElement` is not a fallback - its
+    // `border-top-color` computes to `currentColor`, so the grid would come
+    // back as the body text colour and draw solid near-black lines across the
+    // plot. These are `.hextra-chart__canvas`'s own colours, hardcoded: the
+    // neutral-800/200 ink and the neutral-300/700 border pair.
+    //
+    // Picking by mode is what reading the computed value exists to avoid, and
+    // it is wrong here for the same reason - but with no element to read there
+    // is nothing to be right about, and this branch only ever seeds defaults
+    // that `themeScales` then overwrites per chart from its own canvas.
+    const FALLBACK_INK = { light: "#262626", dark: "#e5e5e5" };
+    const FALLBACK_GRID = { light: "#d4d4d4", dark: "#404040" };
+
     const palette = (el) => {
-      const style = getComputedStyle(el || document.documentElement);
+      const mode = document.documentElement.classList.contains("dark") ? "dark" : "light";
+      if (!el) return { text: FALLBACK_INK[mode], grid: FALLBACK_GRID[mode] };
+
+      const style = getComputedStyle(el);
       return {
-        text: toRGB(style.color),
+        text: toRGB(style.color) || FALLBACK_INK[mode],
         // The longhand, not `borderColor`: the shorthand serialises to an empty
         // string when the four sides disagree, and nothing here guarantees they
         // never will.
-        grid: toRGB(style.borderTopColor),
+        grid: toRGB(style.borderTopColor) || FALLBACK_GRID[mode],
       };
     };
 
