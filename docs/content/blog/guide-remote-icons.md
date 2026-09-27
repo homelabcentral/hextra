@@ -236,6 +236,8 @@ If all three miss, the build fails. That is the whole path.
 
 **Vendoring is a supported move, with a precedent in the repo.** `scripts/vendor-codeblock-icons.mjs` freezes every icon named by `data/codeblock-icons.yaml` into `data/icons-vendored.yaml`, precisely because those appear on nearly every page and no build should depend on a network round trip for them. The same shape works for your own icons: fetch once, paste the SVG into `data/icons.yaml`, use it under a plain name.
 
+**What that vendoring does not cover is easy to misread.** The script reads the _theme's_ `data/codeblock-icons.yaml` and freezes the `iconify:` names it finds there. A name you introduce yourself never passes through it — not an `icon="iconify:mdi/cog-outline"` on a code fence, not an entry in your site's own `data/codeblock-icons.yaml`, not an `iconify:` value on a card or a menu entry. Each of those is a live fetch on a cold cache, and each fails the build under `params.icons.remote.enable: false`, with the same `icon "name" not found` a typo produces. Turning remote fetching off is therefore a claim about the whole site, not a fallback: audit for provider-prefixed names first, and move the ones you want to keep into `data/icons.yaml`.
+
 **Templates can ask without failing.** `layouts/_partials/utils/icon-exists.html` answers "would this name render?" and returns an empty string instead of stopping the build. It exists for custom layouts that need to branch on an icon's presence; the normal path stays loud on purpose.
 
 ## The rule of thumb
