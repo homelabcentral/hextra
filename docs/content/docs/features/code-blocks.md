@@ -95,7 +95,7 @@ will be rendered as:
 console.log("Hello!");
 ```
 
-The defaults use [Simple Icons](https://simpleicons.org) for languages and tools, vendored into the theme so builds work offline. Override the resolved icon per block with the `icon` attribute, extend the extension/language mappings by creating your own `data/codeblock-icons.yaml`, or disable the feature entirely:
+The defaults use [Simple Icons](https://simpleicons.org) for languages and tools, vendored into the theme so builds work offline. That vendoring covers the theme's own mappings only: an `iconify:` name you supply yourself is fetched at build time. Override the resolved icon per block with the `icon` attribute, extend the extension/language mappings by creating your own `data/codeblock-icons.yaml`, or disable the feature entirely:
 
 ```yaml {filename="hugo.yaml"}
 params:

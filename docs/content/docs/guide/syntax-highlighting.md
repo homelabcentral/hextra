@@ -66,6 +66,10 @@ key = value
 key = value
 ```
 
+{{< callout type="warning" >}}
+**Only the theme's own defaults are vendored.** `data/icons-vendored.yaml` holds a frozen copy of every icon named by the theme's `data/codeblock-icons.yaml`, so the automatically resolved icons need no network. An `iconify:` name you pick yourself is not in that file — whether you write it as an `icon` attribute or add it to your site's own `data/codeblock-icons.yaml` — so it is fetched at build time and fails the build under `params.icons.remote.enable: false`. To keep such an icon offline-safe, paste its SVG into your site's `data/icons.yaml` and reference it by that plain name instead.
+{{< /callout >}}
+
 The built-in mappings live in the theme's `data/codeblock-icons.yaml` and can be extended or overridden by creating the same file in your site. To disable icons entirely:
 
 ```yaml {filename="hugo.yaml"}
